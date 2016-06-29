@@ -1,0 +1,23 @@
+<div ng-if="!viewLoaded" class="fill">
+  <div
+    class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active">
+  </div>
+</div>
+
+<div
+  mdl-upgrade
+  stat-graph
+  ng-model="dashboard.chart"
+  ng-if="viewLoaded"
+  ng-class="{animate: !updated}"
+  class="content-graph mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
+</div>
+
+<div
+  stat-card
+  ng-repeat="stat in dashboard.stats"
+  ng-model="stat"
+  ng-if="viewLoaded"
+  ng-class="{animate: !updated}"
+  class="mdl-color--primary mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col">
+</div>

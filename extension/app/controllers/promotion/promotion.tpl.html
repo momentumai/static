@@ -1,0 +1,33 @@
+<div ng-if="!viewLoaded" class="fill-full" mdl-upgrade>
+	<div
+		class="mdl-spinner
+			mdl-spinner--single-color
+			mdl-js-spinner
+			is-active">
+	</div>
+</div>
+
+<div ng-if="viewLoaded" class="promotion" mdl-upgrade>
+
+	<div
+		class="promotion-form form"
+		promotion-form
+		ng-model="form"
+		mdl-upgrade>
+	</div>
+
+	<div class="spacer"></div>
+	<div class="actions">
+		<a 
+			ui-sref="preview({
+				model: form,
+				contentId: contentId
+			})"
+			class="mdl-button
+				mdl-button--primary
+				mdl-js-button
+				mdl-js-ripple-effect">
+			Preview
+		</a>
+	</div>
+</div>

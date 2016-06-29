@@ -1,0 +1,12 @@
+.team-settings {
+	.mdl-card {
+		height: 100%;
+		min-height: 0;
+	}
+
+	.mdl-card__media {
+		max-height: 430px;
+	    overflow-y: auto;
+	    overflow-x: hidden;
+	}
+}

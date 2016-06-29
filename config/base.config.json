@@ -1,0 +1,35 @@
+{
+    "endpoint": "http://localhost:8080/v1/",
+    "docBase": "http://localhost:8080",
+    "autoprefixer": [
+        "ie >= 10",
+        "ie_mob >= 10",
+        "ff >= 30",
+        "chrome >= 34",
+        "safari >= 7",
+        "opera >= 23",
+        "ios >= 7",
+        "android >= 4.4",
+        "bb >= 10"
+    ],
+    "facebook": {
+        "appId": "1711997195683402",
+        "scope": [
+            "manage_pages",
+            "ads_management",
+            "publish_pages"
+        ]
+    },
+    "stripe": {
+        "public": "pk_test_yWBSSDXz7dmdms3KKiWXLV2a"
+    },
+    "ga": {
+        "id": "UA-64108533-2",
+        "options": {
+            "cookieDomain": "none"
+        },
+        "debug": 1
+    },
+    "tutorialVideo": "<iframe width=\"420\" height=\"315\" src=\"https://www.youtube.com/embed/lkUsF63z7Ko\" frameborder=\"0\" allowfullscreen></iframe>",
+    "extensionUrl": "https://chrome.google.com/webstore/detail/aeooeojbngloclgmeleimndcfaafnpcl"
+}

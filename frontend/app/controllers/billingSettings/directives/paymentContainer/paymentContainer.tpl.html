@@ -1,0 +1,109 @@
+
+<form ng-submit="model.pay()" novalidate class="payment" mdl-upgrade>
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">
+            Payment
+        </h2>
+    </div>
+    <div ng-if="!model.status" class="mdl-card__supporting-text" mdl-upgrade>
+        <p>You don't have any unpaid invoice</p>
+        <p>Looking for a paid invoice? Send a mail to billing@momentum.ai and we'll resend it to you.</p>
+    </div>
+    <div ng-if="model.status" class="mdl-card__supporting-text" mdl-upgrade>
+        <div
+            class="payment-error">
+            {{model.error}}
+        </div>
+        <p>You have an unpaid invoice.
+            Please, pay £{{model.amount}} to use Momentum's features.</p>
+        <div class="row">
+            <div class="mdl-textfield full mdl-js-textfield mdl-textfield--floating-label">
+                <input
+                    class="mdl-textfield__input"
+                    type="text"
+                    ng-model="model.stripe.number"
+                    data-stripe="number"
+                    payments-validate="card"
+                    payments-format="card"
+                    id="card-number" />
+                <label class="mdl-textfield__label" for="card-number">Card Number</label>
+              <span class="mdl-textfield__error">Valid card number only</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input
+                    class="mdl-textfield__input"
+                    type="text"
+                    size="2"
+                    ng-model="model.stripe.expiry"
+                    payments-validate="expiry"
+                    payments-format="expiry"
+                    id="expiry" />
+                <label class="mdl-textfield__label" for="expiry">Expiration date (MM/YY)</label>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input
+                    class="mdl-textfield__input"
+                    type="text"
+                    size="4"
+                    ng-model="model.stripe.cvc"
+                    data-stripe="cvc"
+                    payments-validate="cvc"
+                    payments-format="cvc"
+                    id="cvc" />
+                <label class="mdl-textfield__label" for="cvc">CVC</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input
+                    ng-model="model.company"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="info-company" />
+                <label class="mdl-textfield__label" for="info-company">Company</label>
+            </div>
+            <div
+                dropdown
+                ng-model="model.countries"
+                class="dropdown"
+                id="info-countries">
+            </div>
+        </div>
+        <div class="row">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input
+                    ng-model="model.stripe.address_city"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="info-city" />
+                <label class="mdl-textfield__label" for="info-city">City</label>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input
+                    ng-model="model.stripe.address_zip"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="info-zip" />
+                <label class="mdl-textfield__label" for="info-zip">ZIP</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="mdl-textfield full mdl-js-textfield mdl-textfield--floating-label">
+                <input
+                    ng-model="model.stripe.address_line1"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="info-address1" />
+                <label class="mdl-textfield__label" for="info-address1">Address</label>
+            </div>
+        </div>
+    </div>
+    <div ng-if="model.status" class="mdl-card__actions">
+        <button
+            ng-disabled="model.dataLoading"
+            type="submit"
+            class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Pay (£{{model.amount}})</button>
+    </div>
+</form>

@@ -1,0 +1,118 @@
+<div class="url-builder" mdl-upgrade>
+    <div class="mdl-list">
+        <div class="mdl-list__item">
+        <span class="mdl-list__item-primary-content">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
+                <input
+                    ng-model="url"
+                    ng-change="update()"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="url-input">
+                <label class="mdl-textfield__label" for="url-input">URL</label>
+            </div>
+        </span>
+        </div>
+        <div class="mdl-list__item">
+            <span class="mdl-list__item-primary-content">
+                Campaign name
+            </span>
+            <span class="mdl-list__item-secondary-action">
+                <div class="mdl-textfield mdl-js-textfield">
+                    <input
+                        ng-model="campaign"
+                        ng-change="update()"
+                        class="mdl-textfield__input"
+                        type="text"
+                        placeholder="Product, promo code, etc.">
+                    <label class="mdl-textfield__label"></label>
+                </div>
+            </span>
+        </div>
+        <div class="mdl-list__item">
+            <span class="mdl-list__item-primary-content">
+                Campaign source
+            </span>
+            <span class="mdl-list__item-secondary-action">
+                <div class="mdl-textfield mdl-js-textfield">
+                    <input
+                        ng-model="source"
+                        ng-change="update()"
+                        class="mdl-textfield__input"
+                        type="text"
+                        placeholder="Referrer: google, facebook, twitter, etc.">
+                    <label class="mdl-textfield__label"></label>
+                </div>
+            </span>
+        </div>
+        <div class="mdl-list__item">
+            <span class="mdl-list__item-primary-content">
+                Campaign medium
+            </span>
+            <span class="mdl-list__item-secondary-action">
+                <div class="mdl-textfield mdl-js-textfield">
+                    <input
+                        ng-model="medium"
+                        ng-change="update()"
+                        class="mdl-textfield__input"
+                        type="text"
+                        placeholder="Marketing medium: cpc, banner, email, etc.">
+                    <label class="mdl-textfield__label"></label>
+                </div>
+            </span>
+        </div>
+        <div class="mdl-list__item">
+            <span class="mdl-list__item-primary-content">
+                Campaign content
+            </span>
+            <span class="mdl-list__item-secondary-action">
+                <div class="mdl-textfield mdl-js-textfield">
+                    <input
+                        ng-model="content"
+                        ng-change="update()"
+                        class="mdl-textfield__input"
+                        type="text"
+                        placeholder="Use to differentiate ads" />
+                    <label class="mdl-textfield__label"></label>
+                </div>
+            </span>
+        </div>
+        <div class="mdl-list__item">
+            <span class="mdl-list__item-primary-content">
+                Paid campaign
+            </span>
+            <span class="mdl-list__item-secondary-action" style="width: 325px;">
+                <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="is-paid">
+                <input
+                    ng-model="paid"
+                    ng-change="update()"
+                    ng-disabled="paid_disabled"
+                    type="checkbox"
+                    id="is-paid"
+                    class="mdl-switch__input">
+            </span>
+        </div>
+        <div class="mdl-list__item">
+            <span
+                ng-click="select()"
+                class="copy-text-cont mdl-color-text--primary
+                mdl-color--grey-200
+                mdl-list__item-primary-content">
+                <div class="copy-text" id="copy-text">
+                    {{result}}
+                </div>
+            </span>
+            <span class="mdl-list__item-secondary-action">
+                <button
+                    ng-click="copy()"
+                    class="mdl-button
+                        mdl-button--primary
+                        mdl-js-button
+                        mdl-js-ripple-effect">
+                    Copy to clipboard
+                </button>
+            </span>
+        </div>
+
+    </div>
+</div>

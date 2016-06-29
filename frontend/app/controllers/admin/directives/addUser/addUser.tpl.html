@@ -1,0 +1,75 @@
+
+<form ng-submit="model.send()" mdl-upgrade>
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">
+            Add new user to Momentum
+        </h2>
+    </div>
+    <div class="mdl-card__supporting-text">
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input
+                ng-model="model.teamName"
+                class="mdl-textfield__input"
+                type="text"
+                id="teamName" />
+            <label class="mdl-textfield__label" for="teamName">Company's name</label>
+        </div>
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input
+                ng-model="model.email"
+                ng-change="model.emailChange()"
+                class="mdl-textfield__input is-dirty"
+                type="text"
+                id="email" />
+            <label class="mdl-textfield__label" for="email">Email address</label>
+        </div>
+        <div class="">
+            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="sendCode">
+				<input type="checkbox" ng-model="model.sendCode" name="sendCode" id="sendCode" class="mdl-switch__input" checked>
+				<span class="mdl-switch__label">Send the code in email</span>
+			</label>
+        </div>
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty" ng-if="model.sendCode">
+            <input
+            	ng-disabled="!model.sendCode"
+                ng-model="model.sendCodeTo"
+                class="mdl-textfield__input"
+                type="text"
+                id="sendCodeTo" />
+            <label class="mdl-textfield__label" for="sendCodeTo"></label>
+        </div>
+        <div class="">
+            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="partner">
+                <input type="checkbox" ng-model="model.partner" name="partner" id="partner" class="mdl-switch__input">
+                <span class="mdl-switch__label">Assign to Momentum Partner</span>
+            </label>
+        </div>
+        <div class="">
+            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="forcePayment">
+				<input type="checkbox" ng-model="model.forcePayment" name="forcePayment" id="forcePayment" class="mdl-switch__input">
+				<span class="mdl-switch__label">Force payment (£)</span>
+			</label>
+        </div>
+        <div class="mdl-textfield
+                mdl-js-textfield
+                mdl-textfield--floating-label
+                is-dirty"
+            ng-if="model.forcePayment"
+            mdl-upgrade>
+            <input
+            	ng-disabled="!model.forcePayment"
+                ng-model="model.paymentAmount"
+                class="mdl-textfield__input"
+                type="text"
+                 pattern="-?[0-9]*(\.[0-9]+)?"
+                id="paymentAmount" />
+            <label class="mdl-textfield__label" for="paymentAmount"></label>
+        </div>
+    </div>
+    <div class="mdl-card__actions">
+        <button
+            ng-disabled="model.dataLoading"
+            type="submit"
+            class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Add user</button>
+    </div>
+</form>

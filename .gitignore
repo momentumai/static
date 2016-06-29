@@ -1,0 +1,3 @@
+config/prod.config.json
+.idea
+node_modules

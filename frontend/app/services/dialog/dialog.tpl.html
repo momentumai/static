@@ -1,0 +1,42 @@
+<div id="dialog" ng-click="cancel()" mdl-upgrade>
+	<div class="dialog-focus-trap" tabindex="0"></div>
+	<div 
+		ng-click="$event.stopPropagation()"
+		tabindex="-1"
+		class="{{dialogClass}} {{animateClass}} mdl-card mdl-shadow--16dp dialog-container">
+		<h4 ng-if="title" class="dialog-title">{{title}}</h4>
+		<form ng-submit="submit()">
+			<div
+				id="dialog-content"
+				tabindex="-1"
+				bind-html-compile="rendered"
+				mdl-upgrade>
+			</div>
+			<div class="dialog-button-bar">
+				<button
+					type="reset"
+					ng-if="showCancel"
+                    ng-hide="loading"
+					class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+					ng-click="cancelButton()">
+					{{cancelText}}
+				</button>
+				<p
+					ng-show="loading"
+					style="margin: 0 16px;"
+					mdl-upgrade
+					class="mdl-spinner mdl-js-spinner mdl-spinner--single-color is-active">
+				</p>
+				<button
+                    ng-disabled="isDisabled && isDisabled()"
+					id="dialog-ok"
+					ng-hide="loading"
+					type="submit"
+					class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+					{{okText}}
+				</button>
+			</div>
+			<div class="dialog-focus-trap" tabindex="0"></div>
+		</form>
+	</div>
+</div>

@@ -1,0 +1,37 @@
+<div ng-if="!viewLoaded" class="fill-full" mdl-upgrade>
+	<div
+		class="mdl-spinner
+			mdl-spinner--single-color
+			mdl-js-spinner
+			is-active">
+	</div>
+</div>
+
+<div ng-if="viewLoaded" class="content" mdl-upgrade>
+	<label ng-if="currentPost" class="list-label">Active on tab</label>
+	<post-content
+		ng-if="currentPost"
+		model="currentPost"
+		share="share"
+		class="first last" mdl-upgrade></post-content>
+	<label class="list-label">Recommended for promotion</label>
+	<post-content 
+		mdl-upgrade
+		ng-repeat="post in topPosts track by post.id"
+		model='post'
+		share="share"
+		ng-class="{first: $first, last: $last}">
+	</post-content>
+	<div ng-if="!topPosts.length" class="post-empty">
+		There is nothing to recommend for now.
+	</div>
+	<div class="spacer"></div>
+	<div class="actions">
+		<a ng-href="{{dashboardUrl}}" target="_blank" class="mdl-button
+			mdl-button--primary
+			mdl-js-button
+			mdl-js-ripple-effect">
+			Open dashboard
+		</a>
+	</div>
+</div>

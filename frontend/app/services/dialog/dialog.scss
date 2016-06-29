@@ -1,0 +1,72 @@
+#dialog {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: auto;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+
+    form {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
+
+    .dialog-title {
+        margin: 0;
+        padding: 24px;
+        padding-bottom: 20px;
+    }
+
+    .dialog-title ~ form > #dialog-content {
+        padding-top: 0;
+    }
+
+    .dialog-container {
+        animation-name: card-show;
+        transform: scale(0);
+        animation-duration: 0.3s;
+        animation-timing-function: cubic-bezier(.25, .8, .25, 1);
+        animation-fill-mode: forwards;
+        min-width: 240px;
+        max-width: 80%;
+        max-height: 80%;
+        min-height: 0;
+        align-self: center;
+        outline: 0;
+    }
+
+    .dialog-container:not(.animate) {
+        transform: scale(1);
+        animation: none;
+    }
+
+    .dialog-button-bar {
+        display: flex;
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: flex-end;
+        margin-bottom: 0;
+        padding-right: 8px;
+        padding-left: 16px;
+        min-height: 52px;
+        overflow: hidden;
+    }
+}
+
+#dialog-content {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    padding: 24px;
+    flex-grow: 1;
+    flex-shrink: 1;
+    color: rgba(0,0,0,0.87);
+    outline: 0 !important;
+}

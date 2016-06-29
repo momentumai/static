@@ -1,0 +1,97 @@
+<div class="row">
+  <div
+    dropdown
+    ng-model="model.adaccount"
+    class="dropdown">
+  </div>
+  <div
+    dropdown
+    ng-model="model.page"
+    class="dropdown">
+  </div>
+  <div
+    dropdown
+    ng-model="model.audiences"
+    class="dropdown">
+  </div>
+</div>
+<div class="row">
+    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+        <input
+            ng-model="model.budget"
+            class="mdl-textfield__input"
+            step="any"
+            min="0.000001"
+            type="number"
+            id="budget"
+            required>
+            <label for="budget">Lifetime budget ({{model.currency.name}})</label>
+        </input>
+    </div>
+  <label
+    title="Automatically optimise campaign length"
+    ng-class="{'is-checked': model.automated}"
+    class="mdl-switch mdl-js-switch mdl-js-ripple-effect"
+    for="auto_checker">
+    <input
+      type="checkbox"
+      id="auto_checker"
+      class="mdl-switch__input"
+      ng-model="model.automated"
+      ng-disabled="model.status === 'inactive'">
+    <span class="mdl-switch__label">Automated</span>
+  </label>
+  <div
+    class="date_picker"
+    for="date_picker">
+    <input
+      min="{{ model.from | date:'yyyy-MM-dd' }}"
+      max="{{ model.to | date:'yyyy-MM-dd' }}"
+      ng-disabled="model.automated"
+      type="date"
+      id="date_picker"
+      ng-model="model.until"
+      required>
+    <label>Promote until</label>
+  </div>
+</div>
+<div class="row">
+    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+        <input
+            ng-model="model.utm_source"
+            class="mdl-textfield__input"
+            type="text"
+            id="utm_source">
+            <label for="utm_source">UTM source</label>
+        </input>
+    </div>
+    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+        <input
+            ng-model="model.utm_medium"
+            class="mdl-textfield__input"
+            type="text"
+            id="utm_medium">
+            <label for="utm_medium">UTM medium</label>
+        </input>
+    </div>
+    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+        <input
+            ng-model="model.utm_campaign"
+            class="mdl-textfield__input"
+            type="text"
+            id="utm_campaign">
+            <label for="utm_campaign">UTM campaign</label>
+        </input>
+    </div>
+</div>
+<div class="row">
+  <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+    <textarea
+      id="promotion-message"
+      class="mdl-textfield__input"
+      type="text"
+      rows="4"
+      ng-model="model.message"></textarea>
+    <label for="promotion-message">Post message</label>
+  </div>
+</div>

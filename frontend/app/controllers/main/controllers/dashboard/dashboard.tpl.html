@@ -1,0 +1,18 @@
+<div mdl-upgrade class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+  <div class="mdl-tabs__tab-bar">
+    <a
+        href="#tab1"
+        ng-click="state.go('root.main.dashboard.info')"
+        ng-class="{'is-active': state.is('root.main.dashboard.info')}"
+        class="mdl-tabs__tab"
+    >Today</a>
+    <a
+        href="#tab2"
+        ng-click="state.go('root.main.dashboard.history')"
+        ng-class="{'is-active': state.is('root.main.dashboard.history')}"
+        class="mdl-tabs__tab"
+    >History</a>
+  </div>
+</div>
+
+<div ui-view="tab-container"></div>

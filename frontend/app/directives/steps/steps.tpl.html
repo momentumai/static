@@ -1,0 +1,20 @@
+<div ng-if="$root.hasSteps"
+    class="guide"
+    mdl-upgrade>
+    <button
+        ng-click="$root.guide(null, step)"
+        ng-class="{'active': !value || value === 'skip'}"
+        ng-repeat="(step, value) in $root.guideSteps"
+        class="mdl-button mdl-js-button mdl-js-ripple-effect"
+        ng-disabled="value && value !== 'skip'"
+        mdl-upgrade>
+        <div class="spacer left"></div>
+        <i class="material-icons">{{
+            value && value !== 'skip' ?
+            'check' :
+            'edit'
+        }}</i>
+        <span>{{$root.guideStepProperties[step].title}}</span>
+        <div class="spacer right"></div>
+    </button>
+</div>

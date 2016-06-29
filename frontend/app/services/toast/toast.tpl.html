@@ -1,0 +1,16 @@
+<div id="toast" mdl-upgrade>
+	<form class="toast-body mdl-color--gray-400 mdl-color-text--accent-contrast" ng-submit="submit()">
+		<div
+			id="toast-content"
+			bind-html-compile="rendered"
+			ng-model="model"
+			mdl-upgrade>
+		</div>
+		<button
+			id="toast-ok"
+			type="submit"
+			class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect">
+			{{okText}}
+		</button>
+	</form>
+</div>

@@ -1,0 +1,63 @@
+<div class="mdl-card__title mdl-color--primary mdl-color-text--primary-contrast">
+  <h2 class="mdl-card__title-text">{{model.title}}</h2>
+</div>
+
+<div class="mdl-card__media mdl-color--primary mdl-color-text--primary-contrast">
+  <div class="metrics first">
+    <div class="percent">{{model.percent}}</div>
+    <div class="unit">%</div>
+    <div class="desc">of total traffic</div>
+  </div>
+  <div class="metrics">
+    <div title="{{model.topSource}}" class="value">{{model.topSource}}</div>
+    <div class="key">top source</div>
+  </div>
+</div>
+
+<div ng-if="model.active" class="mdl-card__media">
+  <table class="source-table mdl-data-table mdl-js-data-table">
+    <thead>
+      <tr>
+        <th class="mdl-data-table__cell--non-numeric">Source</th>
+        <th>Social views</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="detail in model.details | limitTo:5:model.offset">
+        <td class="mdl-data-table__cell--non-numeric">{{detail.name}}</td>
+        <td>{{detail.share}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="source-table-footer">
+    <button
+      ng-disabled="model.offset + 5 >= model.details.length"
+      class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect"
+      ng-click="switchPage(model.id, 1)">
+      <i class="material-icons">navigate_next</i>
+    </button>
+    <button
+      ng-disabled="!model.offset"
+      class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect"
+      ng-click="switchPage(model.id, -1)">
+      <i class="material-icons">navigate_before</i>
+    </button>
+    <span>showing {{model.details.length ? model.offset + 1 : 0}}-{{model.details.length ? model.details.length - model.offset < 5 ? model.details.length : model.offset + 5 : 0}}</span>
+  </div>
+</div>
+<div ng-if="model.hasMore" class="mdl-card__actions mdl-card--border">
+  <a
+    mdl-upgrade
+    ng-if="!model.active"
+    ng-click="switchState(model.id)"
+    class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+    <span>More</span>
+  </a>
+  <a
+    mdl-upgrade
+    ng-if="model.active"
+    ng-click="switchState(model.id)"
+    class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+    <span>Less</span>
+  </a>
+</div>

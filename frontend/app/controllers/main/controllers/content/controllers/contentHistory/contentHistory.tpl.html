@@ -1,0 +1,38 @@
+<div
+    mdl-upgrade
+    class="mdl-grid">
+
+    <div ng-if="!viewLoaded" class="fill">
+      <div
+        class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active">
+      </div>
+    </div>
+
+     <div 
+      mdl-upgrade
+      campaigns
+      ng-export="export"
+      ng-toggle="toggle"
+      ng-next="next"
+      ng-prev="prev"
+      ng-model="content.campaigns"
+      ng-if="viewLoaded"
+      class="animate campaigns-card mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
+    </div>
+
+    <div 
+        mdl-upgrade
+        source-stat
+        ng-repeat="stat in content.sourceStats track by stat.id"
+        ng-model="stat"
+        ng-state="switchState"
+        ng-page="switchPage"
+        ng-if="viewLoaded && (isVisible(stat.id) || !stat.hasMore)"
+        ng-class="{
+            'mdl-cell--12-col': stat.active,
+            'animate': !statsDirty
+        }"
+      class="source-stat mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col">
+    </div>
+
+</div>

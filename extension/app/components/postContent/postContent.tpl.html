@@ -1,0 +1,40 @@
+<div class="circle
+    no-shrink
+    no-grow
+    mdl-color--primary
+    mdl-color-text--primary-contrast">
+    <img hide-on-error ng-src="{{$ctrl.model.img}}" class="circle circle-img"/>
+    <span>{{$ctrl.model.momentum}}</span>
+</div>
+<div 
+    ng-class="{'two-lines': $ctrl.model.promoted || $ctrl.model.recommended}"
+    class="text shrink grow">
+    <a href="{{$ctrl.model.dashboardUrl}}" target="_blank">
+        {{$ctrl.model.title || $ctrl.model.url}}
+    </a>
+    <div ng-if="$ctrl.model.promoted || $ctrl.model.recommended" class="statuses">
+        <div ng-if="$ctrl.model.recommended" class="status mdl-color-text--accent">
+            recommended
+        </div>
+        <div ng-if="$ctrl.model.promoted" class="status mdl-color-text--primary">
+            promoted
+        </div>
+    </div>
+</div>
+<div class="right no-shrink no-grow">
+    <div
+        mini-chart
+        class="mini-chart"
+        ng-model="$ctrl.model.chartData"
+        color="rgba(0, 0, 0, 0.54)"></div>
+    <button
+        ui-sref="promotion({contentId: $ctrl.model.id})"
+        class="mdl-button
+        mdl-button--primary
+        mdl-button-js
+        mdl-button-ripple-effect">Promote</button>
+    <button ng-click="$ctrl.share($ctrl.model.id)" class="mdl-button
+        mdl-button--primary
+        mdl-button-js
+        mdl-button-ripple-effect">Share</button>
+</div>

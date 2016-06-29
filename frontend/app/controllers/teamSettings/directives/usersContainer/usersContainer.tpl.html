@@ -1,0 +1,41 @@
+<div class="mdl-card__title">
+    <h2 class="mdl-card__title-text">
+        Your team
+    </h2>
+</div>
+<div class="mdl-card__media" style="background: none">
+    <div class="list-container">
+        <div
+            class="list-item"
+            ng-class="{last: $last}"
+            ng-repeat="current in model.users">
+            <div class="list-text">
+                {{current.email}}
+            </div>
+            <div class="list-action">
+                <button
+                    ng-if="!current.me"
+                    ng-disabled="!user.is_admin || model.switchProgress"
+                    ng-click="model.switchState(current.id, current.is_admin)"
+                    ng-class="{'mdl-button--accent': current.is_admin, 'mdl-button--colored': !current.is_admin}"
+                    class="mdl-button mdl-js-button mdl-js-ripple-effect">
+                        <span ng-if="!current.is_admin">Make admin</span>
+                        <span ng-if="current.is_admin">Revoke admin</span>
+                </button>
+                <button
+                    ng-if="!current.me"
+                    ng-disabled="!user.is_admin || model.switchProgress"
+                    ng-click="model.removeUser(current.id, current.email)"
+                    class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect">
+                        <span>Remove</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mdl-card__actions">
+    <button
+        ng-disabled="model.dataLoading"
+        ng-click="model.addUser()"
+        class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Invite</button>
+</div>

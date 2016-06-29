@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en-us" ng-app="momentum">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="app.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="app.js"></script>
+</head>
+<body class="momentum-extension" ng-click="destroyMomentum()">
+    <div class="momentum-focus-trap" tabindex="0"></div>
+    <div
+        tabindex="-1"
+        id="document-root"
+        ng-click="$event.stopPropagation()"
+        class="momentum-extension-container"
+        ui-view="body"
+        ng-controller="RootController"
+        mdl-upgrade>
+        <div
+          body
+          class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-shadow--16dp">
+        </div>
+    </div>
+    <div class="momentum-focus-trap" tabindex="0"></div>
+</body>
+</html>

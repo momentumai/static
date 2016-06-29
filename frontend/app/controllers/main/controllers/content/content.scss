@@ -1,0 +1,74 @@
+.content-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  animation-name: card-show;
+  transform: scale(0);
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(.25, .8, .25, 1);
+  animation-fill-mode: forwards;
+
+  .hover {
+    opacity: 0;
+  }
+
+  .showing {
+    opacity: 1;
+  }
+
+  .showing, .hiding {
+    transition: opacity .1s cubic-bezier(.55,0,.55,.2)
+  }
+
+  .hiding {
+    opacity: 0;
+  }
+
+  &-menu {
+    position: fixed;
+    bottom: 24px;
+    padding-bottom: 56px;
+    right: 24px;
+    width: 56px;
+    z-index: 999;
+    text-align: center;
+    animation-name: card-show;
+    transform: scale(0);
+    animation-duration: 0.0s;
+    animation-delay: 0.3s;
+    animation-fill-mode: forwards;
+
+    pointer-events: none;
+
+    &.open {
+      pointer-events: all;
+    }
+
+    &-fab {
+      color: rgb(33, 33, 33);
+      background-color: rgb(250, 250, 250) !important;
+      margin-bottom: 16px;
+      transition: transform .1s cubic-bezier(.55,0,.55,.2)
+    }
+
+    &-fab:hover, &-fab:focus {
+      background-color: #d8d8d8 !important;
+    }
+
+    &-fab.fab1 {
+      transform: scale(0);
+      transition-delay: 0;
+    }
+    &-fab.fab2 {
+      transform: scale(0);
+      transition-delay: 0.05s;
+    }
+  }
+}
+
+.content-fab:hover + .content-fab-menu, .content-fab-menu:hover {
+  .content-fab-menu-fab {
+    transform: scale(1);
+  }
+}

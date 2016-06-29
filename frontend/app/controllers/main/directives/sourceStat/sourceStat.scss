@@ -1,0 +1,76 @@
+.source {
+  &-stat {
+    min-height: 0;
+    &.mdl-cell--12-col {
+      & > .mdl-card__media {
+        .metrics {
+          width: 263px;
+        }
+      }
+    }
+
+    & > .mdl-card__media {
+      background: none;
+      .metrics {
+        display: flex;
+        padding: 16px;
+        width: 100%;
+        align-items: baseline;
+        box-sizing: border-box;
+        line-height: normal;
+        &.first {
+          padding-bottom: 0;
+          padding-top: 0;
+        }
+        .key {
+            flex-shrink: 0;
+        }
+        .value {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding-right: 8px;
+            flex-grow: 1;
+        }
+      }
+      .unit {
+        font-size: 34px;
+        font-weight: 400;
+        flex-grow: 1;
+      }
+      .percent {
+        font-weight: 400;
+        font-size: 45px;
+      }
+      .desc {
+      }
+    }
+  }
+  &-table {
+    border: 0;
+    width: 100%;
+    &-footer {
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      height: 56px;
+      font-size: 12px;
+      & > * {
+        color: rgba(0, 0, 0, 0.54);
+      }
+      & > span {
+        margin-right: 22px;
+      }
+      & > .mdl-button {
+        margin-left: 10px;
+        margin-right: 14px;
+      }
+    }
+    &-chart {
+      width: 125px;
+      height: 20px;
+      margin-left: auto;
+      outline: 0;
+    }
+  }
+}

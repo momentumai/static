@@ -1,0 +1,22 @@
+<div class="facebook mdl-grid" mdl-upgrade>
+    <div ng-if="!viewLoaded" class="fill-full">
+      <div
+        class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active">
+      </div>
+    </div>
+
+    <div
+        facebook-connected
+        ng-user="user"
+        ng-model="facebookConnected"
+        ng-if="viewLoaded"
+        class="animate
+            mdl-card
+            mdl-shadow--2dp
+            mdl-cell
+            mdl-cell--5-col-desktop
+            mdl-cell--6-col-tablet
+            mdl-cell--4-col-phone">
+    </div>
+
+</div>

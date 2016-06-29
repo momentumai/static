@@ -1,0 +1,33 @@
+{
+    "name": "Momentum",
+    "short_name": "Momentum",
+    "description": "Momentum chrome extension",
+    "version": "1.0.5",
+    "manifest_version": 2,
+    "author": "Attila Varga <artit91@gmail.com>",
+    "browser_action": {
+        "default_icon": "icon64.png"
+    },
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "minimum_chrome_version": "38.0.2125.101",
+    "offline_enabled": false,
+    "permissions": [
+        "tabs",
+        "storage",
+        "notifications",
+        "cookies",
+        "alarms",
+        "<all_urls>"
+    ],
+    "web_accessible_resources": [
+        "index.html",
+        "scripts.js"
+    ],
+    "content_scripts" : [{
+        "matches" : ["<all_urls>"],
+        "js" : ["scripts.js"]
+    }]
+}

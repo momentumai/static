@@ -1,0 +1,7 @@
+<select
+	ng-model="model.selected"
+    ng-change="model.change()"
+    ng-disabled="model.disabled"
+	ng-options="item.id as item.label for item in model.data">
+</select>
+<label>{{model.label}}</label>

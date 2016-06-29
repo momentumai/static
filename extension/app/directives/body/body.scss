@@ -1,0 +1,27 @@
+.nav-button {
+	position: absolute;
+    top: 0;
+    left: 0;
+    height: 64px;
+    width: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    a {
+    	display: block;
+    }
+
+    .logo {
+    	left: 12px;
+	    top: 12px;
+	    background-size: 90%;
+	    background-repeat: no-repeat;
+	    background-position: center;
+    	display: block;
+    	position: absolute;
+    	width: 32px;
+    	height: 32px;
+    	background-image: url(/logo64.png);
+    }
+}

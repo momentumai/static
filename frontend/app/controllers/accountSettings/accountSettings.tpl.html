@@ -1,0 +1,49 @@
+<div class="mdl-grid account" mdl-upgrade>
+
+    <div ng-if="!viewLoaded" class="fill-full">
+      <div
+        class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active">
+      </div>
+    </div>
+
+    <div
+        fb-int
+        ng-model="fbInt"
+        ng-if="viewLoaded"
+        class="animate
+            mdl-card
+            mdl-shadow--2dp
+            mdl-cell
+            mdl-cell--4-col-desktop
+            mdl-cell--8-col-tablet
+            mdl-cell--4-col-phone">
+    </div>
+
+    <div
+        switch-team
+        ng-model="teamSwitch"
+        ng-if="viewLoaded && teamSwitch.teams.data.length > 1"
+        class="animate
+            mdl-card
+            mdl-shadow--2dp
+            mdl-cell
+            mdl-cell--4-col-desktop
+            mdl-cell--8-col-tablet
+            mdl-cell--4-col-phone">
+    </div>
+
+    <div 
+        change-password
+        ng-model="pwChange"
+        ng-if="viewLoaded"
+        class="animate
+            mdl-card
+            mdl-shadow--2dp
+            mdl-cell
+            mdl-cell--4-col-desktop
+            mdl-cell--8-col-tablet
+            mdl-cell--4-col-phone">
+    </div>
+
+    
+</div>

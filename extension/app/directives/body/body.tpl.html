@@ -1,0 +1,45 @@
+<header class="mdl-layout__header is-casting-shadow">
+  <div class="nav-button">
+    <a
+      ng-if="!state.is('main')"
+      mdl-upgrade
+      ui-sref="main"
+      class="mdl-button
+        mdl-js-button
+        mdl-button--icon
+        mdl-js-button mdl-js-ripple-effect">
+      <i class="material-icons">arrow_back</i>
+    </a>
+    <a
+      ng-if="state.is('main')"
+      mdl-upgrade
+      ui-sref="main"
+      class="mdl-button
+        mdl-js-button
+        mdl-button--icon
+        mdl-js-button mdl-js-ripple-effect">
+      <i class="logo material-icons"></i>
+    </a>
+  </div>
+  <div class="mdl-layout__header-row">
+    <span class="mdl-layout-title">{{$root.title || stateParams.title}}</span>
+    <div class="mdl-layout-spacer"></div>
+    <nav class="mdl-navigation">
+      <button
+        ui-sref="urlBuilder"
+        class="first mdl-button mdl-js-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+        <i class="material-icons">link</i>
+      </button>
+      <button
+        ui-sref="settings"
+        class="mdl-button mdl-js-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+        <i class="material-icons">settings</i>
+      </button>
+    </nav>
+  </div>
+</header>
+</div>
+<main
+  ui-view="container"
+  class="container mdl-layout__content mdl-color--grey-50">
+</main>

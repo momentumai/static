@@ -1,0 +1,46 @@
+<div class="auth mdl-layout mdl-js-layout mdl-color--grey-100">
+    <main class="mdl-layout__content">
+        <div class="mdl-card mdl-shadow--6dp">
+            <div class="mdl-card__title mdl-color--primary">
+                <img src="/images/logo-white.png" />
+            </div>
+            <form ng-submit="auth.login()">
+                <div class="mdl-card__supporting-text">
+                    <div
+                        ng-class="{'is-invalid': auth.error}"
+                        class="mdl-textfield mdl-js-textfield">
+                        <input
+                            ng-model="auth.email"
+                            class="mdl-textfield__input"
+                            type="text"
+                            id="email" />
+                        <label class="mdl-textfield__label" for="email">Email</label>
+                    </div>
+                    <div
+                        ng-class="{'is-invalid': auth.error}" 
+                        class="mdl-textfield mdl-js-textfield">
+                        <input
+                            ng-model="auth.password"
+                            class="mdl-textfield__input"
+                            type="password"
+                            id="password" />
+                        <label class="mdl-textfield__label" for="password">Password</label>
+                        <span
+                            class="mdl-textfield__error">
+                            {{auth.error}}
+                        </span>
+                    </div>
+                    <div class="mdl-typography--text-right">
+                        <a href="#/forgot-password" class="mdl-color-text--primary">Forgot password?</a>
+                    </div>
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <button
+                        ng-disabled="auth.dataLoading"
+                        type="submit"
+                        class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Log in</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>

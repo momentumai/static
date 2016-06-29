@@ -1,0 +1,27 @@
+<div class="post-badge">
+  <div
+    class="circle mdl-color--primary">
+    <img hide-on-error ng-src="{{model.img}}" class="circle circle-img"/>
+    <div class="text mdl-color-text--primary-contrast">{{ model.momentum }}</div>
+  </div>
+</div>
+<div class="post-text" mdl-upgrade>
+  <div class="primary">{{ model.title }}</div>
+  <div class="secondary">
+    <div ng-if="model.recommended || model.promoted" class="statuses">
+      <div ng-if="model.recommended" class="status mdl-color-text--accent">
+        recommended
+      </div>
+      <div ng-if="model.promoted" class="status mdl-color-text--primary">
+        promoted
+      </div>
+    </div>
+    <div
+      mini-chart
+      ng-model="model.chartData"
+      color="rgba(0, 0, 0, 0.54)"
+      class="chart"
+      id="posts-chart-{{ model.id }}"></div>
+  </div>
+	<div class="mdl-tooltip" for="posts-chart-{{ model.id }}">Views</div>
+</div>

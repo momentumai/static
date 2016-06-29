@@ -1,0 +1,14 @@
+
+<div class="mdl-card__title">
+    <h2 class="mdl-card__title-text">
+        <span ng-class="{'mdl-color-text--accent': model.status === 1}"> 
+        Demo mode is {{model.status === 0 ? 'OFF' : 'ON'}}
+        </span>
+    </h2>
+</div>
+<div class="mdl-card__supporting-text">
+    <a
+        ng-class="{'mdl-button--accent': model.status === 0, 'mdl-button--colored': model.status === 1}"
+        ng-click="model.change()"
+        class="mdl-button mdl-js-button mdl-button--raised">{{model.status === 0 ? 'Start' : 'Stop'}} DEMO</a>
+</div>

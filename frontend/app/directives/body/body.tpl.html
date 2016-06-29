@@ -1,0 +1,85 @@
+<div
+  ng-if="!loaded"
+  class="loader-wrapper mdl-color--primary-contrast">
+    <div class="loader"></div>
+</div>
+<header class="mdl-layout__header is-casting-shadow">
+  <div class="mdl-layout__header-row">
+    <span class="mdl-layout-title">{{$root.title || stateParams.title}}</span>
+    <div class="mdl-layout-spacer"></div>
+    <nav class="mdl-navigation">
+        <button ng-if="false"
+            ui-sref="root.help"
+            class="mdl-button
+                mdl-js-button
+                mdl-button--icon
+                mdl-js-button
+                mdl-js-ripple-effect">
+            <i class="material-icons">help</i>
+        </button>
+        <button ng-click="openFilters()"
+            analytics-on
+            analytics-event="open"
+            analytics-properties="{
+                category: 'filter',
+                label: user.real_team_id
+            }"
+            class="mdl-button
+                mdl-js-button
+                mdl-button--icon
+                mdl-js-button
+                mdl-js-ripple-effect">
+            <i class="material-icons">filter_list</i>
+        </button>
+    </nav>
+  </div>
+  <div steps class="mdl-color--grey-50"></div>
+</header>
+<div id="main-menu" class="drawer mdl-layout__drawer mdl-color--primary mdl-color-text--primary">
+  <header class="drawer-header">
+    <img src="/images/logo-white.png" class="logo" />
+  </header>
+  <nav class="navigation mdl-navigation mdl-color--primary">
+    <a hide-overlay
+      class="mdl-navigation__link"
+      href="#/dashboard/main">
+      <i class="material-icons" role="dashboard">dashboard</i>
+      Dashboard
+    </a>
+    <a hide-overlay
+      class="mdl-navigation__link"
+      href="#/dashboard/rules">
+      <i class="material-icons" role="rules">assignment</i>
+      Rules
+    </a>
+    <a hide-overlay
+      ng-if="user.is_super"
+      class="mdl-navigation__link"
+      href="#/dashboard/admin">
+      <i class="material-icons" role="build">build</i>
+      Admin
+    </a>
+    <div class="mdl-layout-spacer"></div>
+    <a hide-overlay
+      class="mdl-navigation__link"
+      href="#/dashboard/settings/account">
+      <i class="material-icons" role="settings">settings</i>
+      Account Settings
+    </a>
+    <a hide-overlay
+      class="mdl-navigation__link"
+      href="#/dashboard/settings/team">
+      <i class="material-icons" role="people">people</i>
+      Team Settings
+    </a>
+    <a class="mdl-navigation__link" href="" ng-click="logout()">
+      <i class="material-icons" role="exit_to_app">exit_to_app</i>
+      Sign out
+    </a>
+  </nav>
+</div>
+<main
+  ui-view="container"
+  class="mdl-layout__content mdl-color--grey-50"
+  ng-class="{'has-steps': $root.hasSteps}">
+</main>

@@ -1,0 +1,38 @@
+<div ng-if="!viewLoaded" class="fill-full" mdl-upgrade>
+    <div
+        class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active">
+    </div>
+</div>
+
+<div class="rules-other" ng-if="viewLoaded">
+    Rules for the active filter
+</div>
+
+<div ng-if="viewLoaded" class="rule-groups" mdl-upgrade>
+    <div class="group-cont" ng-init="group = activeGroup">
+        <div class="group isOpen open mdl-shadow--2dp mdl-color--white"
+            ng-include="'ruleGroup.tpl.html'"
+            mdl-upgrade>
+        </div>
+    </div>
+</div>
+
+<div class="rules-other" ng-if="viewLoaded && groups.length">
+    Rules for other filters
+</div>
+
+<div ng-if="viewLoaded && groups.length" class="rule-groups" mdl-upgrade>
+    <div class="group-cont"
+        ng-class="{'mdl-shadow--2dp mdl-color--white': !groups.isOpen}">
+        <div ng-repeat="group in groups track by group.id"
+            class="group"
+            ng-class="{
+                'isOpen mdl-shadow--2dp mdl-color--white': groups.isOpen,
+                'open': group.open
+            }"
+            ng-click="open(group)"
+            ng-include="'ruleGroup.tpl.html'"
+            mdl-upgrade>
+        </div>
+    </div>
+</div>

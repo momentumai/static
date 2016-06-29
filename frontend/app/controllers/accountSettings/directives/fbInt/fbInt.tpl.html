@@ -1,0 +1,100 @@
+<form
+    ng-submit="model.connected && model.submit() || !model.connected && model.connect()"
+    class="fb-int"
+    mdl-upgrade
+>
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">
+            Facebook integration
+        </h2>
+    </div>
+    <div ng-if="!model.connected" class="mdl-card__supporting-text">
+        To use Momentum's social features, you must connect your account to Facebook.
+    </div>
+    <div ng-if="model.connected" class="mdl-card__media mdl-color--white" mdl-upgrade>
+        <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+            <div class="mdl-tabs__tab-bar">
+                <a href="#fb-accounts" class="mdl-tabs__tab is-active">
+                    Ad Accounts
+                </a>
+                <a href="#fb-pages" class="mdl-tabs__tab">
+                    Pages
+                </a>
+            </div>
+            <div class="mdl-tabs__panel is-active" id="fb-accounts">
+                <div ng-if="!model.assets.adaccount.length" class="no-data">
+                    To use Momentum's social features, you must have access at least one Facebook ad account.
+                </div>
+                <ul ng-if="model.assets.adaccount.length" class="mdl-list">
+                    <li ng-repeat="asset in model.assets.adaccount track by asset.value"
+                        class="mdl-list__item">
+                        <span class="mdl-list__item-primary-content">
+                            <label
+                                ng-class="{'is-checked': asset.checked}"
+                                class="mdl-switch mdl-js-switch mdl-js-ripple-effect"
+                                for="list-switch-{{asset.value}}">
+                                <input
+                                    type="checkbox"
+                                    id="list-switch-{{asset.value}}"
+                                    class="mdl-switch__input"
+                                    ng-change="model.checkChange('adaccount', asset.value)"
+                                    ng-model="asset.checked"/>
+                            </label>
+                            {{asset.display}}
+                        </span>
+                        <span class="mdl-list__item-secondary-action">
+                            <a
+                                ng-click="model.switchDefault('adaccount', asset.value)"
+                                href="javascript:void(0)"
+                                ng-class="{'mdl-button--accent': asset.default}"
+                                class="mdl-button def-button mdl-js-button mdl-js-ripple-effect">
+                                Default
+                            </a>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+            <div class="mdl-tabs__panel" id="fb-pages">
+                <div ng-if="!model.assets.page.length" class="no-data">
+                    To use Momentum's social features, you must have access at least one Facebook page.
+                </div>
+                <ul ng-if="model.assets.page.length" class="mdl-list">
+                    <li ng-repeat="asset in model.assets.page track by asset.value"
+                        class="mdl-list__item">
+                        <span class="mdl-list__item-primary-content">
+                            <label
+                                ng-class="{'is-checked': asset.checked}"
+                                class="mdl-switch mdl-js-switch mdl-js-ripple-effect"
+                                for="list-switch-{{asset.value}}">
+                                <input
+                                    type="checkbox"
+                                    id="list-switch-{{asset.value}}"
+                                    class="mdl-switch__input"
+                                    ng-change="model.checkChange('page', asset.value)"
+                                    ng-model="asset.checked"/>
+                            </label>
+                            {{asset.display}}
+                        </span>
+                        <span class="mdl-list__item-secondary-action">
+                            <a
+                                ng-click="model.switchDefault('page', asset.value)"
+                                href="javascript:void(0)"
+                                ng-class="{'mdl-button--accent': asset.default}"
+                                class="mdl-button def-button mdl-js-button mdl-js-ripple-effect">
+                                Default
+                            </a>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="mdl-card__actions mdl-card--border">
+        <button
+            ng-disabled="model.dataLoading"
+            type="submit"
+            class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+            {{model.connected ? 'Save': 'Connect'}}
+        </button>
+    </div>
+</form>

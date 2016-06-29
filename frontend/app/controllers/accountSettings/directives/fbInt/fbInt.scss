@@ -1,0 +1,29 @@
+.fb-int {
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+
+    .mdl-tabs__tab-bar {
+        justify-content: flex-end;
+        padding-top: 14px;
+    }
+
+    .no-data {
+        padding: 16px;
+    }
+
+    .mdl-switch {
+        margin-left: 2px;
+        width: 54px;
+        flex-shrink: 0;
+    }
+
+    .def-button:not(.mdl-button--accent) {
+        color: rgba(0,0,0, 0.54);
+    }
+
+    .mdl-card__supporting-text, 
+    .mdl-card__media {
+        flex-grow: 1;
+    }
+}

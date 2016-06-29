@@ -1,0 +1,23 @@
+<div
+    mdl-upgrade
+    class="mdl-grid">
+
+    <div ng-if="!viewLoaded" class="fill">
+      <div
+        class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active">
+      </div>
+    </div>
+
+    <div 
+      mdl-upgrade
+      campaigns
+      ng-export="export"
+      ng-next="next"
+      ng-prev="prev"
+      ng-toggle="toggle"
+      ng-model="history.campaigns"
+      ng-if="viewLoaded"
+      class="animate campaigns-card mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
+    </div>
+
+</div>

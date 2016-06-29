@@ -1,0 +1,14 @@
+<div class="mdl-card__title">
+    <h2 class="mdl-card__title-text">
+        Your code
+    </h2>
+</div>
+<div class="code-media mdl-card__media mdl-color--white">
+    <textarea select-on-click spellcheck="false" id="tr-code" readonly class="code-cont">{{model.code}}</textarea>
+</div>
+<div class="mdl-card__actions" style="padding-top: 0">
+    <button
+        ng-disabled="model.dataLoading"
+        ng-click="model.copy()"
+        class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Copy</button>
+</div>

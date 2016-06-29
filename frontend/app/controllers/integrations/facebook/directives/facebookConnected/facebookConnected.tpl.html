@@ -1,0 +1,32 @@
+<div class="mdl-card__title">
+    <h2 class="mdl-card__title-text">
+        Connected accounts
+    </h2>
+</div>
+<div class="mdl-card__supporting-text">
+    To use Momentum's social features, you must connect your account to Facebook.
+    <span
+        ng-if="model.state === 'valid'"
+        class="mdl-color-text--primary">Your account already has been connected.</span>
+    <span
+        ng-if="model.state !== 'valid'"
+        class="mdl-color-text--accent">Your account is not connected to Facebook.</span>
+</div>
+<div class="mdl-card__actions">
+    <button
+        ng-if="model.state !== 'valid'"
+        ng-click="model.renew()"
+        type="button"
+        class="mdl-button
+        mdl-button--colored
+        mdl-js-button
+        mdl-js-ripple-effect">Connect to Facebook</button>
+    <button
+        ng-if="model.state === 'valid'"
+        ng-click="model.renew()"
+        type="button"
+        class="mdl-button
+        mdl-button--colored
+        mdl-js-button
+        mdl-js-ripple-effect">Reconnect to Facebook</button>
+</div>

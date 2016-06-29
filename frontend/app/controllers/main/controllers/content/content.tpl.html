@@ -1,0 +1,92 @@
+<div mdl-upgrade class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+  <div class="mdl-tabs__tab-bar">
+    <a
+        href="#tab1"
+        ng-click="state.go('root.main.content.info')"
+        ng-class="{'is-active': state.is('root.main.content.info')}"
+        class="mdl-tabs__tab"
+    >Today</a>
+    <a
+        href="#tab2"
+        ng-click="state.go('root.main.content.history')"
+        ng-class="{'is-active': state.is('root.main.content.history')}"
+        class="mdl-tabs__tab"
+    >History</a>
+  </div>
+</div>
+
+<div ui-view="tab-container"></div>
+
+<div style="height: 86px"></div>
+
+<a analytics-on="click"
+    analytics-event="fab"
+    analytics-properties="{
+        category: 'promote',
+        label: user.real_team_id
+    }"
+    ng-mouseover="showMenu()"
+    ng-mouseleave="hideMenu()"
+    ng-if="viewLoaded"
+    ng-click="promotion()"
+    class="content-fab
+        mdl-shadow--8dp
+        mdl-button
+        mdl-js-button
+        mdl-button--fab
+        mdl-js-ripple-effect
+        mdl-button--colored"
+        mdl-upgrade>
+  <i ng-class="{
+        'hiding': menuOpen === 1,
+        'showing': menuOpen === 0
+    }"
+    class="material-icons">more_vert</i>
+  <i ng-class="{
+        'hiding': menuOpen === 0,
+        'showing': menuOpen === 1
+    }"
+    class="hover material-icons">monetization_on</i>
+</a>
+<div ng-class="{open: menuOpen === 1}"
+    ng-mouseover="showMenu()"
+    ng-mouseleave="hideMenu()"
+    ng-if="viewLoaded"
+    class="content-fab-menu"
+    mdl-upgrade>
+    <a analytics-on="click"
+        analytics-event="fab"
+        analytics-properties="{
+            category: 'open_link',
+            label: user.real_team_id
+        }"
+        ng-href="http://{{info.url}}"
+        target="_blank"
+        class="fab2
+            content-fab-menu-fab
+            mdl-shadow--8dp
+            mdl-button
+            mdl-js-button
+            mdl-button--fab
+            mdl-button--mini-fab
+            mdl-js-ripple-effect">
+        <i class="material-icons">open_in_new</i>
+    </a>
+    <a analytics-on="click"
+        analytics-event="fab"
+        analytics-properties="{
+            category: 'share',
+            label: user.real_team_id
+        }"
+        ng-click="share()"
+        class="fab1
+        content-fab-menu-fab
+        mdl-shadow--8dp
+        mdl-button
+        mdl-js-button
+        mdl-button--fab
+        mdl-button--mini-fab
+        mdl-js-ripple-effect">
+        <i class="material-icons">share</i>
+    </a>
+</div>
