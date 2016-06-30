@@ -65699,7 +65699,7 @@ a.registerEventTrack(function(a,b){console.log("Event tracking: ",a,b)})}])}(ang
 (function () {
     var modules;
 
-    window.bvConfig = JSON.parse('{"endpoint":"http://localhost:8080/v1/","docBase":"http://localhost:8080","autoprefixer":["ie >= 10","ie_mob >= 10","ff >= 30","chrome >= 34","safari >= 7","opera >= 23","ios >= 7","android >= 4.4","bb >= 10"],"facebook":{"appId":"1711996355683486","scope":["manage_pages","ads_management","publish_pages"]},"stripe":{"public":"pk_test_yWBSSDXz7dmdms3KKiWXLV2a"},"ga":{"id":"UA-64108533-2","options":{"cookieDomain":"none"},"debug":1},"tutorialVideo":"<iframe width=\\"420\\" height=\\"315\\" src=\\"https://www.youtube.com/embed/lkUsF63z7Ko\\" frameborder=\\"0\\" allowfullscreen></iframe>","extensionUrl":"https://chrome.google.com/webstore/detail/aeooeojbngloclgmeleimndcfaafnpcl"}');
+    window.bvConfig = JSON.parse('{"endpoint":"http://localhost:8081/api/","docBase":"http://localhost:8080","autoprefixer":["ie >= 10","ie_mob >= 10","ff >= 30","chrome >= 34","safari >= 7","opera >= 23","ios >= 7","android >= 4.4","bb >= 10"],"facebook":{"appId":"1711996355683486","scope":["manage_pages","ads_management","publish_pages"]},"stripe":{"public":"pk_test_yWBSSDXz7dmdms3KKiWXLV2a"},"ga":{"id":"UA-64108533-2","options":{"cookieDomain":"none"},"debug":1},"tutorialVideo":"<iframe width=\\"420\\" height=\\"315\\" src=\\"https://www.youtube.com/embed/lkUsF63z7Ko\\" frameborder=\\"0\\" allowfullscreen></iframe>","extensionUrl":"https://chrome.google.com/webstore/detail/aeooeojbngloclgmeleimndcfaafnpcl"}');
 
     modules = [
         'ngCookies',
@@ -66086,6 +66086,1349 @@ function ($stateProvider, $urlRouterProvider) {
         }
     });
 }]);
+
+/*global momentum */
+momentum.controller('AccountSettingsController', [
+    'auth',
+    'account',
+    'userData',
+    'teamUserData',
+    'dialog',
+    'toast',
+    'fb',
+    'utils',
+    'storage',
+    '$q',
+    '$timeout',
+    '$state',
+    '$rootScope',
+    '$scope',
+    function (
+        auth,
+        account,
+        userData,
+        teamUserData,
+        dialog,
+        toast,
+        fb,
+        utils,
+        storage,
+        $q,
+        $timeout,
+        $state,
+        $rootScope,
+        $scope
+    ) {
+        function animate () {
+            $timeout(function () {
+                $scope.fbInt.animate();
+                $scope.pwChange.animate();
+                $scope.teamSwitch.animate();
+            });
+        }
+
+        function reloadAssets () {
+            var promises = {},
+                fbAssets,
+                assets;
+
+            promises['fbAssets'] = fb.listFbAssets(
+                $scope.sessionId
+            ).then(function (a) {
+                $scope.fbInt.connected = 1;
+                fbAssets = a;
+            }).catch(function () {});
+
+            promises['assets'] = fb.listAssets(
+                $scope.sessionId
+            ).then(function (a) {
+                assets = a;
+            });
+
+            return $q.all(promises).then(function () {
+                if ($scope.fbInt.connected) {
+                    $scope.fbInt.assets = utils.mergeAssets(
+                        fbAssets,
+                        assets
+                    );
+                }
+            });
+        }
+
+        $scope.viewLoaded = 0;
+
+        $scope.fbInt = {
+            'dataLoading': 0,
+            'connected': 0,
+            'assets': null,
+            'submit': function () {
+                var assets = $scope.fbInt.assets,
+                    checkFunc = function (e) {
+                        return e.checked;
+                    },
+                    pages = assets.page.filter(checkFunc),
+                    adaccounts = assets.adaccount.filter(checkFunc),
+                    req = pages.concat(adaccounts);
+
+                if (!pages.length || !adaccounts.length) {
+                    return dialog.open({
+                        'htmlText': 'Choose at least one ad account and page.'
+                    });
+                }
+
+                $scope.fbInt.dataLoading = 1;
+                return fb.saveAssets(
+                    $scope.sessionId,
+                    req
+                ).then(function (data) {
+                    if (data.length !== req.length) {
+                        return reloadAssets().then(function () {
+                            $scope.fbInt.dataLoading = 0;
+                            return dialog.open({
+                                'htmlText': 'Can\'t save one or more assets.'
+                            });
+                        });
+                    }
+                    $scope.fbInt.dataLoading = 0;
+                    toast.open({
+                        'htmlText': 'Assets saved'
+                    });
+                    return teamUserData.set(
+                        $scope.sessionId,
+                        'guide_fb',
+                        'added'
+                    ).then(function () {
+                        $rootScope.guideSteps['fb'] = 'added';
+                        return $rootScope.guide();
+                    });
+                });
+            },
+            'connect': function () {
+                $scope.fbInt.dataLoading = 1;
+                fb.login().then(function (accessToken) {
+                    return fb.token(
+                        $scope.sessionId,
+                        accessToken
+                    ).then(function () {
+                        return reloadAssets().then(function () {
+                            $scope.fbInt.dataLoading = 0;
+                        });
+                    });
+                });
+            },
+            'switchDefault': function (type, id) {
+                $scope.fbInt.assets[type].forEach(function (asset) {
+                    asset.default = false;
+                    if (asset.value === id) {
+                        asset.default = true;
+                        asset.checked = true;
+                    }
+                });
+            },
+            'checkChange': function (type, id) {
+                var val,
+                    hasDefault,
+                    checked = [];
+
+                $scope.fbInt.assets[type].forEach(function (asset) {
+                    val = asset.checked;
+                    if (asset.value === id) {
+                        if (val) {
+                            asset.checked = true;
+                            val = true;
+                        } else {
+                            asset.checked = false;
+                            asset.default = false;
+                        }
+                    }
+                    if (val) {
+                        checked.push(asset);
+                    }
+                });
+
+                checked.forEach(function (asset) {
+                    if (asset.default) {
+                        hasDefault = true;
+                    }
+                });
+
+                if (!hasDefault && checked.length) {
+                    checked[0].default = 1;
+                }
+            }
+        };
+
+        $scope.teamSwitch = {
+            'dataLoading': 0,
+            'teams': null,
+            'submit': function () {
+                $scope.teamSwitch.dataLoading = 1;
+                auth.setTeam(
+                    $scope.sessionId,
+                    $scope.teamSwitch.teams.selected
+                ).then(function () {
+                    $scope.teamSwitch.dataLoading = 0;
+                    storage.invalidateCache();
+                    $state.go('root.main.dashboard.info');
+                });
+            }
+        };
+
+        $scope.pwChange = {
+            'dataLoading': 0,
+            'error': '',
+            'oldPassword': '',
+            'newPassword': '',
+            'changePassword': function () {
+                $scope.pwChange.dataLoading = 1;
+                $scope.pwChange.error = '';
+
+                account.changePassword(
+                    $scope.sessionId,
+                    $scope.pwChange.oldPassword,
+                    $scope.pwChange.newPassword
+                ).then(function (response) {
+                    var error = response.data.errorMessage;
+
+                    if (error) {
+                        $scope.pwChange.error = error.split(':')[2];
+                    } else {
+                        $scope.pwChange.newPassword = '';
+                        $scope.pwChange.oldPassword = '';
+                        toast.open({
+                            'htmlText': 'Password changed'
+                        });
+                    }
+                }).finally(function () {
+                    $scope.pwChange.dataLoading = 0;
+                });
+            }
+        };
+
+        function init () {
+            var promises = {};
+
+            promises['teams'] = auth.getTeams(
+                $scope.sessionId
+            ).then(function (teams) {
+                $scope.teamSwitch.teams = teams;
+            });
+
+            promises['assets'] = reloadAssets();
+
+            return $q.all(promises).then(function () {
+                animate();
+                $scope.viewLoaded = 1;
+            });
+        }
+
+        if ($scope.loaded) {
+            init();
+        } else {
+            $scope.$on('loaded', init);
+        }
+    }]
+);
+
+/*global momentum, confirm*/
+momentum.controller('AdminController', [
+    '$timeout',
+    '$scope',
+    'admin',
+    'storage',
+    'toast',
+    'dialog',
+    '$q',
+    function ($timeout, $scope, admin, storage, toast, dialog, $q) {
+        $scope.viewLoaded = 0;
+
+        $scope.addUser = {
+            'dataLoading': 0,
+            'email': '',
+            'teamName': '',
+            'sendCode': true,
+            'forcePayment': false,
+            'partner': false,
+            'sendCodeTo': '',
+            'paymentAmount': 0,
+            'send': function () {
+                var sendCode = $scope.addUser.sendCode,
+                    amount = Number($scope.addUser.paymentAmount),
+                    forcePayment = $scope.addUser.forcePayment;
+
+                $scope.addUser.dataLoading = 1;
+                admin.addTeam(
+                    $scope.sessionId,
+                    $scope.addUser.teamName,
+                    $scope.addUser.email,
+                    sendCode ? $scope.addUser.sendCodeTo : '',
+                    Number($scope.addUser.partner),
+                    forcePayment ? amount : 0
+                ).then(function (resp) {
+                    $scope.addUser.dataLoading = 0;
+                    return dialog.open({
+                        'dialogClass': 'auto-width',
+                        'htmlText': [
+                            'Team has been added<br /><br />',
+                            'Insert code:<br />',
+                            '<textarea',
+                            ' spellcheck="false" id="tr-code"',
+                            ' readonly class="code-cont">',
+                            resp,
+                            '</textarea>'
+                        ].join('')
+                    }).catch(function () {});
+                }).catch(function (err) {
+                    return dialog.open({
+                        'htmlText': err
+                    }).finally(function () {
+                        $scope.addUser.dataLoading = 0;
+                    });
+                });
+            },
+            'emailChange': function () {
+                $scope.addUser.sendCodeTo = $scope.addUser.email;
+            }
+        };
+        $scope.payment = {
+            'dataLoading': 0,
+            'status': false,
+            'amount': 0,
+            'name': '',
+            'change': function () {
+                var amount = $scope.payment.status ?
+                    Number($scope.payment.amount) : 0;
+
+                $scope.payment.dataLoading = 1;
+                return admin.setPayment(
+                    $scope.sessionId,
+                    amount
+                ).then(function () {
+                    $scope.payment.dataLoading = 0;
+                    return toast.open({
+                        'htmlText': 'Payment settings have been saved'
+                    });
+                });
+            }
+        };
+
+        $scope.demo = {
+            'status': storage.getDemo() || 0,
+            'change': function () {
+                $scope.demo.status = $scope.demo.status === 1 ? 0 : 1;
+                storage.setDemo($scope.demo.status);
+            }
+        };
+
+        function confirmInactive () {
+            var text = [
+                'Are you sure you want to ',
+                $scope.inactivate.status ? 'disable' : 'enable',
+                ' tracking for ',
+                $scope.inactivate.name
+            ].join('');
+
+            return confirm(text);
+        }
+
+        $scope.inactivate = {
+            'status': null,
+            'name': '',
+            'change': function () {
+                if (confirmInactive()) {
+                    $scope.inactivate.status = $scope.inactivate.status ? 0 : 1;
+                    return admin.setTeamInactive(
+                        $scope.sessionId,
+                        $scope.inactivate.status
+                    ).then(function () {
+                        return toast.open({
+                            'htmlText': [
+                                'Tracking code is ',
+                                $scope.inactivate.status ?
+                                    'enabled' : 'disabled'
+                            ].join('')
+                        });
+                    });
+                }
+            }
+        };
+
+        function getTeamInactive () {
+            return admin.getTeamInactive(
+                $scope.sessionId
+            ).then(function (resp) {
+                $scope.inactivate.status = Number(resp.status);
+                $scope.inactivate.name = resp.name;
+            });
+        }
+
+        function getPayment () {
+            return admin.getPayment(
+                $scope.sessionId
+            ).then(function (resp) {
+                $scope.payment.status = Boolean(resp.status);
+                $scope.payment.amount = resp.amount;
+                $scope.payment.name = resp.name;
+            });
+        }
+
+        function animate () {
+            $timeout(function () {
+                $scope.addUser.animate();
+                $scope.demo.animate();
+                $scope.inactivate.animate();
+                $scope.payment.animate();
+            });
+        }
+
+        function init () {
+            var promises = [];
+
+            promises.push(getTeamInactive());
+            promises.push(getPayment());
+
+            $q.all(promises).then(function () {
+                animate();
+                $scope.viewLoaded = 1;
+            });
+        }
+
+        if ($scope.loaded) {
+            init();
+        } else {
+            $scope.$on('loaded', init);
+        }
+    }
+]);
+
+/*global momentum, window */
+momentum.controller('AuthController', ['storage', 'auth', '$state', '$scope',
+function (storage, auth, $state, $scope) {
+    $scope.auth = {
+        'dataLoading': 0,
+        'error': '',
+        'email': '',
+        'password': '',
+        'login': function () {
+            $scope.auth.dataLoading = 1;
+            $scope.auth.error = '';
+            auth.login(
+                $scope.auth.email,
+                $scope.auth.password
+            ).then(function (response) {
+                if (response.data.errorMessage) {
+                    $scope.auth.dataLoading = 0;
+                    $scope.auth.error = response.data.errorMessage.split(
+                        ':'
+                    )[2];
+                } else {
+                    storage.storeAuthData(
+                        response.data.session_id,
+                        response.data.teams
+                    ).then(function () {
+                        $scope.auth.dataLoading = 0;
+                        window.location.href = '/';
+                    });
+                }
+            });
+        }
+    };
+}]);
+
+/*global momentum, Stripe, window */
+momentum.controller('BillingSettingsController', [
+    'toast',
+    'account',
+    'formHelper',
+    '$scope',
+    '$state',
+    '$q',
+    '$timeout',
+    'stripe',
+    function (
+        toast,
+        account,
+        formHelper,
+        $scope,
+        $state,
+        $q,
+        $timeout,
+        stripe
+    ) {
+        function animate () {
+            $timeout(function () {
+                $scope.payment.animate();
+            });
+        }
+
+        function getPayment () {
+            return account.getPayment(
+                $scope.sessionId
+            ).then(function (resp) {
+                $scope.payment.status = Boolean(resp.status);
+                $scope.payment.amount = resp.amount;
+                $scope.payment.name = resp.name;
+                if (!resp.status) {
+                    $state.go('root.main.dashboard.info');
+                }
+            });
+        }
+
+        $scope.payment = {
+            'dataLoading': false,
+            'amount': 0,
+            'status': false,
+            'states': {},
+            'countries': {},
+            'company': '',
+            'error': '',
+            'stripe': {
+                'number': '',
+                'expiry': '',
+                'cvc': '',
+                'address_city': '',
+                'address_country': '',
+                'address_line1': '',
+                'address_zip': ''
+            },
+            'pay': function () {
+                return $q(function (resolve, reject) {
+                    var data = $scope.payment.stripe,
+                        exp = $scope.payment.stripe.expiry || '';
+
+                    /* You must not change the following 4 lines! */
+                    exp = exp.toString();
+                    exp = exp.split('/');
+                    data.exp_month = exp && Number(exp[0]) || '';
+                    data.exp_year = exp && Number(exp[1]) || '';
+                    data.address_country = $scope.payment.countries.selected;
+                    delete data.expiry;
+                    $scope.payment.dataLoading = true;
+                    Stripe.card.createToken(
+                        data,
+                        function (status, resp) {
+                            if (resp.error) {
+                                reject(resp.error.message);
+                            }
+                            resolve(resp);
+                        }
+                    );
+                }).then(function (resp) {
+                    var data = {};
+
+                    data.client_ip = resp.client_ip;
+                    data.address_country = $scope.payment.countries.selected;
+                    data.address_line1 =  $scope.payment.stripe.address_line1;
+                    data.address_zip =  $scope.payment.stripe.address_zip;
+                    data.address_city =  $scope.payment.stripe.address_city;
+                    data.company = $scope.payment.company;
+                    return stripe.pay(
+                        $scope.sessionId,
+                        data,
+                        resp.id
+                    );
+                }).then(function (resp) {
+                    if (resp === 'success') {
+                        window.location.reload(true);
+                    } else {
+                        throw resp.toString();
+                    }
+                }).catch(function (err) {
+                    $scope.payment.dataLoading = false;
+                    $scope.payment.error = err;
+                    return false;
+                });
+            }
+        };
+
+        $scope.payment.countries = {
+            'data': formHelper.countries,
+            'selected': 'GB',
+            'label': 'Country'
+        };
+
+        function getBilling () {
+            return stripe.getBilling(
+                $scope.sessionId
+            ).then(function (resp) {
+                $scope.payment.countries.selected =
+                    resp.address_country || 'GB';
+                $scope.payment.stripe.address_line1 = resp.address_line1;
+                $scope.payment.stripe.address_zip = resp.address_zip;
+                $scope.payment.stripe.address_country = resp.address_country;
+                $scope.payment.stripe.address_city = resp.address_city;
+                $scope.payment.company = resp.company;
+            });
+        }
+
+        $scope.viewLoaded = 0;
+
+        function init () {
+            var promises = {
+                'payment': getPayment(),
+                'getBilling': getBilling(),
+                'stripe': stripe.init()
+            };
+
+            return $q.all(promises).then(function () {
+                animate();
+                $scope.viewLoaded = 1;
+            });
+        }
+
+        if ($scope.loaded) {
+            init();
+        } else {
+            $scope.$on('loaded', init);
+        }
+    }
+]);
+
+/*global momentum */
+momentum.controller('ForgotPasswordController', [
+    'auth',
+    '$state',
+    '$scope',
+    'toast',
+    'dialog',
+    function (auth, $state, $scope, toast, dialog) {
+        $scope.forgot = {
+            'dataLoading': 0,
+            'email': '',
+            'send': function () {
+                $scope.forgot.dataLoading = 1;
+                auth.forgotPassword(
+                    $scope.forgot.email
+                ).then(function () {
+                    toast.open({
+                        'htmlText': 'Reminder email sent'
+                    }).finally(function () {
+                        $state.go('auth');
+                    });
+                }).catch(function (err) {
+                    return dialog.open({
+                        'htmlText': err
+                    }).finally(function () {
+                        $scope.forgot.dataLoading = 0;
+                    });
+                });
+            }
+        };
+    }
+]);
+
+/*global momentum, bvConfig */
+momentum.controller('HelpController', [
+    '$timeout',
+    '$sce',
+    '$scope',
+    function ($timeout, $sce, $scope) {
+        $scope.viewLoaded = 0;
+        $scope.videoContainer = {
+            'video': $sce.trustAsHtml(
+                bvConfig.tutorialVideo
+            )
+        };
+
+        function animate () {
+            $timeout(function () {
+                $scope.videoContainer.animate();
+            });
+        }
+
+        function init () {
+            animate();
+            $scope.viewLoaded = 1;
+        }
+
+        if ($scope.loaded) {
+            init();
+        } else {
+            $scope.$on('loaded', init);
+        }
+    }
+]);
+
+/*global momentum*/
+momentum.controller('MainController', [
+    'post',
+    '$state',
+    '$scope',
+    '$q',
+    '$timeout',
+    function (
+        post,
+        $state,
+        $scope,
+        $q,
+        $timeout
+    ) {
+        var poller;
+
+        $scope.posts = null;
+        $scope.viewLoaded = 0;
+
+        $scope.itemClick = function (id) {
+            $scope.posts.forEach(function (post) {
+                if (post.id === id) {
+                    post.active = post.active ? 0 : 1;
+                    if (post.active) {
+                        $state.go('root.main.content.info', {
+                            'contentId': String(id)
+                        });
+                    } else {
+                        $state.go('root.main.dashboard.info');
+                    }
+                } else {
+                    post.active = 0;
+                }
+            });
+        };
+        function oneMinutePoll () {
+            var promises = {
+                'posts': post.list($scope.sessionId, 20)
+            };
+
+            if (poller) {
+                $timeout.cancel(poller);
+            }
+
+            promises.posts = promises.posts.then(function (posts) {
+                $scope.posts = posts.data;
+                $scope.posts.forEach(function (post) {
+                    if (post.id === Number($scope.stateParams.contentId)) {
+                        post.active = 1;
+                    }
+                });
+            });
+
+            $q.all(promises).then(function () {
+                $timeout(function () { $scope.viewLoaded = 1; });
+                poller = $timeout(oneMinutePoll, 60000);
+            });
+        }
+
+        if ($scope.loaded) {
+            oneMinutePoll();
+        } else {
+            $scope.$on('loaded', oneMinutePoll);
+        }
+
+        $scope.$on('$destroy', function () {
+            if (poller) {
+                $timeout.cancel(poller);
+            }
+        });
+    }
+]);
+
+/*global momentum */
+momentum.controller('PasswordSetupController', [
+    'auth',
+    '$state',
+    '$scope',
+    '$stateParams',
+    'toast',
+    'dialog',
+    function (auth, $state, $scope, $stateParams, toast, dialog) {
+        $scope.setup = {
+            'dataLoading': 0,
+            'password': '',
+            'send': function () {
+                $scope.setup.dataLoading = 1;
+                auth.setupPassword(
+                    $stateParams.email,
+                    $stateParams.token,
+                    $scope.setup.password
+                ).then(function () {
+                    toast.open({
+                        'htmlText': 'New password saved'
+                    });
+                }).catch(function (err) {
+                    dialog.open({
+                        'htmlText': err
+                    }).finally(function () {
+                        $scope.setup.dataLoading = 0;
+                    });
+                });
+            }
+        };
+    }
+]);
+
+/*global momentum, window*/
+momentum.controller('RootController', [
+    '$state',
+    '$stateParams',
+    '$q',
+    '$scope',
+    '$rootScope',
+    'storage',
+    'auth',
+    'dialog',
+    'category',
+    'guide',
+    function (
+        $state,
+        $stateParams,
+        $q,
+        $scope,
+        $rootScope,
+        storage,
+        auth,
+        dialog,
+        category,
+        guide
+    ) {
+        $scope.sessionId = '0';
+
+        function sendSessionId () {
+            window.postMessage({
+                'type': 'BVSID',
+                'value': $scope.sessionId
+            },
+            '*');
+        }
+
+        $scope.state = $state;
+        $scope.stateParams = $stateParams;
+        $scope.loaded = 0;
+
+        $scope.openFilters = function () {
+            category.getWithSelected(
+                $scope.sessionId
+            ).then(function (data) {
+                dialog.open({
+                    'title': 'Filters',
+                    'template': 'filterDialog.tpl.html',
+                    'okText': 'Save',
+                    'showCancel': true,
+                    'destroy': false,
+                    'model': data
+                }).then(function () {
+                    storage.invalidateCache();
+                    return category.setSelected($scope.sessionId, {
+                        'category': data.category.selected,
+                        'subCategory': data.subCategory.selected,
+                        'subSubCategory': data.subSubCategory.selected
+                    }).then(function () {
+                        window.location.reload(true);
+                    });
+                }).catch(function () {});
+            });
+        };
+
+        storage.getSessionId().then(function (data) {
+            $scope.sessionId = data;
+            return auth.getUser(data);
+        }).then(function (user) {
+            $scope.user = user;
+            $scope.loaded = 1;
+            sendSessionId();
+
+            $scope.$broadcast('loaded');
+
+            if (!Number(user.is_super)) {
+                return guide.show($scope.sessionId, user);
+            }
+        });
+
+        $rootScope.$on(
+            '$stateChangeStart',
+            function (
+                event,
+                toState,
+                ignore,
+                fromState
+            ) {
+                if (!toState.name.indexOf('root.main') &&
+                    $scope.user.payment_amount) {
+                    event.preventDefault();
+                    if (fromState.name.indexOf('root.billing')) {
+                        $state.go('root.billing');
+                    }
+                }
+            }
+        );
+    }
+]);
+
+/*global momentum*/
+momentum.controller('RouterController', [
+    function () {}
+]);
+
+/*global momentum, angular*/
+momentum.controller('RulesController', [
+    'dialog',
+    'toast',
+    'rule',
+    'fb',
+    '$q',
+    '$state',
+    '$scope',
+    function (dialog, toast, rule, fb, $q, $state, $scope) {
+        $scope.groups = null;
+        $scope.activeGroup = null;
+        $scope.viewLoaded = 0;
+
+        function init () {
+            $scope.groups = null;
+            return rule.list($scope.sessionId).then(function (ret) {
+                $scope.groups = ret.groups;
+                $scope.activeGroup = ret.active;
+                $scope.activeGroup.open = 1;
+                $scope.groups.isOpen = 0;
+            }).then(function () {
+                $scope.viewLoaded = 1;
+            });
+        }
+
+        function getCurrency (model) {
+            if (model.adaccount && model.adaccount.selected) {
+                return fb.currency(
+                    $scope.sessionId,
+                    model.adaccount.selected
+                );
+            }
+        }
+
+        function getAudiences (model) {
+            if (model.adaccount && model.adaccount.selected) {
+                return fb.audiences(
+                    $scope.sessionId,
+                    model.adaccount.selected
+                );
+            }
+        }
+
+        function refreshModel (model) {
+            var promises = [];
+
+            promises.push(getAudiences(model));
+            promises.push(getCurrency(model));
+
+            return $q.all(promises).then(function (resp) {
+                var offset = resp[1] && resp[1].offset || 100;
+
+                model.audiences = resp[0];
+                model.currency = resp[1];
+                model.budget = Math.floor(
+                    2000 /
+                    offset
+                );
+
+                return model;
+            });
+        }
+
+        function getOptionsModel () {
+            var promises,
+                ret;
+
+            promises = {
+                'assets': fb.listAssets($scope.sessionId)
+            };
+
+            ret = {};
+
+            promises.assets = promises.assets.then(function (assets) {
+                (assets || []).forEach(function (item) {
+                    ret[item.type] = ret[item.type] || {};
+                    if (item.default) {
+                        ret[item.type].selected = item.value;
+                    }
+                    ret[item.type].data = ret[item.type].data || [];
+                    ret[item.type].label = item.type;
+                    ret[item.type].data.push({
+                        'label': item.display,
+                        'id': item.value
+                    });
+                });
+
+                if (!ret['page'] ||
+                    !ret['page'].data ||
+                    !ret['page'].data.length ||
+                    !ret['adaccount'] ||
+                    !ret['adaccount'].data ||
+                    !ret['adaccount'].data.length
+                ) {
+                    $state.go('root.account-settings');
+                    return $q.reject('Choose at least one ' +
+                        'ad account and page.');
+                }
+                if (!ret['page'].selected) {
+                    ret['page'].selected = ret['page'].data[0].id;
+                }
+                if (!ret['adaccount'].selected) {
+                    ret['adaccount'].selected = ret['adaccount'].data[0].id;
+                }
+
+                ret['page'].label = 'Pages:';
+                ret['adaccount'].label = 'Ad accounts:';
+                ret['adaccount'].change = function () {
+                    return refreshModel(ret);
+                };
+            });
+
+            return $q.all(promises).then(function () {
+                return ret;
+            });
+        }
+
+        function removeNew (group) {
+            var removable = [];
+
+            group.items.forEach(function (item) {
+                if (!String(item.id).indexOf('new_')) {
+                    removable.push(item);
+                }
+            });
+
+            removable.forEach(function (item) {
+                group.items.splice(group.items.indexOf(item), 1);
+            });
+        }
+
+        $scope.reset = function (group) {
+            removeNew(group);
+            group.items.forEach(function (item, index) {
+                group.items[index] = group.items[index].$original;
+                group.items[index].$original = angular.copy(
+                    group.items[index]
+                );
+            });
+        };
+
+        $scope.open = function (group) {
+            var isOpen = 0;
+
+            if (group.open) {
+                return false;
+            }
+
+            $scope.groups.forEach(function (g) {
+                removeNew(g);
+
+                if (g.id === group.id) {
+                    g.items.forEach(function (item, index) {
+                        g.items[index] = g.items[index].$original;
+                        g.items[index].$original = angular.copy(
+                            g.items[index]
+                        );
+                    });
+                    g.open = 1;
+                    isOpen = 1;
+                } else {
+                    g.open = 0;
+                }
+            });
+
+            $scope.groups.isOpen = isOpen;
+        };
+
+        $scope.close = function () {
+            $scope.groups.isOpen = 0;
+            $scope.groups.forEach(function (g) {
+                removeNew(g);
+                g.open = 0;
+            });
+        };
+
+        $scope.options = function (item) {
+            var promise = $q.resolve();
+
+            if (item.deleted) {
+                return false;
+            }
+
+            if (!item.my) {
+                promise = dialog.open({
+                    'htmlText': '<span>This rule edited by other user.<br/>' +
+                        'Are you sure you want to edit?</span>',
+                    'okText': 'Proceed',
+                    'destroy': false,
+                    'cancelText': 'Cancel',
+                    'showCancel': true
+                });
+            }
+
+            promise.then(function () {
+                return getOptionsModel().then(function (model) {
+                    return refreshModel(model);
+                }).then(function (model) {
+                    model['max_duration'] = 1;
+
+                    return dialog.open({
+                        'title': 'Rule options',
+                        'template': 'ruleOptions.tpl.html',
+                        'okText': 'Ok',
+                        'showCancel': true,
+                        'model': model,
+                        'animate': item.my,
+                        'dialogClass': 'rule-options-dialog'
+                    }).then(function (model) {
+                        var options = {
+                            'ad_account': model.adaccount.selected,
+                            'page_id': model.page.selected,
+                            'audience': model.audiences.selected,
+                            'max_duration': model.max_duration,
+                            'budget': model.budget * model.currency.offset,
+                            'meta': {
+                                'page': model.page.data.filter(
+                                    function (elem) {
+                                        return elem.id ===
+                                            model.page.selected;
+                                    }
+                                )[0].label,
+                                'audience': model.audiences.data.filter(
+                                    function (elem) {
+                                        return elem.id ===
+                                            model.audiences.selected;
+                                    }
+                                )[0].label,
+                                'adaccount': model.adaccount.data.filter(
+                                    function (elem) {
+                                        return elem.id ===
+                                            model.adaccount.selected;
+                                    }
+                                )[0].label,
+                                'currency': model.currency.name,
+                                'offset': model.currency.offset
+                            }
+                        };
+
+                        item.my = 1;
+                        item.options = options;
+                    });
+                });
+            });
+        };
+
+        $scope.changed = function (item) {
+            if (item.deleted) {
+                return false;
+            }
+
+            return !item.$original || !angular.equals(item, item.$original);
+        };
+
+        $scope.delete = function (group, item) {
+            if (item.deleted) {
+                return false;
+            }
+
+            if (!String(item.id).indexOf('new_')) {
+                group.items.splice(group.items.indexOf(item, 1));
+                return true;
+            }
+
+            item.deleted = 1;
+        };
+
+        $scope.add = function (group) {
+            group.items.push({
+                'id': 'new_' + group.items.length,
+                'condition': 'NONE',
+                'action': 'NONE',
+                'my': 1,
+                'value': 50,
+                'options': {}
+            });
+        };
+
+        $scope.actionChange = function (item) {
+            if (item.action === 'promotion_start') {
+                $scope.options(item);
+            }
+        };
+
+        $scope.save = function (group) {
+            $scope.viewLoaded = 0;
+            return rule.saveGroup(
+                $scope.sessionId,
+                group
+            ).then(function () {
+                return init();
+            }).then(function () {
+                return toast.open({
+                    'htmlText': 'Rules saved successfully'
+                });
+            });
+        };
+
+        $scope.condNoneCheck = function (item) {
+            return item.condition === 'NONE';
+        };
+
+        $scope.actionNoneCheck = function (item) {
+            return item.action === 'NONE';
+        };
+
+        $scope.emptyOptions = function (item) {
+            if (item.action === 'promotion_start') {
+                return !Object.keys(item.options).length;
+            }
+            return 0;
+        };
+
+        if ($scope.loaded) {
+            init();
+        } else {
+            $scope.$on('loaded', init);
+        }
+    }
+]);
+
+/*global momentum, window */
+momentum.controller('TeamSettingsController', [
+    'auth',
+    'toast',
+    'dialog',
+    '$q',
+    '$timeout',
+    '$scope',
+    function (auth, toast, dialog, $q, $timeout, $scope) {
+        function updateUsers () {
+            return auth.getUsers($scope.sessionId).then(function (users) {
+                $scope.usersContainer.users.length = 0;
+                $scope.usersContainer.users.push.apply(
+                    $scope.usersContainer.users,
+                    users
+                );
+            });
+        }
+
+        function getCode () {
+            return auth.getCode($scope.sessionId).then(function (resp) {
+                $scope.codeContainer.code = resp;
+            });
+        }
+
+        function animate () {
+            $timeout(function () {
+                $scope.usersContainer.animate();
+                $scope.codeContainer.animate();
+            });
+        }
+
+        $scope.usersContainer = {
+            'switchProgress': 0,
+            'users': [],
+            'removeUser': function (id, email) {
+                dialog.open({
+                    'title': 'Remove user?',
+                    'htmlText': '<div>{{model.email}}</div>',
+                    'okText': 'Remove',
+                    'cancelText': 'Cancel',
+                    'showCancel': true,
+                    'model': {
+                        'email': email
+                    }
+                }).then(function () {
+                    return auth.removeUser(
+                        $scope.sessionId,
+                        id
+                    ).then(function (users) {
+                        $scope.usersContainer.users.length = 0;
+                        $scope.usersContainer.users.push.apply(
+                            $scope.usersContainer.users,
+                            users
+                        );
+                    }).then(function () {
+                        return toast.open({
+                            'htmlText': email + ' removed'
+                        });
+                    });
+                }).catch(function () {});
+            },
+            'addUser': function () {
+                dialog.open({
+                    'title': 'Invite user',
+                    'template': 'inviteUserDialog.tpl.html',
+                    'okText': 'Invite',
+                    'cancelText': 'Cancel',
+                    'showCancel': true,
+                    'model': {}
+                }).then(function (data) {
+                    return auth.inviteUser(
+                        $scope.sessionId,
+                        data.email
+                    ).then(function (users) {
+                        $scope.usersContainer.users.length = 0;
+                        $scope.usersContainer.users.push.apply(
+                            $scope.usersContainer.users,
+                            users
+                        );
+                    }).then(function () {
+                        return toast.open({
+                            'htmlText': data.email + ' added'
+                        });
+                    });
+                }).catch(function () {});
+            },
+            'switchState': function (id, state) {
+                $scope.switchProgress = 1;
+                return auth.switchAdminState(
+                    $scope.sessionId,
+                    id,
+                    state
+                ).then(function () {
+                    updateUsers().then(function () {
+                        $scope.switchProgress = 0;
+                    });
+                }).then(function () {
+                    return toast.open({
+                        'htmlText': 'Permission changed'
+                    });
+                });
+            }
+        };
+
+        $scope.codeContainer = {
+            'code': '',
+            'copy': function () {
+                var copyTextarea;
+
+                copyTextarea = window
+                    .document
+                    .getElementById('tr-code');
+                copyTextarea.select();
+
+                try {
+                    window.document.execCommand('copy');
+                    return toast.open({
+                        'htmlText': 'Copied to clipboard'
+                    });
+                } catch (err) {
+                    return toast.open({
+                        'htmlText': 'Can\'t copy to clipboard. Use Ctrl/Cmd-C'
+                    });
+                }
+            }
+        };
+
+        $scope.viewLoaded = 0;
+
+        function init () {
+            var promises = {
+                'users': updateUsers(),
+                'code': getCode()
+            };
+
+            return $q.all(promises).then(function () {
+                animate();
+                $scope.viewLoaded = 1;
+            });
+        }
+
+        if ($scope.loaded) {
+            init();
+        } else {
+            $scope.$on('loaded', init);
+        }
+    }
+]);
 
 /*global momentum*/
 momentum.directive('body', [
@@ -68359,1349 +69702,6 @@ momentum.factory('utils', [
 ]);
 
 /*global momentum */
-momentum.controller('AccountSettingsController', [
-    'auth',
-    'account',
-    'userData',
-    'teamUserData',
-    'dialog',
-    'toast',
-    'fb',
-    'utils',
-    'storage',
-    '$q',
-    '$timeout',
-    '$state',
-    '$rootScope',
-    '$scope',
-    function (
-        auth,
-        account,
-        userData,
-        teamUserData,
-        dialog,
-        toast,
-        fb,
-        utils,
-        storage,
-        $q,
-        $timeout,
-        $state,
-        $rootScope,
-        $scope
-    ) {
-        function animate () {
-            $timeout(function () {
-                $scope.fbInt.animate();
-                $scope.pwChange.animate();
-                $scope.teamSwitch.animate();
-            });
-        }
-
-        function reloadAssets () {
-            var promises = {},
-                fbAssets,
-                assets;
-
-            promises['fbAssets'] = fb.listFbAssets(
-                $scope.sessionId
-            ).then(function (a) {
-                $scope.fbInt.connected = 1;
-                fbAssets = a;
-            }).catch(function () {});
-
-            promises['assets'] = fb.listAssets(
-                $scope.sessionId
-            ).then(function (a) {
-                assets = a;
-            });
-
-            return $q.all(promises).then(function () {
-                if ($scope.fbInt.connected) {
-                    $scope.fbInt.assets = utils.mergeAssets(
-                        fbAssets,
-                        assets
-                    );
-                }
-            });
-        }
-
-        $scope.viewLoaded = 0;
-
-        $scope.fbInt = {
-            'dataLoading': 0,
-            'connected': 0,
-            'assets': null,
-            'submit': function () {
-                var assets = $scope.fbInt.assets,
-                    checkFunc = function (e) {
-                        return e.checked;
-                    },
-                    pages = assets.page.filter(checkFunc),
-                    adaccounts = assets.adaccount.filter(checkFunc),
-                    req = pages.concat(adaccounts);
-
-                if (!pages.length || !adaccounts.length) {
-                    return dialog.open({
-                        'htmlText': 'Choose at least one ad account and page.'
-                    });
-                }
-
-                $scope.fbInt.dataLoading = 1;
-                return fb.saveAssets(
-                    $scope.sessionId,
-                    req
-                ).then(function (data) {
-                    if (data.length !== req.length) {
-                        return reloadAssets().then(function () {
-                            $scope.fbInt.dataLoading = 0;
-                            return dialog.open({
-                                'htmlText': 'Can\'t save one or more assets.'
-                            });
-                        });
-                    }
-                    $scope.fbInt.dataLoading = 0;
-                    toast.open({
-                        'htmlText': 'Assets saved'
-                    });
-                    return teamUserData.set(
-                        $scope.sessionId,
-                        'guide_fb',
-                        'added'
-                    ).then(function () {
-                        $rootScope.guideSteps['fb'] = 'added';
-                        return $rootScope.guide();
-                    });
-                });
-            },
-            'connect': function () {
-                $scope.fbInt.dataLoading = 1;
-                fb.login().then(function (accessToken) {
-                    return fb.token(
-                        $scope.sessionId,
-                        accessToken
-                    ).then(function () {
-                        return reloadAssets().then(function () {
-                            $scope.fbInt.dataLoading = 0;
-                        });
-                    });
-                });
-            },
-            'switchDefault': function (type, id) {
-                $scope.fbInt.assets[type].forEach(function (asset) {
-                    asset.default = false;
-                    if (asset.value === id) {
-                        asset.default = true;
-                        asset.checked = true;
-                    }
-                });
-            },
-            'checkChange': function (type, id) {
-                var val,
-                    hasDefault,
-                    checked = [];
-
-                $scope.fbInt.assets[type].forEach(function (asset) {
-                    val = asset.checked;
-                    if (asset.value === id) {
-                        if (val) {
-                            asset.checked = true;
-                            val = true;
-                        } else {
-                            asset.checked = false;
-                            asset.default = false;
-                        }
-                    }
-                    if (val) {
-                        checked.push(asset);
-                    }
-                });
-
-                checked.forEach(function (asset) {
-                    if (asset.default) {
-                        hasDefault = true;
-                    }
-                });
-
-                if (!hasDefault && checked.length) {
-                    checked[0].default = 1;
-                }
-            }
-        };
-
-        $scope.teamSwitch = {
-            'dataLoading': 0,
-            'teams': null,
-            'submit': function () {
-                $scope.teamSwitch.dataLoading = 1;
-                auth.setTeam(
-                    $scope.sessionId,
-                    $scope.teamSwitch.teams.selected
-                ).then(function () {
-                    $scope.teamSwitch.dataLoading = 0;
-                    storage.invalidateCache();
-                    $state.go('root.main.dashboard.info');
-                });
-            }
-        };
-
-        $scope.pwChange = {
-            'dataLoading': 0,
-            'error': '',
-            'oldPassword': '',
-            'newPassword': '',
-            'changePassword': function () {
-                $scope.pwChange.dataLoading = 1;
-                $scope.pwChange.error = '';
-
-                account.changePassword(
-                    $scope.sessionId,
-                    $scope.pwChange.oldPassword,
-                    $scope.pwChange.newPassword
-                ).then(function (response) {
-                    var error = response.data.errorMessage;
-
-                    if (error) {
-                        $scope.pwChange.error = error.split(':')[2];
-                    } else {
-                        $scope.pwChange.newPassword = '';
-                        $scope.pwChange.oldPassword = '';
-                        toast.open({
-                            'htmlText': 'Password changed'
-                        });
-                    }
-                }).finally(function () {
-                    $scope.pwChange.dataLoading = 0;
-                });
-            }
-        };
-
-        function init () {
-            var promises = {};
-
-            promises['teams'] = auth.getTeams(
-                $scope.sessionId
-            ).then(function (teams) {
-                $scope.teamSwitch.teams = teams;
-            });
-
-            promises['assets'] = reloadAssets();
-
-            return $q.all(promises).then(function () {
-                animate();
-                $scope.viewLoaded = 1;
-            });
-        }
-
-        if ($scope.loaded) {
-            init();
-        } else {
-            $scope.$on('loaded', init);
-        }
-    }]
-);
-
-/*global momentum, confirm*/
-momentum.controller('AdminController', [
-    '$timeout',
-    '$scope',
-    'admin',
-    'storage',
-    'toast',
-    'dialog',
-    '$q',
-    function ($timeout, $scope, admin, storage, toast, dialog, $q) {
-        $scope.viewLoaded = 0;
-
-        $scope.addUser = {
-            'dataLoading': 0,
-            'email': '',
-            'teamName': '',
-            'sendCode': true,
-            'forcePayment': false,
-            'partner': false,
-            'sendCodeTo': '',
-            'paymentAmount': 0,
-            'send': function () {
-                var sendCode = $scope.addUser.sendCode,
-                    amount = Number($scope.addUser.paymentAmount),
-                    forcePayment = $scope.addUser.forcePayment;
-
-                $scope.addUser.dataLoading = 1;
-                admin.addTeam(
-                    $scope.sessionId,
-                    $scope.addUser.teamName,
-                    $scope.addUser.email,
-                    sendCode ? $scope.addUser.sendCodeTo : '',
-                    Number($scope.addUser.partner),
-                    forcePayment ? amount : 0
-                ).then(function (resp) {
-                    $scope.addUser.dataLoading = 0;
-                    return dialog.open({
-                        'dialogClass': 'auto-width',
-                        'htmlText': [
-                            'Team has been added<br /><br />',
-                            'Insert code:<br />',
-                            '<textarea',
-                            ' spellcheck="false" id="tr-code"',
-                            ' readonly class="code-cont">',
-                            resp,
-                            '</textarea>'
-                        ].join('')
-                    }).catch(function () {});
-                }).catch(function (err) {
-                    return dialog.open({
-                        'htmlText': err
-                    }).finally(function () {
-                        $scope.addUser.dataLoading = 0;
-                    });
-                });
-            },
-            'emailChange': function () {
-                $scope.addUser.sendCodeTo = $scope.addUser.email;
-            }
-        };
-        $scope.payment = {
-            'dataLoading': 0,
-            'status': false,
-            'amount': 0,
-            'name': '',
-            'change': function () {
-                var amount = $scope.payment.status ?
-                    Number($scope.payment.amount) : 0;
-
-                $scope.payment.dataLoading = 1;
-                return admin.setPayment(
-                    $scope.sessionId,
-                    amount
-                ).then(function () {
-                    $scope.payment.dataLoading = 0;
-                    return toast.open({
-                        'htmlText': 'Payment settings have been saved'
-                    });
-                });
-            }
-        };
-
-        $scope.demo = {
-            'status': storage.getDemo() || 0,
-            'change': function () {
-                $scope.demo.status = $scope.demo.status === 1 ? 0 : 1;
-                storage.setDemo($scope.demo.status);
-            }
-        };
-
-        function confirmInactive () {
-            var text = [
-                'Are you sure you want to ',
-                $scope.inactivate.status ? 'disable' : 'enable',
-                ' tracking for ',
-                $scope.inactivate.name
-            ].join('');
-
-            return confirm(text);
-        }
-
-        $scope.inactivate = {
-            'status': null,
-            'name': '',
-            'change': function () {
-                if (confirmInactive()) {
-                    $scope.inactivate.status = $scope.inactivate.status ? 0 : 1;
-                    return admin.setTeamInactive(
-                        $scope.sessionId,
-                        $scope.inactivate.status
-                    ).then(function () {
-                        return toast.open({
-                            'htmlText': [
-                                'Tracking code is ',
-                                $scope.inactivate.status ?
-                                    'enabled' : 'disabled'
-                            ].join('')
-                        });
-                    });
-                }
-            }
-        };
-
-        function getTeamInactive () {
-            return admin.getTeamInactive(
-                $scope.sessionId
-            ).then(function (resp) {
-                $scope.inactivate.status = Number(resp.status);
-                $scope.inactivate.name = resp.name;
-            });
-        }
-
-        function getPayment () {
-            return admin.getPayment(
-                $scope.sessionId
-            ).then(function (resp) {
-                $scope.payment.status = Boolean(resp.status);
-                $scope.payment.amount = resp.amount;
-                $scope.payment.name = resp.name;
-            });
-        }
-
-        function animate () {
-            $timeout(function () {
-                $scope.addUser.animate();
-                $scope.demo.animate();
-                $scope.inactivate.animate();
-                $scope.payment.animate();
-            });
-        }
-
-        function init () {
-            var promises = [];
-
-            promises.push(getTeamInactive());
-            promises.push(getPayment());
-
-            $q.all(promises).then(function () {
-                animate();
-                $scope.viewLoaded = 1;
-            });
-        }
-
-        if ($scope.loaded) {
-            init();
-        } else {
-            $scope.$on('loaded', init);
-        }
-    }
-]);
-
-/*global momentum, window */
-momentum.controller('AuthController', ['storage', 'auth', '$state', '$scope',
-function (storage, auth, $state, $scope) {
-    $scope.auth = {
-        'dataLoading': 0,
-        'error': '',
-        'email': '',
-        'password': '',
-        'login': function () {
-            $scope.auth.dataLoading = 1;
-            $scope.auth.error = '';
-            auth.login(
-                $scope.auth.email,
-                $scope.auth.password
-            ).then(function (response) {
-                if (response.data.errorMessage) {
-                    $scope.auth.dataLoading = 0;
-                    $scope.auth.error = response.data.errorMessage.split(
-                        ':'
-                    )[2];
-                } else {
-                    storage.storeAuthData(
-                        response.data.session_id,
-                        response.data.teams
-                    ).then(function () {
-                        $scope.auth.dataLoading = 0;
-                        window.location.href = '/';
-                    });
-                }
-            });
-        }
-    };
-}]);
-
-/*global momentum, Stripe, window */
-momentum.controller('BillingSettingsController', [
-    'toast',
-    'account',
-    'formHelper',
-    '$scope',
-    '$state',
-    '$q',
-    '$timeout',
-    'stripe',
-    function (
-        toast,
-        account,
-        formHelper,
-        $scope,
-        $state,
-        $q,
-        $timeout,
-        stripe
-    ) {
-        function animate () {
-            $timeout(function () {
-                $scope.payment.animate();
-            });
-        }
-
-        function getPayment () {
-            return account.getPayment(
-                $scope.sessionId
-            ).then(function (resp) {
-                $scope.payment.status = Boolean(resp.status);
-                $scope.payment.amount = resp.amount;
-                $scope.payment.name = resp.name;
-                if (!resp.status) {
-                    $state.go('root.main.dashboard.info');
-                }
-            });
-        }
-
-        $scope.payment = {
-            'dataLoading': false,
-            'amount': 0,
-            'status': false,
-            'states': {},
-            'countries': {},
-            'company': '',
-            'error': '',
-            'stripe': {
-                'number': '',
-                'expiry': '',
-                'cvc': '',
-                'address_city': '',
-                'address_country': '',
-                'address_line1': '',
-                'address_zip': ''
-            },
-            'pay': function () {
-                return $q(function (resolve, reject) {
-                    var data = $scope.payment.stripe,
-                        exp = $scope.payment.stripe.expiry || '';
-
-                    /* You must not change the following 4 lines! */
-                    exp = exp.toString();
-                    exp = exp.split('/');
-                    data.exp_month = exp && Number(exp[0]) || '';
-                    data.exp_year = exp && Number(exp[1]) || '';
-                    data.address_country = $scope.payment.countries.selected;
-                    delete data.expiry;
-                    $scope.payment.dataLoading = true;
-                    Stripe.card.createToken(
-                        data,
-                        function (status, resp) {
-                            if (resp.error) {
-                                reject(resp.error.message);
-                            }
-                            resolve(resp);
-                        }
-                    );
-                }).then(function (resp) {
-                    var data = {};
-
-                    data.client_ip = resp.client_ip;
-                    data.address_country = $scope.payment.countries.selected;
-                    data.address_line1 =  $scope.payment.stripe.address_line1;
-                    data.address_zip =  $scope.payment.stripe.address_zip;
-                    data.address_city =  $scope.payment.stripe.address_city;
-                    data.company = $scope.payment.company;
-                    return stripe.pay(
-                        $scope.sessionId,
-                        data,
-                        resp.id
-                    );
-                }).then(function (resp) {
-                    if (resp === 'success') {
-                        window.location.reload(true);
-                    } else {
-                        throw resp.toString();
-                    }
-                }).catch(function (err) {
-                    $scope.payment.dataLoading = false;
-                    $scope.payment.error = err;
-                    return false;
-                });
-            }
-        };
-
-        $scope.payment.countries = {
-            'data': formHelper.countries,
-            'selected': 'GB',
-            'label': 'Country'
-        };
-
-        function getBilling () {
-            return stripe.getBilling(
-                $scope.sessionId
-            ).then(function (resp) {
-                $scope.payment.countries.selected =
-                    resp.address_country || 'GB';
-                $scope.payment.stripe.address_line1 = resp.address_line1;
-                $scope.payment.stripe.address_zip = resp.address_zip;
-                $scope.payment.stripe.address_country = resp.address_country;
-                $scope.payment.stripe.address_city = resp.address_city;
-                $scope.payment.company = resp.company;
-            });
-        }
-
-        $scope.viewLoaded = 0;
-
-        function init () {
-            var promises = {
-                'payment': getPayment(),
-                'getBilling': getBilling(),
-                'stripe': stripe.init()
-            };
-
-            return $q.all(promises).then(function () {
-                animate();
-                $scope.viewLoaded = 1;
-            });
-        }
-
-        if ($scope.loaded) {
-            init();
-        } else {
-            $scope.$on('loaded', init);
-        }
-    }
-]);
-
-/*global momentum */
-momentum.controller('ForgotPasswordController', [
-    'auth',
-    '$state',
-    '$scope',
-    'toast',
-    'dialog',
-    function (auth, $state, $scope, toast, dialog) {
-        $scope.forgot = {
-            'dataLoading': 0,
-            'email': '',
-            'send': function () {
-                $scope.forgot.dataLoading = 1;
-                auth.forgotPassword(
-                    $scope.forgot.email
-                ).then(function () {
-                    toast.open({
-                        'htmlText': 'Reminder email sent'
-                    }).finally(function () {
-                        $state.go('auth');
-                    });
-                }).catch(function (err) {
-                    return dialog.open({
-                        'htmlText': err
-                    }).finally(function () {
-                        $scope.forgot.dataLoading = 0;
-                    });
-                });
-            }
-        };
-    }
-]);
-
-/*global momentum, bvConfig */
-momentum.controller('HelpController', [
-    '$timeout',
-    '$sce',
-    '$scope',
-    function ($timeout, $sce, $scope) {
-        $scope.viewLoaded = 0;
-        $scope.videoContainer = {
-            'video': $sce.trustAsHtml(
-                bvConfig.tutorialVideo
-            )
-        };
-
-        function animate () {
-            $timeout(function () {
-                $scope.videoContainer.animate();
-            });
-        }
-
-        function init () {
-            animate();
-            $scope.viewLoaded = 1;
-        }
-
-        if ($scope.loaded) {
-            init();
-        } else {
-            $scope.$on('loaded', init);
-        }
-    }
-]);
-
-/*global momentum*/
-momentum.controller('MainController', [
-    'post',
-    '$state',
-    '$scope',
-    '$q',
-    '$timeout',
-    function (
-        post,
-        $state,
-        $scope,
-        $q,
-        $timeout
-    ) {
-        var poller;
-
-        $scope.posts = null;
-        $scope.viewLoaded = 0;
-
-        $scope.itemClick = function (id) {
-            $scope.posts.forEach(function (post) {
-                if (post.id === id) {
-                    post.active = post.active ? 0 : 1;
-                    if (post.active) {
-                        $state.go('root.main.content.info', {
-                            'contentId': String(id)
-                        });
-                    } else {
-                        $state.go('root.main.dashboard.info');
-                    }
-                } else {
-                    post.active = 0;
-                }
-            });
-        };
-        function oneMinutePoll () {
-            var promises = {
-                'posts': post.list($scope.sessionId, 20)
-            };
-
-            if (poller) {
-                $timeout.cancel(poller);
-            }
-
-            promises.posts = promises.posts.then(function (posts) {
-                $scope.posts = posts.data;
-                $scope.posts.forEach(function (post) {
-                    if (post.id === Number($scope.stateParams.contentId)) {
-                        post.active = 1;
-                    }
-                });
-            });
-
-            $q.all(promises).then(function () {
-                $timeout(function () { $scope.viewLoaded = 1; });
-                poller = $timeout(oneMinutePoll, 60000);
-            });
-        }
-
-        if ($scope.loaded) {
-            oneMinutePoll();
-        } else {
-            $scope.$on('loaded', oneMinutePoll);
-        }
-
-        $scope.$on('$destroy', function () {
-            if (poller) {
-                $timeout.cancel(poller);
-            }
-        });
-    }
-]);
-
-/*global momentum */
-momentum.controller('PasswordSetupController', [
-    'auth',
-    '$state',
-    '$scope',
-    '$stateParams',
-    'toast',
-    'dialog',
-    function (auth, $state, $scope, $stateParams, toast, dialog) {
-        $scope.setup = {
-            'dataLoading': 0,
-            'password': '',
-            'send': function () {
-                $scope.setup.dataLoading = 1;
-                auth.setupPassword(
-                    $stateParams.email,
-                    $stateParams.token,
-                    $scope.setup.password
-                ).then(function () {
-                    toast.open({
-                        'htmlText': 'New password saved'
-                    });
-                }).catch(function (err) {
-                    dialog.open({
-                        'htmlText': err
-                    }).finally(function () {
-                        $scope.setup.dataLoading = 0;
-                    });
-                });
-            }
-        };
-    }
-]);
-
-/*global momentum, window*/
-momentum.controller('RootController', [
-    '$state',
-    '$stateParams',
-    '$q',
-    '$scope',
-    '$rootScope',
-    'storage',
-    'auth',
-    'dialog',
-    'category',
-    'guide',
-    function (
-        $state,
-        $stateParams,
-        $q,
-        $scope,
-        $rootScope,
-        storage,
-        auth,
-        dialog,
-        category,
-        guide
-    ) {
-        $scope.sessionId = '0';
-
-        function sendSessionId () {
-            window.postMessage({
-                'type': 'BVSID',
-                'value': $scope.sessionId
-            },
-            '*');
-        }
-
-        $scope.state = $state;
-        $scope.stateParams = $stateParams;
-        $scope.loaded = 0;
-
-        $scope.openFilters = function () {
-            category.getWithSelected(
-                $scope.sessionId
-            ).then(function (data) {
-                dialog.open({
-                    'title': 'Filters',
-                    'template': 'filterDialog.tpl.html',
-                    'okText': 'Save',
-                    'showCancel': true,
-                    'destroy': false,
-                    'model': data
-                }).then(function () {
-                    storage.invalidateCache();
-                    return category.setSelected($scope.sessionId, {
-                        'category': data.category.selected,
-                        'subCategory': data.subCategory.selected,
-                        'subSubCategory': data.subSubCategory.selected
-                    }).then(function () {
-                        window.location.reload(true);
-                    });
-                }).catch(function () {});
-            });
-        };
-
-        storage.getSessionId().then(function (data) {
-            $scope.sessionId = data;
-            return auth.getUser(data);
-        }).then(function (user) {
-            $scope.user = user;
-            $scope.loaded = 1;
-            sendSessionId();
-
-            $scope.$broadcast('loaded');
-
-            if (!Number(user.is_super)) {
-                return guide.show($scope.sessionId, user);
-            }
-        });
-
-        $rootScope.$on(
-            '$stateChangeStart',
-            function (
-                event,
-                toState,
-                ignore,
-                fromState
-            ) {
-                if (!toState.name.indexOf('root.main') &&
-                    $scope.user.payment_amount) {
-                    event.preventDefault();
-                    if (fromState.name.indexOf('root.billing')) {
-                        $state.go('root.billing');
-                    }
-                }
-            }
-        );
-    }
-]);
-
-/*global momentum*/
-momentum.controller('RouterController', [
-    function () {}
-]);
-
-/*global momentum, angular*/
-momentum.controller('RulesController', [
-    'dialog',
-    'toast',
-    'rule',
-    'fb',
-    '$q',
-    '$state',
-    '$scope',
-    function (dialog, toast, rule, fb, $q, $state, $scope) {
-        $scope.groups = null;
-        $scope.activeGroup = null;
-        $scope.viewLoaded = 0;
-
-        function init () {
-            $scope.groups = null;
-            return rule.list($scope.sessionId).then(function (ret) {
-                $scope.groups = ret.groups;
-                $scope.activeGroup = ret.active;
-                $scope.activeGroup.open = 1;
-                $scope.groups.isOpen = 0;
-            }).then(function () {
-                $scope.viewLoaded = 1;
-            });
-        }
-
-        function getCurrency (model) {
-            if (model.adaccount && model.adaccount.selected) {
-                return fb.currency(
-                    $scope.sessionId,
-                    model.adaccount.selected
-                );
-            }
-        }
-
-        function getAudiences (model) {
-            if (model.adaccount && model.adaccount.selected) {
-                return fb.audiences(
-                    $scope.sessionId,
-                    model.adaccount.selected
-                );
-            }
-        }
-
-        function refreshModel (model) {
-            var promises = [];
-
-            promises.push(getAudiences(model));
-            promises.push(getCurrency(model));
-
-            return $q.all(promises).then(function (resp) {
-                var offset = resp[1] && resp[1].offset || 100;
-
-                model.audiences = resp[0];
-                model.currency = resp[1];
-                model.budget = Math.floor(
-                    2000 /
-                    offset
-                );
-
-                return model;
-            });
-        }
-
-        function getOptionsModel () {
-            var promises,
-                ret;
-
-            promises = {
-                'assets': fb.listAssets($scope.sessionId)
-            };
-
-            ret = {};
-
-            promises.assets = promises.assets.then(function (assets) {
-                (assets || []).forEach(function (item) {
-                    ret[item.type] = ret[item.type] || {};
-                    if (item.default) {
-                        ret[item.type].selected = item.value;
-                    }
-                    ret[item.type].data = ret[item.type].data || [];
-                    ret[item.type].label = item.type;
-                    ret[item.type].data.push({
-                        'label': item.display,
-                        'id': item.value
-                    });
-                });
-
-                if (!ret['page'] ||
-                    !ret['page'].data ||
-                    !ret['page'].data.length ||
-                    !ret['adaccount'] ||
-                    !ret['adaccount'].data ||
-                    !ret['adaccount'].data.length
-                ) {
-                    $state.go('root.account-settings');
-                    return $q.reject('Choose at least one ' +
-                        'ad account and page.');
-                }
-                if (!ret['page'].selected) {
-                    ret['page'].selected = ret['page'].data[0].id;
-                }
-                if (!ret['adaccount'].selected) {
-                    ret['adaccount'].selected = ret['adaccount'].data[0].id;
-                }
-
-                ret['page'].label = 'Pages:';
-                ret['adaccount'].label = 'Ad accounts:';
-                ret['adaccount'].change = function () {
-                    return refreshModel(ret);
-                };
-            });
-
-            return $q.all(promises).then(function () {
-                return ret;
-            });
-        }
-
-        function removeNew (group) {
-            var removable = [];
-
-            group.items.forEach(function (item) {
-                if (!String(item.id).indexOf('new_')) {
-                    removable.push(item);
-                }
-            });
-
-            removable.forEach(function (item) {
-                group.items.splice(group.items.indexOf(item), 1);
-            });
-        }
-
-        $scope.reset = function (group) {
-            removeNew(group);
-            group.items.forEach(function (item, index) {
-                group.items[index] = group.items[index].$original;
-                group.items[index].$original = angular.copy(
-                    group.items[index]
-                );
-            });
-        };
-
-        $scope.open = function (group) {
-            var isOpen = 0;
-
-            if (group.open) {
-                return false;
-            }
-
-            $scope.groups.forEach(function (g) {
-                removeNew(g);
-
-                if (g.id === group.id) {
-                    g.items.forEach(function (item, index) {
-                        g.items[index] = g.items[index].$original;
-                        g.items[index].$original = angular.copy(
-                            g.items[index]
-                        );
-                    });
-                    g.open = 1;
-                    isOpen = 1;
-                } else {
-                    g.open = 0;
-                }
-            });
-
-            $scope.groups.isOpen = isOpen;
-        };
-
-        $scope.close = function () {
-            $scope.groups.isOpen = 0;
-            $scope.groups.forEach(function (g) {
-                removeNew(g);
-                g.open = 0;
-            });
-        };
-
-        $scope.options = function (item) {
-            var promise = $q.resolve();
-
-            if (item.deleted) {
-                return false;
-            }
-
-            if (!item.my) {
-                promise = dialog.open({
-                    'htmlText': '<span>This rule edited by other user.<br/>' +
-                        'Are you sure you want to edit?</span>',
-                    'okText': 'Proceed',
-                    'destroy': false,
-                    'cancelText': 'Cancel',
-                    'showCancel': true
-                });
-            }
-
-            promise.then(function () {
-                return getOptionsModel().then(function (model) {
-                    return refreshModel(model);
-                }).then(function (model) {
-                    model['max_duration'] = 1;
-
-                    return dialog.open({
-                        'title': 'Rule options',
-                        'template': 'ruleOptions.tpl.html',
-                        'okText': 'Ok',
-                        'showCancel': true,
-                        'model': model,
-                        'animate': item.my,
-                        'dialogClass': 'rule-options-dialog'
-                    }).then(function (model) {
-                        var options = {
-                            'ad_account': model.adaccount.selected,
-                            'page_id': model.page.selected,
-                            'audience': model.audiences.selected,
-                            'max_duration': model.max_duration,
-                            'budget': model.budget * model.currency.offset,
-                            'meta': {
-                                'page': model.page.data.filter(
-                                    function (elem) {
-                                        return elem.id ===
-                                            model.page.selected;
-                                    }
-                                )[0].label,
-                                'audience': model.audiences.data.filter(
-                                    function (elem) {
-                                        return elem.id ===
-                                            model.audiences.selected;
-                                    }
-                                )[0].label,
-                                'adaccount': model.adaccount.data.filter(
-                                    function (elem) {
-                                        return elem.id ===
-                                            model.adaccount.selected;
-                                    }
-                                )[0].label,
-                                'currency': model.currency.name,
-                                'offset': model.currency.offset
-                            }
-                        };
-
-                        item.my = 1;
-                        item.options = options;
-                    });
-                });
-            });
-        };
-
-        $scope.changed = function (item) {
-            if (item.deleted) {
-                return false;
-            }
-
-            return !item.$original || !angular.equals(item, item.$original);
-        };
-
-        $scope.delete = function (group, item) {
-            if (item.deleted) {
-                return false;
-            }
-
-            if (!String(item.id).indexOf('new_')) {
-                group.items.splice(group.items.indexOf(item, 1));
-                return true;
-            }
-
-            item.deleted = 1;
-        };
-
-        $scope.add = function (group) {
-            group.items.push({
-                'id': 'new_' + group.items.length,
-                'condition': 'NONE',
-                'action': 'NONE',
-                'my': 1,
-                'value': 50,
-                'options': {}
-            });
-        };
-
-        $scope.actionChange = function (item) {
-            if (item.action === 'promotion_start') {
-                $scope.options(item);
-            }
-        };
-
-        $scope.save = function (group) {
-            $scope.viewLoaded = 0;
-            return rule.saveGroup(
-                $scope.sessionId,
-                group
-            ).then(function () {
-                return init();
-            }).then(function () {
-                return toast.open({
-                    'htmlText': 'Rules saved successfully'
-                });
-            });
-        };
-
-        $scope.condNoneCheck = function (item) {
-            return item.condition === 'NONE';
-        };
-
-        $scope.actionNoneCheck = function (item) {
-            return item.action === 'NONE';
-        };
-
-        $scope.emptyOptions = function (item) {
-            if (item.action === 'promotion_start') {
-                return !Object.keys(item.options).length;
-            }
-            return 0;
-        };
-
-        if ($scope.loaded) {
-            init();
-        } else {
-            $scope.$on('loaded', init);
-        }
-    }
-]);
-
-/*global momentum, window */
-momentum.controller('TeamSettingsController', [
-    'auth',
-    'toast',
-    'dialog',
-    '$q',
-    '$timeout',
-    '$scope',
-    function (auth, toast, dialog, $q, $timeout, $scope) {
-        function updateUsers () {
-            return auth.getUsers($scope.sessionId).then(function (users) {
-                $scope.usersContainer.users.length = 0;
-                $scope.usersContainer.users.push.apply(
-                    $scope.usersContainer.users,
-                    users
-                );
-            });
-        }
-
-        function getCode () {
-            return auth.getCode($scope.sessionId).then(function (resp) {
-                $scope.codeContainer.code = resp;
-            });
-        }
-
-        function animate () {
-            $timeout(function () {
-                $scope.usersContainer.animate();
-                $scope.codeContainer.animate();
-            });
-        }
-
-        $scope.usersContainer = {
-            'switchProgress': 0,
-            'users': [],
-            'removeUser': function (id, email) {
-                dialog.open({
-                    'title': 'Remove user?',
-                    'htmlText': '<div>{{model.email}}</div>',
-                    'okText': 'Remove',
-                    'cancelText': 'Cancel',
-                    'showCancel': true,
-                    'model': {
-                        'email': email
-                    }
-                }).then(function () {
-                    return auth.removeUser(
-                        $scope.sessionId,
-                        id
-                    ).then(function (users) {
-                        $scope.usersContainer.users.length = 0;
-                        $scope.usersContainer.users.push.apply(
-                            $scope.usersContainer.users,
-                            users
-                        );
-                    }).then(function () {
-                        return toast.open({
-                            'htmlText': email + ' removed'
-                        });
-                    });
-                }).catch(function () {});
-            },
-            'addUser': function () {
-                dialog.open({
-                    'title': 'Invite user',
-                    'template': 'inviteUserDialog.tpl.html',
-                    'okText': 'Invite',
-                    'cancelText': 'Cancel',
-                    'showCancel': true,
-                    'model': {}
-                }).then(function (data) {
-                    return auth.inviteUser(
-                        $scope.sessionId,
-                        data.email
-                    ).then(function (users) {
-                        $scope.usersContainer.users.length = 0;
-                        $scope.usersContainer.users.push.apply(
-                            $scope.usersContainer.users,
-                            users
-                        );
-                    }).then(function () {
-                        return toast.open({
-                            'htmlText': data.email + ' added'
-                        });
-                    });
-                }).catch(function () {});
-            },
-            'switchState': function (id, state) {
-                $scope.switchProgress = 1;
-                return auth.switchAdminState(
-                    $scope.sessionId,
-                    id,
-                    state
-                ).then(function () {
-                    updateUsers().then(function () {
-                        $scope.switchProgress = 0;
-                    });
-                }).then(function () {
-                    return toast.open({
-                        'htmlText': 'Permission changed'
-                    });
-                });
-            }
-        };
-
-        $scope.codeContainer = {
-            'code': '',
-            'copy': function () {
-                var copyTextarea;
-
-                copyTextarea = window
-                    .document
-                    .getElementById('tr-code');
-                copyTextarea.select();
-
-                try {
-                    window.document.execCommand('copy');
-                    return toast.open({
-                        'htmlText': 'Copied to clipboard'
-                    });
-                } catch (err) {
-                    return toast.open({
-                        'htmlText': 'Can\'t copy to clipboard. Use Ctrl/Cmd-C'
-                    });
-                }
-            }
-        };
-
-        $scope.viewLoaded = 0;
-
-        function init () {
-            var promises = {
-                'users': updateUsers(),
-                'code': getCode()
-            };
-
-            return $q.all(promises).then(function () {
-                animate();
-                $scope.viewLoaded = 1;
-            });
-        }
-
-        if ($scope.loaded) {
-            init();
-        } else {
-            $scope.$on('loaded', init);
-        }
-    }
-]);
-
-/*global momentum */
 momentum.controller('FacebookController', [
     'auth',
     'fb',
@@ -70575,6 +70575,28 @@ momentum.directive('usersContainer', [
 ]);
 
 /*global momentum, angular*/
+momentum.directive('facebookConnected', [
+    'animate',
+    function (animate) {
+        return {
+            'restrict': 'A',
+            'templateUrl': 'facebookConnected.tpl.html',
+            'scope': {
+                'model': '=ngModel',
+                'user': '=ngUser'
+            },
+            'link': function ($scope, $element) {
+                $scope.model.animate = angular.bind(
+                    null,
+                    animate.attach,
+                    $element
+                );
+            }
+        };
+    }
+]);
+
+/*global momentum, angular*/
 momentum.directive('facebookConnect', [
     'animate',
     function (animate) {
@@ -70596,25 +70618,258 @@ momentum.directive('facebookConnect', [
     }
 ]);
 
-/*global momentum, angular*/
-momentum.directive('facebookConnected', [
-    'animate',
-    function (animate) {
-        return {
-            'restrict': 'A',
-            'templateUrl': 'facebookConnected.tpl.html',
-            'scope': {
-                'model': '=ngModel',
-                'user': '=ngUser'
-            },
-            'link': function ($scope, $element) {
-                $scope.model.animate = angular.bind(
-                    null,
-                    animate.attach,
-                    $element
-                );
-            }
+/*global momentum */
+momentum.controller('HistoryController', [
+    'fb',
+    'dialog',
+    'storage',
+    'utils',
+    '$scope',
+    '$timeout',
+    function (
+        fb,
+        dialog,
+        storage,
+        utils,
+        $scope,
+        $timeout
+    ) {
+        var defaultCampaigns = {
+            'data': [],
+            'sum': 0,
+            'currency': 'USD',
+            'offset': 0,
+            'cnt': 0
         };
+
+        $scope.viewLoaded = 0;
+
+        $scope.history = {
+            'campaigns': null
+        };
+
+        $scope.toggle = function (id, active) {
+            var promise;
+
+            if (active) {
+                promise = dialog.open({
+                    'htmlText': 'Are you sure you ' +
+                        'want to stop this campaign?',
+                    'showCancel': true
+                }).then(function () {
+                    $scope.history.campaigns.loading = 1;
+                    return fb.disableCampaign(
+                        $scope.sessionId,
+                        id
+                    ).then(function () {
+                        storage.invalidateCache();
+                    });
+                });
+            } else {
+                promise = dialog.open({
+                    'htmlText': 'Are you sure you ' +
+                        'want to clone this campaign?',
+                    'showCancel': true
+                }).then(function () {
+                    $scope.history.campaigns.loading = 1;
+                    return fb.cloneCampaign(
+                        $scope.sessionId,
+                        id
+                    ).then(function () {
+                        storage.invalidateCache();
+                    });
+                });
+            }
+
+            promise.catch(function (err) {
+                if (typeof err === 'string') {
+                    return dialog.open({
+                        'htmlText': err
+                    });
+                }
+            });
+
+            promise.then(function () {
+                storage.invalidateCache();
+                return fb.getCampaigns(
+                    $scope.sessionId,
+                    null,
+                    10,
+                    0
+                ).then(function (campaigns) {
+                    $scope.history.campaigns = campaigns;
+                }).catch(function () {
+                    var h = $scope.history;
+
+                    h.campaigns = defaultCampaigns;
+                    h.campaigns.errorMessage = 'Insufficient permission.';
+                });
+            });
+        };
+
+        $scope.next = function () {
+            $scope.history.campaigns.loading = 1;
+            return fb.getCampaigns(
+                $scope.sessionId,
+                null,
+                10,
+                $scope.history.campaigns.offset + 10
+            ).then(function (campaigns) {
+                $scope.history.campaigns = campaigns;
+            }).catch(function () {
+                var h = $scope.history;
+
+                h.campaigns = defaultCampaigns;
+                h.campaigns.errorMessage = 'Insufficient permission.';
+            });
+        };
+
+        $scope.prev = function () {
+            $scope.history.campaigns.loading = 1;
+            return fb.getCampaigns(
+                $scope.sessionId,
+                null,
+                10,
+                $scope.history.campaigns.offset - 10
+            ).then(function (campaigns) {
+                $scope.history.campaigns = campaigns;
+            }).catch(function () {
+                var h = $scope.history;
+
+                h.campaigns = defaultCampaigns;
+                h.campaigns.errorMessage = 'Insufficient permission.';
+            });
+        };
+
+        $scope.export = function () {
+            var model = {};
+
+            model.months = utils.getMonths();
+
+            return dialog.open({
+                'title': 'Export as CSV',
+                'template': 'monthSelector.tpl.html',
+                'model': model,
+                'showCancel': true,
+                'dialogClass': 'auto-width',
+                'destroy': false
+            }).then(function () {
+                var args = model.months.selected.split('-');
+
+                return fb.export(
+                    $scope.sessionId,
+                    args[1],
+                    args[0],
+                    null
+                ).then(function (data) {
+                    utils.downloadCSV(data);
+                });
+            }).finally(function () {
+                dialog.destroy();
+            });
+        };
+
+        function animate () {
+            $timeout(function () {
+                $scope.history.campaigns.animate();
+            });
+        }
+
+        function init () {
+            return fb.getCampaigns(
+                $scope.sessionId,
+                null,
+                10,
+                0
+            ).then(function (campaigns) {
+                $scope.history.campaigns = campaigns;
+            }).catch(function () {
+                var h = $scope.history;
+
+                h.campaigns = defaultCampaigns;
+                h.campaigns.errorMessage = 'Insufficient permission.';
+            }).finally(function () {
+                $scope.viewLoaded = 1;
+                animate();
+            });
+        }
+
+        if ($scope.loaded) {
+            init();
+        } else {
+            $scope.$on('loaded', init);
+        }
+    }
+]);
+
+/*global momentum*/
+momentum.controller('InfoController', [
+    'dashboard',
+    '$scope',
+    '$q',
+    '$timeout',
+    function (
+        dashboard,
+        $scope,
+        $q,
+        $timeout
+    ) {
+        var poller;
+
+        $scope.viewLoaded = 0;
+        $scope.updated = 0;
+
+        $scope.dashboard = {
+            'chart': null,
+            'stats': null
+        };
+
+        function animate () {
+            $timeout(function () {
+                $scope.dashboard.chart.animate();
+                $scope.dashboard.stats.forEach(function (stat) {
+                    stat.animate();
+                });
+            });
+        }
+
+        function oneMinutePoll () {
+            var promises = {
+                    'main': dashboard.getMain($scope.sessionId)
+                },
+                first = !$scope.viewLoaded;
+
+            if (poller) {
+                $timeout.cancel(poller);
+            }
+
+            promises.main = promises.main.then(function (main) {
+                $scope.dashboard.chart = main.chart;
+                $scope.dashboard.stats = main.stats;
+            });
+
+            $q.all(promises).then(function () {
+                $scope.viewLoaded = 1;
+                if (first) {
+                    animate();
+                } else {
+                    $scope.updated = 1;
+                }
+                poller = $timeout(oneMinutePoll, 60000);
+            });
+        }
+
+        if ($scope.loaded) {
+            oneMinutePoll();
+        } else {
+            $scope.$on('loaded', oneMinutePoll);
+        }
+
+        $scope.$on('$destroy', function () {
+            if (poller) {
+                $timeout.cancel(poller);
+            }
+        });
     }
 ]);
 
@@ -70978,261 +71233,6 @@ momentum.controller('ContentInfoController', [
     }
 ]);
 
-/*global momentum */
-momentum.controller('HistoryController', [
-    'fb',
-    'dialog',
-    'storage',
-    'utils',
-    '$scope',
-    '$timeout',
-    function (
-        fb,
-        dialog,
-        storage,
-        utils,
-        $scope,
-        $timeout
-    ) {
-        var defaultCampaigns = {
-            'data': [],
-            'sum': 0,
-            'currency': 'USD',
-            'offset': 0,
-            'cnt': 0
-        };
-
-        $scope.viewLoaded = 0;
-
-        $scope.history = {
-            'campaigns': null
-        };
-
-        $scope.toggle = function (id, active) {
-            var promise;
-
-            if (active) {
-                promise = dialog.open({
-                    'htmlText': 'Are you sure you ' +
-                        'want to stop this campaign?',
-                    'showCancel': true
-                }).then(function () {
-                    $scope.history.campaigns.loading = 1;
-                    return fb.disableCampaign(
-                        $scope.sessionId,
-                        id
-                    ).then(function () {
-                        storage.invalidateCache();
-                    });
-                });
-            } else {
-                promise = dialog.open({
-                    'htmlText': 'Are you sure you ' +
-                        'want to clone this campaign?',
-                    'showCancel': true
-                }).then(function () {
-                    $scope.history.campaigns.loading = 1;
-                    return fb.cloneCampaign(
-                        $scope.sessionId,
-                        id
-                    ).then(function () {
-                        storage.invalidateCache();
-                    });
-                });
-            }
-
-            promise.catch(function (err) {
-                if (typeof err === 'string') {
-                    return dialog.open({
-                        'htmlText': err
-                    });
-                }
-            });
-
-            promise.then(function () {
-                storage.invalidateCache();
-                return fb.getCampaigns(
-                    $scope.sessionId,
-                    null,
-                    10,
-                    0
-                ).then(function (campaigns) {
-                    $scope.history.campaigns = campaigns;
-                }).catch(function () {
-                    var h = $scope.history;
-
-                    h.campaigns = defaultCampaigns;
-                    h.campaigns.errorMessage = 'Insufficient permission.';
-                });
-            });
-        };
-
-        $scope.next = function () {
-            $scope.history.campaigns.loading = 1;
-            return fb.getCampaigns(
-                $scope.sessionId,
-                null,
-                10,
-                $scope.history.campaigns.offset + 10
-            ).then(function (campaigns) {
-                $scope.history.campaigns = campaigns;
-            }).catch(function () {
-                var h = $scope.history;
-
-                h.campaigns = defaultCampaigns;
-                h.campaigns.errorMessage = 'Insufficient permission.';
-            });
-        };
-
-        $scope.prev = function () {
-            $scope.history.campaigns.loading = 1;
-            return fb.getCampaigns(
-                $scope.sessionId,
-                null,
-                10,
-                $scope.history.campaigns.offset - 10
-            ).then(function (campaigns) {
-                $scope.history.campaigns = campaigns;
-            }).catch(function () {
-                var h = $scope.history;
-
-                h.campaigns = defaultCampaigns;
-                h.campaigns.errorMessage = 'Insufficient permission.';
-            });
-        };
-
-        $scope.export = function () {
-            var model = {};
-
-            model.months = utils.getMonths();
-
-            return dialog.open({
-                'title': 'Export as CSV',
-                'template': 'monthSelector.tpl.html',
-                'model': model,
-                'showCancel': true,
-                'dialogClass': 'auto-width',
-                'destroy': false
-            }).then(function () {
-                var args = model.months.selected.split('-');
-
-                return fb.export(
-                    $scope.sessionId,
-                    args[1],
-                    args[0],
-                    null
-                ).then(function (data) {
-                    utils.downloadCSV(data);
-                });
-            }).finally(function () {
-                dialog.destroy();
-            });
-        };
-
-        function animate () {
-            $timeout(function () {
-                $scope.history.campaigns.animate();
-            });
-        }
-
-        function init () {
-            return fb.getCampaigns(
-                $scope.sessionId,
-                null,
-                10,
-                0
-            ).then(function (campaigns) {
-                $scope.history.campaigns = campaigns;
-            }).catch(function () {
-                var h = $scope.history;
-
-                h.campaigns = defaultCampaigns;
-                h.campaigns.errorMessage = 'Insufficient permission.';
-            }).finally(function () {
-                $scope.viewLoaded = 1;
-                animate();
-            });
-        }
-
-        if ($scope.loaded) {
-            init();
-        } else {
-            $scope.$on('loaded', init);
-        }
-    }
-]);
-
-/*global momentum*/
-momentum.controller('InfoController', [
-    'dashboard',
-    '$scope',
-    '$q',
-    '$timeout',
-    function (
-        dashboard,
-        $scope,
-        $q,
-        $timeout
-    ) {
-        var poller;
-
-        $scope.viewLoaded = 0;
-        $scope.updated = 0;
-
-        $scope.dashboard = {
-            'chart': null,
-            'stats': null
-        };
-
-        function animate () {
-            $timeout(function () {
-                $scope.dashboard.chart.animate();
-                $scope.dashboard.stats.forEach(function (stat) {
-                    stat.animate();
-                });
-            });
-        }
-
-        function oneMinutePoll () {
-            var promises = {
-                    'main': dashboard.getMain($scope.sessionId)
-                },
-                first = !$scope.viewLoaded;
-
-            if (poller) {
-                $timeout.cancel(poller);
-            }
-
-            promises.main = promises.main.then(function (main) {
-                $scope.dashboard.chart = main.chart;
-                $scope.dashboard.stats = main.stats;
-            });
-
-            $q.all(promises).then(function () {
-                $scope.viewLoaded = 1;
-                if (first) {
-                    animate();
-                } else {
-                    $scope.updated = 1;
-                }
-                poller = $timeout(oneMinutePoll, 60000);
-            });
-        }
-
-        if ($scope.loaded) {
-            oneMinutePoll();
-        } else {
-            $scope.$on('loaded', oneMinutePoll);
-        }
-
-        $scope.$on('$destroy', function () {
-            if (poller) {
-                $timeout.cancel(poller);
-            }
-        });
-    }
-]);
-
 /*global momentum*/
 momentum.directive('selectOnClick', [
     function () {
@@ -71254,10 +71254,10 @@ $templateCache.put("facebook.tpl.html","<div class=\"facebook mdl-grid\" mdl-upg
 $templateCache.put("changePassword.tpl.html","<form ng-submit=\"model.changePassword()\" mdl-upgrade>\n    <div class=\"mdl-card__title\">\n        <h2 class=\"mdl-card__title-text\">\n            Change password\n        </h2>\n    </div>\n    <div class=\"mdl-card__supporting-text\">\n        <div\n            ng-class=\"{\'is-invalid\': model.error, \'is-dirty\': model.oldPassword}\" \n            class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input\n                ng-model=\"model.oldPassword\"\n                class=\"mdl-textfield__input\"\n                type=\"password\"\n                id=\"old-password\" />\n            <label class=\"mdl-textfield__label\" for=\"old-password\">Old password</label>\n        </div>\n        <div\n            ng-class=\"{\'is-invalid\': model.error, \'is-dirty\': model.newPassword}\"  \n            class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input\n                ng-model=\"model.newPassword\"\n                class=\"mdl-textfield__input\"\n                type=\"password\"\n                id=\"new-password\" />\n            <label class=\"mdl-textfield__label\" for=\"new-password\">New password</label>\n            <span\n                class=\"mdl-textfield__error\">\n                {{model.error}}\n            </span>\n        </div>\n    </div>\n    <div class=\"mdl-card__actions\">\n        <button\n            ng-disabled=\"model.dataLoading\"\n            type=\"submit\"\n            class=\"mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect\">Change</button>\n    </div>\n</form>");
 $templateCache.put("fbInt.tpl.html","<form\n    ng-submit=\"model.connected && model.submit() || !model.connected && model.connect()\"\n    class=\"fb-int\"\n    mdl-upgrade\n>\n    <div class=\"mdl-card__title\">\n        <h2 class=\"mdl-card__title-text\">\n            Facebook integration\n        </h2>\n    </div>\n    <div ng-if=\"!model.connected\" class=\"mdl-card__supporting-text\">\n        To use Momentum\'s social features, you must connect your account to Facebook.\n    </div>\n    <div ng-if=\"model.connected\" class=\"mdl-card__media mdl-color--white\" mdl-upgrade>\n        <div class=\"mdl-tabs mdl-js-tabs mdl-js-ripple-effect\">\n            <div class=\"mdl-tabs__tab-bar\">\n                <a href=\"#fb-accounts\" class=\"mdl-tabs__tab is-active\">\n                    Ad Accounts\n                </a>\n                <a href=\"#fb-pages\" class=\"mdl-tabs__tab\">\n                    Pages\n                </a>\n            </div>\n            <div class=\"mdl-tabs__panel is-active\" id=\"fb-accounts\">\n                <div ng-if=\"!model.assets.adaccount.length\" class=\"no-data\">\n                    To use Momentum\'s social features, you must have access at least one Facebook ad account.\n                </div>\n                <ul ng-if=\"model.assets.adaccount.length\" class=\"mdl-list\">\n                    <li ng-repeat=\"asset in model.assets.adaccount track by asset.value\"\n                        class=\"mdl-list__item\">\n                        <span class=\"mdl-list__item-primary-content\">\n                            <label\n                                ng-class=\"{\'is-checked\': asset.checked}\"\n                                class=\"mdl-switch mdl-js-switch mdl-js-ripple-effect\"\n                                for=\"list-switch-{{asset.value}}\">\n                                <input\n                                    type=\"checkbox\"\n                                    id=\"list-switch-{{asset.value}}\"\n                                    class=\"mdl-switch__input\"\n                                    ng-change=\"model.checkChange(\'adaccount\', asset.value)\"\n                                    ng-model=\"asset.checked\"/>\n                            </label>\n                            {{asset.display}}\n                        </span>\n                        <span class=\"mdl-list__item-secondary-action\">\n                            <a\n                                ng-click=\"model.switchDefault(\'adaccount\', asset.value)\"\n                                href=\"javascript:void(0)\"\n                                ng-class=\"{\'mdl-button--accent\': asset.default}\"\n                                class=\"mdl-button def-button mdl-js-button mdl-js-ripple-effect\">\n                                Default\n                            </a>\n                        </span>\n                    </li>\n                </ul>\n            </div>\n            <div class=\"mdl-tabs__panel\" id=\"fb-pages\">\n                <div ng-if=\"!model.assets.page.length\" class=\"no-data\">\n                    To use Momentum\'s social features, you must have access at least one Facebook page.\n                </div>\n                <ul ng-if=\"model.assets.page.length\" class=\"mdl-list\">\n                    <li ng-repeat=\"asset in model.assets.page track by asset.value\"\n                        class=\"mdl-list__item\">\n                        <span class=\"mdl-list__item-primary-content\">\n                            <label\n                                ng-class=\"{\'is-checked\': asset.checked}\"\n                                class=\"mdl-switch mdl-js-switch mdl-js-ripple-effect\"\n                                for=\"list-switch-{{asset.value}}\">\n                                <input\n                                    type=\"checkbox\"\n                                    id=\"list-switch-{{asset.value}}\"\n                                    class=\"mdl-switch__input\"\n                                    ng-change=\"model.checkChange(\'page\', asset.value)\"\n                                    ng-model=\"asset.checked\"/>\n                            </label>\n                            {{asset.display}}\n                        </span>\n                        <span class=\"mdl-list__item-secondary-action\">\n                            <a\n                                ng-click=\"model.switchDefault(\'page\', asset.value)\"\n                                href=\"javascript:void(0)\"\n                                ng-class=\"{\'mdl-button--accent\': asset.default}\"\n                                class=\"mdl-button def-button mdl-js-button mdl-js-ripple-effect\">\n                                Default\n                            </a>\n                        </span>\n                    </li>\n                </ul>\n            </div>\n        </div>\n    </div>\n    <div class=\"mdl-card__actions mdl-card--border\">\n        <button\n            ng-disabled=\"model.dataLoading\"\n            type=\"submit\"\n            class=\"mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect\">\n            {{model.connected ? \'Save\': \'Connect\'}}\n        </button>\n    </div>\n</form>\n");
 $templateCache.put("switchTeam.tpl.html","<form ng-submit=\"model.submit()\" mdl-upgrade>\n    <div class=\"mdl-card__title\">\n        <h2 class=\"mdl-card__title-text\">\n            Switch team\n        </h2>\n    </div>\n    <div class=\"mdl-card__supporting-text\">\n        <div\n            dropdown\n            ng-model=\"model.teams\"\n            class=\"dropdown\">\n        </div>\n    </div>\n    <div class=\"mdl-card__actions\">\n        <button\n            ng-disabled=\"model.dataLoading\"\n            type=\"submit\"\n            class=\"mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect\">Switch</button>\n    </div>\n</form>\n");
-$templateCache.put("addUser.tpl.html","\n<form ng-submit=\"model.send()\" mdl-upgrade>\n    <div class=\"mdl-card__title\">\n        <h2 class=\"mdl-card__title-text\">\n            Add new user to Momentum\n        </h2>\n    </div>\n    <div class=\"mdl-card__supporting-text\">\n        <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input\n                ng-model=\"model.teamName\"\n                class=\"mdl-textfield__input\"\n                type=\"text\"\n                id=\"teamName\" />\n            <label class=\"mdl-textfield__label\" for=\"teamName\">Company\'s name</label>\n        </div>\n        <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input\n                ng-model=\"model.email\"\n                ng-change=\"model.emailChange()\"\n                class=\"mdl-textfield__input is-dirty\"\n                type=\"text\"\n                id=\"email\" />\n            <label class=\"mdl-textfield__label\" for=\"email\">Email address</label>\n        </div>\n        <div class=\"\">\n            <label class=\"mdl-switch mdl-js-switch mdl-js-ripple-effect\" for=\"sendCode\">\n				<input type=\"checkbox\" ng-model=\"model.sendCode\" name=\"sendCode\" id=\"sendCode\" class=\"mdl-switch__input\" checked>\n				<span class=\"mdl-switch__label\">Send the code in email</span>\n			</label>\n        </div>\n        <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty\" ng-if=\"model.sendCode\">\n            <input\n            	ng-disabled=\"!model.sendCode\"\n                ng-model=\"model.sendCodeTo\"\n                class=\"mdl-textfield__input\"\n                type=\"text\"\n                id=\"sendCodeTo\" />\n            <label class=\"mdl-textfield__label\" for=\"sendCodeTo\"></label>\n        </div>\n        <div class=\"\">\n            <label class=\"mdl-switch mdl-js-switch mdl-js-ripple-effect\" for=\"partner\">\n                <input type=\"checkbox\" ng-model=\"model.partner\" name=\"partner\" id=\"partner\" class=\"mdl-switch__input\">\n                <span class=\"mdl-switch__label\">Assign to Momentum Partner</span>\n            </label>\n        </div>\n        <div class=\"\">\n            <label class=\"mdl-switch mdl-js-switch mdl-js-ripple-effect\" for=\"forcePayment\">\n				<input type=\"checkbox\" ng-model=\"model.forcePayment\" name=\"forcePayment\" id=\"forcePayment\" class=\"mdl-switch__input\">\n				<span class=\"mdl-switch__label\">Force payment (£)</span>\n			</label>\n        </div>\n        <div class=\"mdl-textfield\n                mdl-js-textfield\n                mdl-textfield--floating-label\n                is-dirty\"\n            ng-if=\"model.forcePayment\"\n            mdl-upgrade>\n            <input\n            	ng-disabled=\"!model.forcePayment\"\n                ng-model=\"model.paymentAmount\"\n                class=\"mdl-textfield__input\"\n                type=\"text\"\n                 pattern=\"-?[0-9]*(\\.[0-9]+)?\"\n                id=\"paymentAmount\" />\n            <label class=\"mdl-textfield__label\" for=\"paymentAmount\"></label>\n        </div>\n    </div>\n    <div class=\"mdl-card__actions\">\n        <button\n            ng-disabled=\"model.dataLoading\"\n            type=\"submit\"\n            class=\"mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect\">Add user</button>\n    </div>\n</form>\n");
 $templateCache.put("demo.tpl.html","\n<div class=\"mdl-card__title\">\n    <h2 class=\"mdl-card__title-text\">\n        <span ng-class=\"{\'mdl-color-text--accent\': model.status === 1}\"> \n        Demo mode is {{model.status === 0 ? \'OFF\' : \'ON\'}}\n        </span>\n    </h2>\n</div>\n<div class=\"mdl-card__supporting-text\">\n    <a\n        ng-class=\"{\'mdl-button--accent\': model.status === 0, \'mdl-button--colored\': model.status === 1}\"\n        ng-click=\"model.change()\"\n        class=\"mdl-button mdl-js-button mdl-button--raised\">{{model.status === 0 ? \'Start\' : \'Stop\'}} DEMO</a>\n</div>");
-$templateCache.put("inactivate.tpl.html","\n<div class=\"mdl-card__title\">\n    <h2 class=\"mdl-card__title-text\">\n        <span ng-class=\"{\'mdl-color-text--accent\': model.status === 1}\"> \n        Tracking code is {{model.status === 0 ? \'OFFLINE\' : \'ONLINE\'}}\n        </span>\n    </h2>\n</div>\n<div class=\"mdl-card__supporting-text\">\n    <a\n        ng-class=\"{\'mdl-button--accent\': model.status === 0, \'mdl-button--colored\': model.status === 1}\"\n        ng-click=\"model.change()\"\n        class=\"mdl-button mdl-js-button mdl-button--raised\">Turn {{model.status === 0 ? \'ON\' : \'OFF\'}}</a>\n</div>");
+$templateCache.put("addUser.tpl.html","\n<form ng-submit=\"model.send()\" mdl-upgrade>\n    <div class=\"mdl-card__title\">\n        <h2 class=\"mdl-card__title-text\">\n            Add new user to Momentum\n        </h2>\n    </div>\n    <div class=\"mdl-card__supporting-text\">\n        <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input\n                ng-model=\"model.teamName\"\n                class=\"mdl-textfield__input\"\n                type=\"text\"\n                id=\"teamName\" />\n            <label class=\"mdl-textfield__label\" for=\"teamName\">Company\'s name</label>\n        </div>\n        <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input\n                ng-model=\"model.email\"\n                ng-change=\"model.emailChange()\"\n                class=\"mdl-textfield__input is-dirty\"\n                type=\"text\"\n                id=\"email\" />\n            <label class=\"mdl-textfield__label\" for=\"email\">Email address</label>\n        </div>\n        <div class=\"\">\n            <label class=\"mdl-switch mdl-js-switch mdl-js-ripple-effect\" for=\"sendCode\">\n				<input type=\"checkbox\" ng-model=\"model.sendCode\" name=\"sendCode\" id=\"sendCode\" class=\"mdl-switch__input\" checked>\n				<span class=\"mdl-switch__label\">Send the code in email</span>\n			</label>\n        </div>\n        <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty\" ng-if=\"model.sendCode\">\n            <input\n            	ng-disabled=\"!model.sendCode\"\n                ng-model=\"model.sendCodeTo\"\n                class=\"mdl-textfield__input\"\n                type=\"text\"\n                id=\"sendCodeTo\" />\n            <label class=\"mdl-textfield__label\" for=\"sendCodeTo\"></label>\n        </div>\n        <div class=\"\">\n            <label class=\"mdl-switch mdl-js-switch mdl-js-ripple-effect\" for=\"partner\">\n                <input type=\"checkbox\" ng-model=\"model.partner\" name=\"partner\" id=\"partner\" class=\"mdl-switch__input\">\n                <span class=\"mdl-switch__label\">Assign to Momentum Partner</span>\n            </label>\n        </div>\n        <div class=\"\">\n            <label class=\"mdl-switch mdl-js-switch mdl-js-ripple-effect\" for=\"forcePayment\">\n				<input type=\"checkbox\" ng-model=\"model.forcePayment\" name=\"forcePayment\" id=\"forcePayment\" class=\"mdl-switch__input\">\n				<span class=\"mdl-switch__label\">Force payment (£)</span>\n			</label>\n        </div>\n        <div class=\"mdl-textfield\n                mdl-js-textfield\n                mdl-textfield--floating-label\n                is-dirty\"\n            ng-if=\"model.forcePayment\"\n            mdl-upgrade>\n            <input\n            	ng-disabled=\"!model.forcePayment\"\n                ng-model=\"model.paymentAmount\"\n                class=\"mdl-textfield__input\"\n                type=\"text\"\n                 pattern=\"-?[0-9]*(\\.[0-9]+)?\"\n                id=\"paymentAmount\" />\n            <label class=\"mdl-textfield__label\" for=\"paymentAmount\"></label>\n        </div>\n    </div>\n    <div class=\"mdl-card__actions\">\n        <button\n            ng-disabled=\"model.dataLoading\"\n            type=\"submit\"\n            class=\"mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect\">Add user</button>\n    </div>\n</form>\n");
 $templateCache.put("payment.tpl.html","\n<form ng-submit=\"model.change()\" mdl-upgrade>\n    <div class=\"mdl-card__title\">\n        <h2 class=\"mdl-card__title-text\">\n            Payment settings for {{model.name}}\n        </h2>\n    </div>\n    <div class=\"mdl-card__supporting-text\">\n        <div class=\"\">\n            <label class=\"mdl-switch mdl-js-switch mdl-js-ripple-effect\" for=\"status\">\n				<input type=\"checkbox\" ng-model=\"model.status\" name=\"status\" id=\"status\" class=\"mdl-switch__input\">\n				<span class=\"mdl-switch__label\">Force payment (£)</span>\n			</label>\n        </div>\n        <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty\" ng-if=\"model.status\" mdl-upgrade>\n            <input\n            	ng-disabled=\"!model.status\"\n                ng-model=\"model.amount\"\n                class=\"mdl-textfield__input\"\n                type=\"text\"\n                 pattern=\"-?[0-9]*(\\.[0-9]+)?\"\n                id=\"amount\" />\n            <label class=\"mdl-textfield__label\" for=\"amount\"></label>\n        </div>\n    </div>\n    <div class=\"mdl-card__actions\">\n        <button\n            ng-disabled=\"model.dataLoading\"\n            type=\"submit\"\n            class=\"mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect\">Save</button>\n    </div>\n</form>\n");
+$templateCache.put("inactivate.tpl.html","\n<div class=\"mdl-card__title\">\n    <h2 class=\"mdl-card__title-text\">\n        <span ng-class=\"{\'mdl-color-text--accent\': model.status === 1}\"> \n        Tracking code is {{model.status === 0 ? \'OFFLINE\' : \'ONLINE\'}}\n        </span>\n    </h2>\n</div>\n<div class=\"mdl-card__supporting-text\">\n    <a\n        ng-class=\"{\'mdl-button--accent\': model.status === 0, \'mdl-button--colored\': model.status === 1}\"\n        ng-click=\"model.change()\"\n        class=\"mdl-button mdl-js-button mdl-button--raised\">Turn {{model.status === 0 ? \'ON\' : \'OFF\'}}</a>\n</div>");
 $templateCache.put("paymentContainer.tpl.html","\n<form ng-submit=\"model.pay()\" novalidate class=\"payment\" mdl-upgrade>\n    <div class=\"mdl-card__title\">\n        <h2 class=\"mdl-card__title-text\">\n            Payment\n        </h2>\n    </div>\n    <div ng-if=\"!model.status\" class=\"mdl-card__supporting-text\" mdl-upgrade>\n        <p>You don\'t have any unpaid invoice</p>\n        <p>Looking for a paid invoice? Send a mail to billing@momentum.ai and we\'ll resend it to you.</p>\n    </div>\n    <div ng-if=\"model.status\" class=\"mdl-card__supporting-text\" mdl-upgrade>\n        <div\n            class=\"payment-error\">\n            {{model.error}}\n        </div>\n        <p>You have an unpaid invoice.\n            Please, pay £{{model.amount}} to use Momentum\'s features.</p>\n        <div class=\"row\">\n            <div class=\"mdl-textfield full mdl-js-textfield mdl-textfield--floating-label\">\n                <input\n                    class=\"mdl-textfield__input\"\n                    type=\"text\"\n                    ng-model=\"model.stripe.number\"\n                    data-stripe=\"number\"\n                    payments-validate=\"card\"\n                    payments-format=\"card\"\n                    id=\"card-number\" />\n                <label class=\"mdl-textfield__label\" for=\"card-number\">Card Number</label>\n              <span class=\"mdl-textfield__error\">Valid card number only</span>\n            </div>\n        </div>\n        <div class=\"row\">\n            <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n                <input\n                    class=\"mdl-textfield__input\"\n                    type=\"text\"\n                    size=\"2\"\n                    ng-model=\"model.stripe.expiry\"\n                    payments-validate=\"expiry\"\n                    payments-format=\"expiry\"\n                    id=\"expiry\" />\n                <label class=\"mdl-textfield__label\" for=\"expiry\">Expiration date (MM/YY)</label>\n            </div>\n            <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n                <input\n                    class=\"mdl-textfield__input\"\n                    type=\"text\"\n                    size=\"4\"\n                    ng-model=\"model.stripe.cvc\"\n                    data-stripe=\"cvc\"\n                    payments-validate=\"cvc\"\n                    payments-format=\"cvc\"\n                    id=\"cvc\" />\n                <label class=\"mdl-textfield__label\" for=\"cvc\">CVC</label>\n            </div>\n        </div>\n        <div class=\"row\">\n            <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n                <input\n                    ng-model=\"model.company\"\n                    class=\"mdl-textfield__input\"\n                    type=\"text\"\n                    id=\"info-company\" />\n                <label class=\"mdl-textfield__label\" for=\"info-company\">Company</label>\n            </div>\n            <div\n                dropdown\n                ng-model=\"model.countries\"\n                class=\"dropdown\"\n                id=\"info-countries\">\n            </div>\n        </div>\n        <div class=\"row\">\n            <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n                <input\n                    ng-model=\"model.stripe.address_city\"\n                    class=\"mdl-textfield__input\"\n                    type=\"text\"\n                    id=\"info-city\" />\n                <label class=\"mdl-textfield__label\" for=\"info-city\">City</label>\n            </div>\n            <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n                <input\n                    ng-model=\"model.stripe.address_zip\"\n                    class=\"mdl-textfield__input\"\n                    type=\"text\"\n                    id=\"info-zip\" />\n                <label class=\"mdl-textfield__label\" for=\"info-zip\">ZIP</label>\n            </div>\n        </div>\n        <div class=\"row\">\n            <div class=\"mdl-textfield full mdl-js-textfield mdl-textfield--floating-label\">\n                <input\n                    ng-model=\"model.stripe.address_line1\"\n                    class=\"mdl-textfield__input\"\n                    type=\"text\"\n                    id=\"info-address1\" />\n                <label class=\"mdl-textfield__label\" for=\"info-address1\">Address</label>\n            </div>\n        </div>\n    </div>\n    <div ng-if=\"model.status\" class=\"mdl-card__actions\">\n        <button\n            ng-disabled=\"model.dataLoading\"\n            type=\"submit\"\n            class=\"mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect\">Pay (£{{model.amount}})</button>\n    </div>\n</form>\n");
 $templateCache.put("videoContainer.tpl.html","<div class=\"mdl-card__title\">\n    <h2 class=\"mdl-card__title-text\">\n        Tutorial\n    </h2>\n</div>\n<div class=\"mdl-card__media mdl-color--white\"\n    ng-bind-html=\"model.video\">\n</div>");
 $templateCache.put("content.tpl.html","<div mdl-upgrade class=\"mdl-tabs mdl-js-tabs mdl-js-ripple-effect\">\n  <div class=\"mdl-tabs__tab-bar\">\n    <a\n        href=\"#tab1\"\n        ng-click=\"state.go(\'root.main.content.info\')\"\n        ng-class=\"{\'is-active\': state.is(\'root.main.content.info\')}\"\n        class=\"mdl-tabs__tab\"\n    >Today</a>\n    <a\n        href=\"#tab2\"\n        ng-click=\"state.go(\'root.main.content.history\')\"\n        ng-class=\"{\'is-active\': state.is(\'root.main.content.history\')}\"\n        class=\"mdl-tabs__tab\"\n    >History</a>\n  </div>\n</div>\n\n<div ui-view=\"tab-container\"></div>\n\n<div style=\"height: 86px\"></div>\n\n<a analytics-on=\"click\"\n    analytics-event=\"fab\"\n    analytics-properties=\"{\n        category: \'promote\',\n        label: user.real_team_id\n    }\"\n    ng-mouseover=\"showMenu()\"\n    ng-mouseleave=\"hideMenu()\"\n    ng-if=\"viewLoaded\"\n    ng-click=\"promotion()\"\n    class=\"content-fab\n        mdl-shadow--8dp\n        mdl-button\n        mdl-js-button\n        mdl-button--fab\n        mdl-js-ripple-effect\n        mdl-button--colored\"\n        mdl-upgrade>\n  <i ng-class=\"{\n        \'hiding\': menuOpen === 1,\n        \'showing\': menuOpen === 0\n    }\"\n    class=\"material-icons\">more_vert</i>\n  <i ng-class=\"{\n        \'hiding\': menuOpen === 0,\n        \'showing\': menuOpen === 1\n    }\"\n    class=\"hover material-icons\">monetization_on</i>\n</a>\n<div ng-class=\"{open: menuOpen === 1}\"\n    ng-mouseover=\"showMenu()\"\n    ng-mouseleave=\"hideMenu()\"\n    ng-if=\"viewLoaded\"\n    class=\"content-fab-menu\"\n    mdl-upgrade>\n    <a analytics-on=\"click\"\n        analytics-event=\"fab\"\n        analytics-properties=\"{\n            category: \'open_link\',\n            label: user.real_team_id\n        }\"\n        ng-href=\"http://{{info.url}}\"\n        target=\"_blank\"\n        class=\"fab2\n            content-fab-menu-fab\n            mdl-shadow--8dp\n            mdl-button\n            mdl-js-button\n            mdl-button--fab\n            mdl-button--mini-fab\n            mdl-js-ripple-effect\">\n        <i class=\"material-icons\">open_in_new</i>\n    </a>\n    <a analytics-on=\"click\"\n        analytics-event=\"fab\"\n        analytics-properties=\"{\n            category: \'share\',\n            label: user.real_team_id\n        }\"\n        ng-click=\"share()\"\n        class=\"fab1\n        content-fab-menu-fab\n        mdl-shadow--8dp\n        mdl-button\n        mdl-js-button\n        mdl-button--fab\n        mdl-button--mini-fab\n        mdl-js-ripple-effect\">\n        <i class=\"material-icons\">share</i>\n    </a>\n</div>");
@@ -71274,10 +71274,10 @@ $templateCache.put("codeContainer.tpl.html","<div class=\"mdl-card__title\">\n  
 $templateCache.put("usersContainer.tpl.html","<div class=\"mdl-card__title\">\n    <h2 class=\"mdl-card__title-text\">\n        Your team\n    </h2>\n</div>\n<div class=\"mdl-card__media\" style=\"background: none\">\n    <div class=\"list-container\">\n        <div\n            class=\"list-item\"\n            ng-class=\"{last: $last}\"\n            ng-repeat=\"current in model.users\">\n            <div class=\"list-text\">\n                {{current.email}}\n            </div>\n            <div class=\"list-action\">\n                <button\n                    ng-if=\"!current.me\"\n                    ng-disabled=\"!user.is_admin || model.switchProgress\"\n                    ng-click=\"model.switchState(current.id, current.is_admin)\"\n                    ng-class=\"{\'mdl-button--accent\': current.is_admin, \'mdl-button--colored\': !current.is_admin}\"\n                    class=\"mdl-button mdl-js-button mdl-js-ripple-effect\">\n                        <span ng-if=\"!current.is_admin\">Make admin</span>\n                        <span ng-if=\"current.is_admin\">Revoke admin</span>\n                </button>\n                <button\n                    ng-if=\"!current.me\"\n                    ng-disabled=\"!user.is_admin || model.switchProgress\"\n                    ng-click=\"model.removeUser(current.id, current.email)\"\n                    class=\"mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect\">\n                        <span>Remove</span>\n                </button>\n            </div>\n        </div>\n    </div>\n</div>\n<div class=\"mdl-card__actions\">\n    <button\n        ng-disabled=\"model.dataLoading\"\n        ng-click=\"model.addUser()\"\n        class=\"mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect\">Invite</button>\n</div>");
 $templateCache.put("facebookConnect.tpl.html","<div class=\"mdl-card__title\">\n    <h2 class=\"mdl-card__title-text\">\n        Connect\n    </h2>\n</div>\n<div class=\"mdl-card__supporting-text\">\n    To use Momentum\'s social features, you must connect an administrator account\n</div>\n<div class=\"mdl-card__actions\">\n    <button\n        ng-disabled=\"!user.is_admin\"\n        ng-click=\"model.connect()\"\n        type=\"button\"\n        class=\"mdl-button\n        mdl-button--colored\n        mdl-js-button\n        mdl-js-ripple-effect\">Connect</button>\n</div>");
 $templateCache.put("facebookConnected.tpl.html","<div class=\"mdl-card__title\">\n    <h2 class=\"mdl-card__title-text\">\n        Connected accounts\n    </h2>\n</div>\n<div class=\"mdl-card__supporting-text\">\n    To use Momentum\'s social features, you must connect your account to Facebook.\n    <span\n        ng-if=\"model.state === \'valid\'\"\n        class=\"mdl-color-text--primary\">Your account already has been connected.</span>\n    <span\n        ng-if=\"model.state !== \'valid\'\"\n        class=\"mdl-color-text--accent\">Your account is not connected to Facebook.</span>\n</div>\n<div class=\"mdl-card__actions\">\n    <button\n        ng-if=\"model.state !== \'valid\'\"\n        ng-click=\"model.renew()\"\n        type=\"button\"\n        class=\"mdl-button\n        mdl-button--colored\n        mdl-js-button\n        mdl-js-ripple-effect\">Connect to Facebook</button>\n    <button\n        ng-if=\"model.state === \'valid\'\"\n        ng-click=\"model.renew()\"\n        type=\"button\"\n        class=\"mdl-button\n        mdl-button--colored\n        mdl-js-button\n        mdl-js-ripple-effect\">Reconnect to Facebook</button>\n</div>");
-$templateCache.put("contentHistory.tpl.html","<div\n    mdl-upgrade\n    class=\"mdl-grid\">\n\n    <div ng-if=\"!viewLoaded\" class=\"fill\">\n      <div\n        class=\"mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active\">\n      </div>\n    </div>\n\n     <div \n      mdl-upgrade\n      campaigns\n      ng-export=\"export\"\n      ng-toggle=\"toggle\"\n      ng-next=\"next\"\n      ng-prev=\"prev\"\n      ng-model=\"content.campaigns\"\n      ng-if=\"viewLoaded\"\n      class=\"animate campaigns-card mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col\">\n    </div>\n\n    <div \n        mdl-upgrade\n        source-stat\n        ng-repeat=\"stat in content.sourceStats track by stat.id\"\n        ng-model=\"stat\"\n        ng-state=\"switchState\"\n        ng-page=\"switchPage\"\n        ng-if=\"viewLoaded && (isVisible(stat.id) || !stat.hasMore)\"\n        ng-class=\"{\n            \'mdl-cell--12-col\': stat.active,\n            \'animate\': !statsDirty\n        }\"\n      class=\"source-stat mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col\">\n    </div>\n\n</div>");
-$templateCache.put("contentInfo.tpl.html","<div\n    mdl-upgrade\n    content-stat\n    class=\"mdl-grid\">\n</div>");
 $templateCache.put("history.tpl.html","<div\n    mdl-upgrade\n    class=\"mdl-grid\">\n\n    <div ng-if=\"!viewLoaded\" class=\"fill\">\n      <div\n        class=\"mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active\">\n      </div>\n    </div>\n\n    <div \n      mdl-upgrade\n      campaigns\n      ng-export=\"export\"\n      ng-next=\"next\"\n      ng-prev=\"prev\"\n      ng-toggle=\"toggle\"\n      ng-model=\"history.campaigns\"\n      ng-if=\"viewLoaded\"\n      class=\"animate campaigns-card mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col\">\n    </div>\n\n</div>");
 $templateCache.put("info.tpl.html","<div\n    mdl-upgrade\n    dashboard-stat\n    class=\"mdl-grid\">\n</div>");
+$templateCache.put("contentHistory.tpl.html","<div\n    mdl-upgrade\n    class=\"mdl-grid\">\n\n    <div ng-if=\"!viewLoaded\" class=\"fill\">\n      <div\n        class=\"mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active\">\n      </div>\n    </div>\n\n     <div \n      mdl-upgrade\n      campaigns\n      ng-export=\"export\"\n      ng-toggle=\"toggle\"\n      ng-next=\"next\"\n      ng-prev=\"prev\"\n      ng-model=\"content.campaigns\"\n      ng-if=\"viewLoaded\"\n      class=\"animate campaigns-card mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col\">\n    </div>\n\n    <div \n        mdl-upgrade\n        source-stat\n        ng-repeat=\"stat in content.sourceStats track by stat.id\"\n        ng-model=\"stat\"\n        ng-state=\"switchState\"\n        ng-page=\"switchPage\"\n        ng-if=\"viewLoaded && (isVisible(stat.id) || !stat.hasMore)\"\n        ng-class=\"{\n            \'mdl-cell--12-col\': stat.active,\n            \'animate\': !statsDirty\n        }\"\n      class=\"source-stat mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col\">\n    </div>\n\n</div>");
+$templateCache.put("contentInfo.tpl.html","<div\n    mdl-upgrade\n    content-stat\n    class=\"mdl-grid\">\n</div>");
 $templateCache.put("root.tpl.html","<div\n  body\n  ng-controller=\"RootController\"\n  class=\"layout mdl-layout mdl-js-layout mdl-layout--fixed-header\">\n</div>");
 $templateCache.put("accountSettings.tpl.html","<div class=\"mdl-grid account\" mdl-upgrade>\n\n    <div ng-if=\"!viewLoaded\" class=\"fill-full\">\n      <div\n        class=\"mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active\">\n      </div>\n    </div>\n\n    <div\n        fb-int\n        ng-model=\"fbInt\"\n        ng-if=\"viewLoaded\"\n        class=\"animate\n            mdl-card\n            mdl-shadow--2dp\n            mdl-cell\n            mdl-cell--4-col-desktop\n            mdl-cell--8-col-tablet\n            mdl-cell--4-col-phone\">\n    </div>\n\n    <div\n        switch-team\n        ng-model=\"teamSwitch\"\n        ng-if=\"viewLoaded && teamSwitch.teams.data.length > 1\"\n        class=\"animate\n            mdl-card\n            mdl-shadow--2dp\n            mdl-cell\n            mdl-cell--4-col-desktop\n            mdl-cell--8-col-tablet\n            mdl-cell--4-col-phone\">\n    </div>\n\n    <div \n        change-password\n        ng-model=\"pwChange\"\n        ng-if=\"viewLoaded\"\n        class=\"animate\n            mdl-card\n            mdl-shadow--2dp\n            mdl-cell\n            mdl-cell--4-col-desktop\n            mdl-cell--8-col-tablet\n            mdl-cell--4-col-phone\">\n    </div>\n\n    \n</div>");
 $templateCache.put("admin.tpl.html","<div class=\"admin mdl-grid\" mdl-upgrade>\n\n    <div ng-if=\"!viewLoaded\" class=\"fill-full\">\n      <div\n        class=\"mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active\">\n      </div>\n    </div>\n    <div\n        add-user\n        ng-model=\"addUser\"\n        ng-if=\"viewLoaded\"\n        class=\"\n            mdl-card\n            mdl-shadow--2dp\n            mdl-cell\n            mdl-cell--4-col-desktop\n            mdl-cell--8-col-tablet\n            mdl-cell--4-col-phone\">\n    </div>\n    <div\n        demo\n        ng-model=\"demo\"\n        ng-if=\"viewLoaded\"\n        class=\"\n            mdl-card\n            mdl-shadow--2dp\n            mdl-cell\n            mdl-cell--4-col-desktop\n            mdl-cell--8-col-tablet\n            mdl-cell--4-col-phone\">\n    </div>\n    <div\n        inactivate\n        ng-model=\"inactivate\"\n        ng-if=\"viewLoaded\"\n        class=\"\n            mdl-card\n            mdl-shadow--2dp\n            mdl-cell\n            mdl-cell--4-col-desktop\n            mdl-cell--8-col-tablet\n            mdl-cell--4-col-phone\">\n    </div>\n    <div\n        payment\n        ng-model=\"payment\"\n        ng-if=\"viewLoaded\"\n        class=\"\n            mdl-card\n            mdl-shadow--2dp\n            mdl-cell\n            mdl-cell--4-col-desktop\n            mdl-cell--8-col-tablet\n            mdl-cell--4-col-phone\">\n    </div>\n</div>\n");

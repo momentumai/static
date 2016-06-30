@@ -1,5 +1,5 @@
 {
-    "endpoint": "http://localhost:8080/v1/",
+    "endpoint": "http://localhost:8081/api/",
     "docBase": "http://localhost:8080",
     "autoprefixer": [
         "ie >= 10",

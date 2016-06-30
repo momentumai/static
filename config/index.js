@@ -6,7 +6,6 @@ var extend = require('extend'),
     devConfigPath = path.join(configPath, 'dev.config.json'),
     prodConfigPath = path.join(configPath, 'prod.config.json'),
     config,
-    exports = {},
     devConfig,
     prodConfig;
 
@@ -21,13 +20,17 @@ function getConfig (path) {
     return cfg;
 }
 
-devConfig = getConfig(baseConfigPath) || {};
-prodConfig = getConfig(baseConfigPath) || {};
+config = getConfig(baseConfigPath) || {};
+devConfig = getConfig(devConfigPath);
+prodConfig = getConfig(prodConfigPath);
 
-devConfig = extend(true, devConfig, getConfig(prodConfigPath));
-prodConfig = extend(true, prodConfig, getConfig(devConfigPath));
+if (process.env['NODE_ENV'] === 'production') {
+    if (!prodConfig) {
+        throw new Error('No production config');
+    }
+    config = extend(true, config, prodConfig);
+} else if (devConfig) {
+    config = extend(true, config, devConfig);
+}
 
-exports.dev = devConfig;
-exports.prod = prodConfig;
-
-module.exports = exports;
+module.exports = config;

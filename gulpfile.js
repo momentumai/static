@@ -4,8 +4,8 @@ var gulp = require('gulp'),
     docBase,
     tmpDir,
     distDir,
-    configType = 'dev',
-    config = require('./config');
+    config = require('./config'),
+    failOnEslintError = 1;
 
 gulp.eslint = require('gulp-eslint');
 gulp.clean = require('gulp-clean');
@@ -18,12 +18,37 @@ gulp.minifyCss = require('gulp-minify-css');
 gulp.templateCache = require('gulp-angular-templatecache');
 gulp.toSASSURI = require('gulp-svg-sass-uri');
 gulp.runSequence = require('gulp-run-sequence');
-gulp.server = require('gulp-express');
 gulp.replace = require('gulp-replace-task');
 gulp.autoprefixer = require('gulp-autoprefixer');
+gulp.watch = require('gulp-watch');
+
+gulp.task('watch', function () {
+    return gulp.watch([
+        path.join(docBase, 'app', '**', '*'),
+        path.join(docBase, 'assets', '**', '*'),
+        path.join(base, 'vendor', '**', '*'),
+        path.join(base, 'shared', '**', '*')
+    ], function () {
+        failOnEslintError = 0;
+        gulp.start('default:build');
+    });
+});
+
+gulp.task('watch:extension', function () {
+    return gulp.watch([
+        path.join(docBase, 'app', '**', '*'),
+        path.join(docBase, 'assets', '**', '*'),
+        path.join(docBase, 'chrome-background', '**', '*'),
+        path.join(base, 'vendor', '**', '*'),
+        path.join(base, 'shared', '**', '*')
+    ], function () {
+        failOnEslintError = 0;
+        gulp.start('extension:build');
+    });
+});
 
 gulp.task('eslint', function () {
-    return gulp.src([
+    var task = gulp.src([
         './gulpfile.js',
         './frontend/**/*.js',
         './extension/**/*.js',
@@ -33,8 +58,13 @@ gulp.task('eslint', function () {
         '!./**/dist/**/*'
     ]).pipe(gulp.eslint({
         'ignore': false
-    })).pipe(gulp.eslint.format())
-    .pipe(gulp.eslint.failAfterError());
+    })).pipe(gulp.eslint.format());
+
+    if (failOnEslintError) {
+        task = task.pipe(gulp.eslint.failAfterError());
+    }
+
+    return task;
 });
 
 gulp.task('clean', function () {
@@ -113,7 +143,7 @@ gulp.task('sass', function () {
             ],
             'file': 'app.css'
         }).on('error', gulp.sass.logError))
-        .pipe(gulp.autoprefixer(config[configType].autoprefixer))
+        .pipe(gulp.autoprefixer(config.autoprefixer))
         .pipe(gulp.dest(tmpDir));
 });
 
@@ -153,7 +183,7 @@ gulp.task('config', function () {
     ]).pipe(gulp.replace({
         'patterns': [{
             'match': 'bvConfig',
-            'replacement': JSON.stringify(config[configType])
+            'replacement': JSON.stringify(config)
                 .replace(/\\/g, '\\\\')
         }]
     })).pipe(gulp.dest(distDir));
@@ -165,7 +195,7 @@ gulp.task('config:background', function () {
     ]).pipe(gulp.replace({
         'patterns': [{
             'match': 'bvConfig',
-            'replacement': JSON.stringify(config[configType])
+            'replacement': JSON.stringify(config)
                 .replace(/\\/g, '\\\\')
         }]
     })).pipe(gulp.dest(distDir));
@@ -220,37 +250,30 @@ gulp.task('package', function (done) {
     gulp.runSequence('dist', ['uglify', 'cssmin'], done);
 });
 
-gulp.task('server', function () {
-    gulp.server.run([path.join(base, 'web', 'index.js')]);
-});
-
 gulp.task('extension:background', function (done) {
     gulp.runSequence('concat:background', 'config:background', done);
 });
 
-gulp.task('prod', ['package'], function () {
-    gulp.runSequence('server');
-});
-
-gulp.task('default', ['eslint'], function () {
+gulp.task('default:build', ['eslint'], function () {
     docBase = path.join(base, '/frontend/');
     tmpDir = path.join(docBase, '.tmp');
     distDir = path.join(docBase, 'dist');
-    gulp.runSequence('dist', 'server');
+    gulp.runSequence('dist');
 });
 
-gulp.task('extension', function () {
+gulp.task('default', ['eslint'], function () {
+    gulp.runSequence('default:build', 'watch');
+});
+
+gulp.task('extension:build', function () {
     docBase = path.join(base, '/extension/');
     tmpDir = path.join(docBase, '.tmp');
     distDir = path.join(docBase, 'dist');
     gulp.runSequence('dist', 'extension:background');
 });
 
-gulp.task('extension:server', function () {
-    docBase = path.join(base, '/extension/');
-    tmpDir = path.join(docBase, '.tmp');
-    distDir = path.join(docBase, 'dist');
-    gulp.runSequence('dist', 'extension:background', 'default');
+gulp.task('extension', function () {
+    gulp.runSequence('extension:build', 'watch:extension');
 });
 
 gulp.task('extension:package', function () {
@@ -262,5 +285,5 @@ gulp.task('extension:package', function () {
         ['uglify', 'cssmin'],
         'extension:background',
         'extension:uglify'
-        );
+    );
 });

@@ -1,6 +1,71 @@
 
 @import 'variables.scss';
 
+.dropdown {
+    position: relative;
+    padding: 20px 0;
+
+    select {
+        appearance: none;
+        display: block;
+        box-sizing: border-box;
+        background-color: transparent;
+        margin: 0;
+        padding: 4px 0;
+        font-size: 16px;
+        color: inherit;
+        width: 100%;
+        outline: 0;
+        border: none;
+        border-bottom: 1px solid rgba(0, 0, 0, .12);
+        border-radius: 0;
+    }
+
+    select ~ label {
+        position: absolute;
+        display: block;
+
+        top: 4px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        color: inherit;
+        font-size: 12px;
+
+        overflow: hidden;
+        white-space: nowrap;
+        pointer-events: none;
+    }
+
+    select:focus ~ label:after {
+        left: 0;
+        width: 100%;
+
+        visibility: visible;
+    }
+
+    select:focus ~ label {
+        color: unquote("rgb(#{$color-primary})");
+    }
+
+    select ~ label:after {
+        position: absolute;
+        bottom: 20px;
+        height: 2px;
+        left: 45%;
+        width: 10%;
+
+        background-color: unquote("rgb(#{$color-primary})");
+
+        content: '';
+        transition-duration: .2s;
+        transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+        visibility: hidden;
+    }
+}
+@import 'variables.scss';
+
 .promotion-form {
 
     .mdl-switch {
@@ -89,71 +154,6 @@
             transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
             visibility: hidden;
         }
-    }
-}
-@import 'variables.scss';
-
-.dropdown {
-    position: relative;
-    padding: 20px 0;
-
-    select {
-        appearance: none;
-        display: block;
-        box-sizing: border-box;
-        background-color: transparent;
-        margin: 0;
-        padding: 4px 0;
-        font-size: 16px;
-        color: inherit;
-        width: 100%;
-        outline: 0;
-        border: none;
-        border-bottom: 1px solid rgba(0, 0, 0, .12);
-        border-radius: 0;
-    }
-
-    select ~ label {
-        position: absolute;
-        display: block;
-
-        top: 4px;
-        left: 0;
-        right: 0;
-        bottom: 0;
-
-        color: inherit;
-        font-size: 12px;
-
-        overflow: hidden;
-        white-space: nowrap;
-        pointer-events: none;
-    }
-
-    select:focus ~ label:after {
-        left: 0;
-        width: 100%;
-
-        visibility: visible;
-    }
-
-    select:focus ~ label {
-        color: unquote("rgb(#{$color-primary})");
-    }
-
-    select ~ label:after {
-        position: absolute;
-        bottom: 20px;
-        height: 2px;
-        left: 45%;
-        width: 10%;
-
-        background-color: unquote("rgb(#{$color-primary})");
-
-        content: '';
-        transition-duration: .2s;
-        transition-timing-function: cubic-bezier(.4, 0, .2, 1);
-        visibility: hidden;
     }
 }
 @import 'variables.scss';
@@ -815,6 +815,82 @@ a.primary {
         box-shadow: 0px 0px 0px 2px unquote("rgb(#{$color-primary})");
     }
 }
+
+.guide {
+    padding: 0 8px;
+    box-sizing: border-box;
+    height: 64px;
+    background-color: white;
+    display: flex;
+    width: 100%;
+    color: rgba(0,0,0,0.87);
+    justify-content: space-between;
+    align-items: center;
+
+    .spacer {
+        flex-grow: 1;
+        flex-shrink: 1;
+        height: 1px;
+        background: rgba(0,0,0, 0.26);
+
+        &.left {
+            margin-right: 8px;
+        }
+
+        &.right {
+            margin-left: 8px;
+        }
+    }
+
+    .mdl-button {
+        padding: 0;
+        height: 64px;
+        text-transform: none;
+        position: relative;
+        color: rgba(0,0,0,0.87);
+        display: flex;
+        flex-grow: 1;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0;
+        font-weight: 400;
+
+        &:first-child {
+            justify-content: flex-start;
+            padding-left: 16px;
+            .spacer.left {
+                display: none;
+            }
+        }
+
+        &:last-child {
+            justify-content: flex-end;
+            padding-right: 16px;
+            .spacer.right {
+                display: none;
+            }
+        }
+
+        &[disabled] {
+            color: rgba(0, 0, 0, 0.87);
+        }
+
+        .material-icons {
+            color: white;
+            margin-right: 8px;
+            background-color: rgba(0, 0, 0, 0.4);
+            font-size: 16px;
+            padding: 4px;
+            border-radius: 50%;
+        }
+        &.active {
+            font-weight: 500;
+            .material-icons {
+                background-color: unquote("rgb(#{$color-primary})");
+            }
+        }
+    }
+}
 .account {
 	.mdl-card {
 		height: 100%;
@@ -861,6 +937,49 @@ a.primary {
 		width: 100%;
 	}
 }
+.list-container {
+  box-sizing: border-box;
+  padding: 8px 0;
+  display: flex;
+  box-orient: vertical;
+  box-direction: normal;
+  flex-direction: column;
+  flex-wrap: nowrap;
+
+  .list-item {
+    display: flex;
+    box-sizing: border-box;
+    height: 48px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding : 0 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &.last {
+      border-bottom: 0;
+    }
+
+    .list-text {
+      flex-grow: 1;
+      flex-shrink: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .list-action {
+      flex-grow: 0;
+      flex-shrink: 0;
+    }
+  }
+
+  .list-item:hover {
+    background-color: rgba(158,158,158, 0.20);
+  }
+}
+
 .auth {
 	&.mdl-layout {
 		align-items: center;
@@ -875,7 +994,6 @@ a.primary {
 		height: auto;
 	}
 }
-
 .details {
     position: fixed;
     margin: 0;
@@ -1099,124 +1217,6 @@ a.primary {
 }
 .rule-options-dialog {}
 
-
-.list-container {
-  box-sizing: border-box;
-  padding: 8px 0;
-  display: flex;
-  box-orient: vertical;
-  box-direction: normal;
-  flex-direction: column;
-  flex-wrap: nowrap;
-
-  .list-item {
-    display: flex;
-    box-sizing: border-box;
-    height: 48px;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    padding : 0 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    &.last {
-      border-bottom: 0;
-    }
-
-    .list-text {
-      flex-grow: 1;
-      flex-shrink: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .list-action {
-      flex-grow: 0;
-      flex-shrink: 0;
-    }
-  }
-
-  .list-item:hover {
-    background-color: rgba(158,158,158, 0.20);
-  }
-}
-.guide {
-    padding: 0 8px;
-    box-sizing: border-box;
-    height: 64px;
-    background-color: white;
-    display: flex;
-    width: 100%;
-    color: rgba(0,0,0,0.87);
-    justify-content: space-between;
-    align-items: center;
-
-    .spacer {
-        flex-grow: 1;
-        flex-shrink: 1;
-        height: 1px;
-        background: rgba(0,0,0, 0.26);
-
-        &.left {
-            margin-right: 8px;
-        }
-
-        &.right {
-            margin-left: 8px;
-        }
-    }
-
-    .mdl-button {
-        padding: 0;
-        height: 64px;
-        text-transform: none;
-        position: relative;
-        color: rgba(0,0,0,0.87);
-        display: flex;
-        flex-grow: 1;
-        align-items: center;
-        justify-content: center;
-        border-radius: 0;
-        font-weight: 400;
-
-        &:first-child {
-            justify-content: flex-start;
-            padding-left: 16px;
-            .spacer.left {
-                display: none;
-            }
-        }
-
-        &:last-child {
-            justify-content: flex-end;
-            padding-right: 16px;
-            .spacer.right {
-                display: none;
-            }
-        }
-
-        &[disabled] {
-            color: rgba(0, 0, 0, 0.87);
-        }
-
-        .material-icons {
-            color: white;
-            margin-right: 8px;
-            background-color: rgba(0, 0, 0, 0.4);
-            font-size: 16px;
-            padding: 4px;
-            border-radius: 50%;
-        }
-        &.active {
-            font-weight: 500;
-            .material-icons {
-                background-color: unquote("rgb(#{$color-primary})");
-            }
-        }
-    }
-}
 #dialog {
     position: absolute;
     top: 0;
