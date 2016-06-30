@@ -1,3 +1,5 @@
 config/prod.config.json
+.tmp
+dist
 .idea
 node_modules
