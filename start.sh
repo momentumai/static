@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 trap 'killall' INT
 
 killall() {
@@ -6,9 +7,9 @@ killall() {
     wait
 }
 
-# npm install -g static
-static -p 8080 frontend/dist &
+# npm install -g static-server
+static-server -p 8080 frontend/dist &
 gulp &
-gulp extension &
+# gulp extension &
 
 cat #run forever
