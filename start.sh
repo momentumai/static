@@ -10,6 +10,6 @@ killall() {
 # npm install -g static-server
 static-server -p 8080 frontend/dist &
 gulp &
-# gulp extension &
+gulp extension &
 
 cat #run forever
