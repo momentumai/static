@@ -10,12 +10,13 @@ function ($http) {
             return ret;
         }
 
-        data.forEach(function (act, index) {
+        Object.keys(data).sort().forEach(function (act, index) {
             ret.push({
                 'x': index,
-                'y': Number(act)
+                'y': Number(data[act])
             });
         });
+
         return ret;
     }
 
@@ -33,29 +34,35 @@ function ($http) {
         }).then(function (resp) {
             var contents = [],
                 i,
-                data = resp.data,
-                posts = data.data;
+                posts = resp.data;
 
             for (i = 0; i < posts.length; i += 1) {
                 contents.push({
-                    'id': posts[i].id,
+                    'id': posts[i].contentId,
                     'src': posts[i].url,
-                    'title': (posts[i].title && posts[i].title.trim()) ||
+                    'title':
+                        posts[i].public &&
+                        posts[i].public.title &&
+                        posts[i].public.title.trim() ||
                         posts[i].url,
-                    'img': posts[i].img,
+                    'img': posts[i].public && posts[i].public.image,
                     'momentum': Math.round(posts[i].momentum * 100),
-                    'chartData': getChartData(posts[i].pageviews),
-                    'recommended': Number(posts[i].recommended),
-                    'promoted': posts[i].promoted,
+                    'chartData': getChartData(
+                        posts[i].stats.view &&
+                        posts[i].stats.view.values ||
+                        null
+                    ),
+                    'recommended': Number(posts[i].recommended || 0),
+                    'promoted': posts[i].promoted || 0,
                     'dashboardUrl': [
                         bvConfig.docBase,
                         '/#/dashboard/content/',
-                        posts[i].id
+                        posts[i].contentId
                     ].join('')
                 });
             }
 
-            return {'data': contents, 'interval': posts.interval};
+            return {'data': contents};
         });
     };
 

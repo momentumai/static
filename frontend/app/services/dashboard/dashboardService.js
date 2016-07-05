@@ -63,9 +63,9 @@ momentum.factory('dashboard', ['$http', function ($http) {
                         },
                         {
                             'metric': 'Social views',
-                            'value': getK(data.stats.seed.sum),
+                            'value': getK(data.stats.share.sum),
                             'chartData': formatChartData(
-                                data.stats.seed.values
+                                data.stats.share.values
                             )
                         }
                     ]
@@ -74,7 +74,7 @@ momentum.factory('dashboard', ['$http', function ($http) {
             Object.keys(data.chart.data).forEach(function (timestamp, index) {
                 ret.chart.data[0].values.push({
                     'x': index,
-                    'y': data.chart.data[timestamp].seed
+                    'y': data.chart.data[timestamp]
                 });
             });
 
