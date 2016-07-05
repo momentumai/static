@@ -41,11 +41,11 @@ function ($http) {
                     'id': posts[i].contentId,
                     'src': posts[i].url,
                     'title':
-                        posts[i].public &&
-                        posts[i].public.title &&
-                        posts[i].public.title.trim() ||
+                        posts[i].ogdata &&
+                        posts[i].ogdata.title &&
+                        posts[i].ogdata.title.trim() ||
                         posts[i].url,
-                    'img': posts[i].public && posts[i].public.image,
+                    'img': posts[i].ogdata && posts[i].ogdata.image,
                     'momentum': Math.round(posts[i].momentum * 100),
                     'chartData': getChartData(
                         posts[i].stats.view &&
