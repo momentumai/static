@@ -80,7 +80,7 @@ momentum.controller('RootController', [
             function (
                 event,
                 toState,
-                ignore,
+                toStateParams,
                 fromState
             ) {
                 if (!toState.name.indexOf('root.main') &&
@@ -90,6 +90,7 @@ momentum.controller('RootController', [
                         $state.go('root.billing');
                     }
                 }
+                $scope.stateParams = toStateParams;
             }
         );
     }

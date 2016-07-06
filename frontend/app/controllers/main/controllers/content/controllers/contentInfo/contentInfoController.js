@@ -12,90 +12,166 @@ momentum.controller('ContentInfoController', [
         $q,
         $timeout
     ) {
-        var poller;
-
         $scope.viewLoaded = 0;
         $scope.updated = 0;
 
-        $scope.content = {
-            'sourceStats': null,
-            'chart': null,
-            'stats': null
-        };
+        $scope.chart = null;
+        $scope.stats = null;
+        $scope.sourceStats = null;
 
         function animate () {
             $timeout(function () {
-                $scope.content.chart.animate();
-                $scope.content.stats.forEach(function (stat) {
+                $scope.chart.animate();
+                $scope.stats.forEach(function (stat) {
                     stat.animate();
                 });
-                $scope.content.sourceStats.forEach(function (stat) {
+                $scope.sourceStats.forEach(function (stat) {
                     stat.animate();
                 });
             });
         }
 
-        function oneMinutePoll () {
-            var promises = {
-                    'stats': content.getStats(
-                        $scope.sessionId,
-                        $scope.stateParams.contentId
-                    ),
-                    'shareStats': content.getShareStats(
-                        $scope.sessionId,
-                        $scope.stateParams.contentId
+        function getChart (chart) {
+            var ret = {
+                'data': [{
+                    'values': [],
+                    'key': 'Social views',
+                    'color': '#4DB6AC'
+                }]
+            };
+
+            Object.keys(chart.data).forEach(function (timestamp, index) {
+                ret.data[0].values.push({
+                    'x': index,
+                    'y': chart.data[timestamp]
+                });
+            });
+
+            ret.data.from = chart.from;
+
+            return ret;
+        }
+
+        function formatChartData (data) {
+            var ret = [],
+                i = 0;
+
+            Object.keys(data).forEach(function (timestamp) {
+                ret.push({
+                    'x': i,
+                    'y': data[timestamp]
+                });
+                i += 1;
+            });
+
+            return ret;
+        }
+
+        function getK (num) {
+            var number = Number(num) || 0;
+
+            return String(
+                number >= 10000 ? (
+                    Math.floor(number / 1000) + 'k'
+                ) : number
+            );
+        }
+
+        function getStats (stats) {
+            return [
+                {
+                    'metric': 'Users',
+                    'value': getK(stats.user.sum),
+                    'chartData': formatChartData(
+                        stats.user.values
                     )
                 },
-                first = !$scope.viewLoaded;
-
-            if (poller) {
-                $timeout.cancel(poller);
-            }
-
-            promises.stats = promises.stats.then(function (data) {
-                $scope.content.stats = data.stats;
-                $scope.content.chart = data.chart;
-            });
-
-            promises.shareStats = promises.shareStats.then(function (data) {
-                var i,
-                    sourceStat;
-
-                if (!$scope.content.sourceStats) {
-                    $scope.content.sourceStats = data;
-                } else {
-                    for (i = 0; i < $scope.content.sourceStats.length; i += 1) {
-                        sourceStat = $scope.content.sourceStats[i];
-                        data.forEach(function (datum) {
-                            if (sourceStat.id === datum.id) {
-                                $scope.content.sourceStats[i] = datum;
-                            }
-                        });
-                    }
+                {
+                    'metric': 'Views',
+                    'value': getK(stats.view.sum),
+                    'chartData': formatChartData(
+                        stats.view.values
+                    )
+                },
+                {
+                    'metric': 'Social views',
+                    'value': getK(stats.share.sum),
+                    'chartData': formatChartData(
+                        stats.share.values
+                    )
                 }
-            });
-
-            $q.all(promises).then(function () {
-                $scope.viewLoaded = 1;
-                if (first) {
-                    animate();
-                } else {
-                    $scope.updated = 1;
-                }
-                poller = $timeout(oneMinutePoll, 60000);
-            });
+            ];
         }
 
-        if ($scope.loaded) {
-            oneMinutePoll();
-        } else {
-            $scope.$on('loaded', oneMinutePoll);
+        function getPercent (sum, value) {
+            if (!value || !sum) {
+                return '0';
+            }
+
+            return String(
+                Math.round(value / sum * 100)
+            );
         }
 
-        $scope.$on('$destroy', function () {
-            if (poller) {
-                $timeout.cancel(poller);
+        function getSourceStats (organic, team, paid, source) {
+            var ret = [],
+                sum = organic +
+                    team +
+                    paid;
+
+            ret.push({
+                'id': 'organic',
+                'title': 'Organic',
+                'percent': getPercent(sum, organic),
+                'topSource': Object.keys(
+                    source['organic'] && source['organic'][0] || {}
+                )[0] || 'N/A'
+            });
+
+            ret.push({
+                'id': 'team',
+                'title': 'Team',
+                'percent': getPercent(sum, team),
+                'topSource': Object.keys(
+                    source['team'] && source['team'][0] || {}
+                )[0] || 'N/A'
+            });
+
+            ret.push({
+                'id': 'paid',
+                'title': 'Paid',
+                'percent': getPercent(sum, paid),
+                'topSource': Object.keys(
+                    source['paid'] && source['paid'][0] || {}
+                )[0] || 'N/A'
+            });
+
+            return ret;
+        }
+
+        $scope.$watch('content', function (content) {
+            var first = !$scope.viewLoaded;
+
+            if (!content) {
+                return;
             }
+
+            $scope.chart = getChart(content.chart);
+            $scope.stats = getStats(content.stats);
+            $scope.sourceStats = getSourceStats(
+                content.organic,
+                content.team,
+                content.paid,
+                content.source
+            );
+
+            if (first) {
+                animate();
+            } else {
+                $scope.updated = 1;
+            }
+
+            $scope.viewLoaded = 1;
         });
     }
 ]);

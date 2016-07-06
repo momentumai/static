@@ -58,7 +58,13 @@ function ($http) {
                         bvConfig.docBase,
                         '/#/dashboard/content/',
                         posts[i].contentId
-                    ].join('')
+                    ].join(''),
+                    'chart': posts[i].chart,
+                    'stats': posts[i].stats,
+                    'organic': posts[i].organic,
+                    'team': posts[i].team,
+                    'paid': posts[i].paid,
+                    'source': posts[i].source
                 });
             }
 

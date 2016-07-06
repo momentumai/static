@@ -7,7 +7,7 @@
 <div
   mdl-upgrade
   stat-graph
-  ng-model="content.chart"
+  ng-model="chart"
   ng-if="viewLoaded"
   ng-class="{animate: !updated}"
   class="content-graph mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
@@ -16,7 +16,7 @@
 <div
   mdl-upgrade
   stat-card
-  ng-repeat="stat in content.stats track by stat.metric"
+  ng-repeat="stat in stats track by stat.metric"
   ng-model="stat"
   ng-if="viewLoaded"
   ng-class="{animate: !updated}"
@@ -26,7 +26,7 @@
 <div 
   mdl-upgrade
   source-stat
-  ng-repeat="stat in content.sourceStats track by stat.id"
+  ng-repeat="stat in sourceStats track by stat.id"
   ng-model="stat"
   ng-state="switchState"
   ng-page="switchPage"

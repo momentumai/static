@@ -18,21 +18,51 @@ momentum.controller('MainController', [
         $scope.viewLoaded = 0;
 
         $scope.itemClick = function (id) {
-            $scope.posts.forEach(function (post) {
-                if (post.id === id) {
-                    post.active = post.active ? 0 : 1;
-                    if (post.active) {
+            $scope.posts.forEach(function (content) {
+                if (content.id === id) {
+                    content.active = content.active ? 0 : 1;
+                    if (content.active) {
                         $state.go('root.main.content.info', {
-                            'contentId': String(id)
+                            'contentId': content.id
                         });
                     } else {
                         $state.go('root.main.dashboard.info');
+                        $scope.content = null;
+                    }
+                } else {
+                    content.active = 0;
+                }
+            });
+        };
+
+        function checkContents (posts, contentId, redirect) {
+            var hasPost = 0;
+
+            if (!posts) {
+                return;
+            }
+
+            posts.forEach(function (post) {
+                if (post.id === contentId) {
+                    post.active = 1;
+                    hasPost = 1;
+                    $scope.content = post;
+                    if (redirect) {
+                        $state.go('root.main.content.info', {
+                            'contentId': contentId
+                        });
                     }
                 } else {
                     post.active = 0;
                 }
             });
-        };
+
+            if (!hasPost) {
+                $state.go('root.main.dashboard.info');
+                $scope.content = null;
+            }
+        }
+
         function oneMinutePoll () {
             var promises = {
                 'posts': post.list($scope.sessionId, 20)
@@ -44,11 +74,7 @@ momentum.controller('MainController', [
 
             promises.posts = promises.posts.then(function (posts) {
                 $scope.posts = posts.data;
-                $scope.posts.forEach(function (post) {
-                    if (post.id === Number($scope.stateParams.contentId)) {
-                        post.active = 1;
-                    }
-                });
+                checkContents($scope.posts, $scope.stateParams.contentId);
             });
 
             $q.all(promises).then(function () {
@@ -62,6 +88,12 @@ momentum.controller('MainController', [
         } else {
             $scope.$on('loaded', oneMinutePoll);
         }
+
+        $scope.$watch('stateParams', function (stateParams) {
+            if (stateParams) {
+                checkContents($scope.posts, stateParams.contentId, 1);
+            }
+        });
 
         $scope.$on('$destroy', function () {
             if (poller) {

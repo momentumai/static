@@ -1,6 +1,5 @@
 /*global momentum, FB*/
 momentum.controller('ContentController', [
-    'content',
     'dialog',
     'toast',
     'fb',
@@ -9,7 +8,6 @@ momentum.controller('ContentController', [
     '$state',
     '$q',
     function (
-        content,
         dialog,
         toast,
         fb,
@@ -78,11 +76,11 @@ momentum.controller('ContentController', [
                 'assets': fb.listAssets($scope.sessionId),
                 'status': fb.isAutomatable(
                     $scope.sessionId,
-                    $scope.stateParams.contentId
+                    $scope.content.id
                 ),
                 'og': fb.getContentOgData(
                     $scope.sessionId,
-                    $scope.stateParams.contentId
+                    $scope.content.id
                 )
             };
 
@@ -188,7 +186,7 @@ momentum.controller('ContentController', [
         function loadPreview (model) {
             return fb.preview(
                 $scope.sessionId,
-                $scope.stateParams.contentId,
+                $scope.content.id,
                 model.preview
             ).then(function (data) {
                 model.previewHtml = data.preview;
@@ -297,7 +295,7 @@ momentum.controller('ContentController', [
 
                             return fb.createPromotion(
                                 $scope.sessionId,
-                                $scope.stateParams.contentId,
+                                $scope.content.id,
                                 params
                             );
                         }).then(function (resp) {
@@ -329,21 +327,11 @@ momentum.controller('ContentController', [
             });
         };
 
-        function init () {
-            content.getInfo(
-                $scope.sessionId,
-                $scope.stateParams.contentId
-            ).then(function (info) {
-                $scope.info = info;
-                $rootScope.title = info.title || info.url;
-            });
-        }
-
-        if ($scope.loaded) {
-            init();
-        } else {
-            $scope.$on('loaded', init);
-        }
+        $scope.$watch('content', function (content) {
+            if (content) {
+                $rootScope.title = content.title;
+            }
+        });
 
         $scope.$on('$destroy', function () {
             $rootScope.title = '';
