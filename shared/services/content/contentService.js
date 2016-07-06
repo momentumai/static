@@ -247,5 +247,18 @@ momentum.factory('content', ['$http', function ($http) {
         });
     };
 
+    content.blacklist = function (sessionId, url, blacklist) {
+        return $http.post([
+            bvConfig.endpoint,
+            'dashboard/content/blacklist'
+        ].join(''), {
+            'session_id': sessionId,
+            'url': url,
+            'blacklist': blacklist
+        }).then(function (res) {
+            return res.data;
+        });
+    };
+
     return content;
 }]);

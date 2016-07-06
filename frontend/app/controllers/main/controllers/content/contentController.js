@@ -3,6 +3,7 @@ momentum.controller('ContentController', [
     'dialog',
     'toast',
     'fb',
+    'content',
     '$rootScope',
     '$scope',
     '$state',
@@ -11,6 +12,7 @@ momentum.controller('ContentController', [
         dialog,
         toast,
         fb,
+        content,
         $rootScope,
         $scope,
         $state,
@@ -171,7 +173,7 @@ momentum.controller('ContentController', [
         $scope.share = function () {
             FB.ui({
                 'method': 'share',
-                'href': $scope.info.share_link
+                'href': $scope.content.shareLink
             }, function () {});
         };
 
@@ -214,8 +216,8 @@ momentum.controller('ContentController', [
                     'dialogClass': 'promote-dialog'
                 }).then(function () {
                     var name = model.og.title ||
-                        $scope.info.title ||
-                        $scope.info.url,
+                        $scope.content.title ||
+                        $scope.content.url,
                         byId = function (array, id) {
                             return array.filter(
                                 function (act) {
@@ -248,7 +250,7 @@ momentum.controller('ContentController', [
                         'message': model.message,
                         'caption': model.og.site_name || '',
                         'image': model.og.image || '',
-                        'link': $scope.info.url,
+                        'link': $scope.content.url,
                         'utm_source': model.utm_source,
                         'utm_medium': model.utm_medium,
                         'utm_campaign': model.utm_campaign
@@ -324,6 +326,30 @@ momentum.controller('ContentController', [
                         'htmlText': err
                     });
                 }
+            });
+        };
+
+        $scope.blacklist = function () {
+            var state = $scope.content.blacklist ? 'enable' : 'disable';
+
+            return dialog.open({
+                'htmlText': 'Are you sure you want to ' +
+                    state + ' tracking for this URL?',
+                'showCancel': true,
+                'okText': state
+            }).then(function () {
+                return content.blacklist(
+                    $scope.sessionId,
+                    $scope.content.url,
+                    !$scope.content.blacklist
+                );
+            }).then(function () {
+                $scope.content.blacklist = !$scope.content.blacklist;
+                return toast.open({
+                    'htmlText': 'URL tracking ' +
+                        state +
+                        'd'
+                });
             });
         };
 

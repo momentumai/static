@@ -57,10 +57,28 @@
     <a analytics-on="click"
         analytics-event="fab"
         analytics-properties="{
+            category: 'blacklist',
+            label: user.real_team_id
+        }"
+        ng-click="blacklist()"
+        ng-class="{'inverse': !content.blacklist}"
+        class="fab3
+            content-fab-menu-fab
+            mdl-shadow--8dp
+            mdl-button
+            mdl-js-button
+            mdl-button--fab
+            mdl-button--mini-fab
+            mdl-js-ripple-effect">
+        <i class="material-icons">{{content.blacklist ? 'restore page' : 'block'}}</i>
+    </a>
+    <a analytics-on="click"
+        analytics-event="fab"
+        analytics-properties="{
             category: 'open_link',
             label: user.real_team_id
         }"
-        ng-href="http://{{info.url}}"
+        ng-href="http://{{content.url}}"
         target="_blank"
         class="fab2
             content-fab-menu-fab

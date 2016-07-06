@@ -45,6 +45,8 @@ function ($http) {
                         posts[i].ogdata.title &&
                         posts[i].ogdata.title.trim() ||
                         posts[i].url,
+                    'url': posts[i].url,
+                    'shareLink': posts[i].shareLink,
                     'img': posts[i].ogdata && posts[i].ogdata.image,
                     'momentum': Math.round(posts[i].momentum * 100),
                     'chartData': getChartData(
@@ -64,7 +66,8 @@ function ($http) {
                     'organic': posts[i].organic,
                     'team': posts[i].team,
                     'paid': posts[i].paid,
-                    'source': posts[i].source
+                    'source': posts[i].source,
+                    'blacklist': posts[i].blacklist
                 });
             }
 
