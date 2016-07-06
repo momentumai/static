@@ -57,7 +57,7 @@ momentum.controller('MainController', [
                 }
             });
 
-            if (!hasPost) {
+            if (!hasPost && $scope.content) {
                 $state.go('root.main.dashboard.info');
                 $scope.content = null;
             }
@@ -79,7 +79,7 @@ momentum.controller('MainController', [
 
             $q.all(promises).then(function () {
                 $timeout(function () { $scope.viewLoaded = 1; });
-                poller = $timeout(oneMinutePoll, 60000);
+                poller = $timeout(oneMinutePoll, 10000);
             });
         }
 

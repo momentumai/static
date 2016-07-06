@@ -94,7 +94,7 @@ momentum.controller('ContentHistoryController', [
                 if (stat.id === id) {
                     stat.offset = Math.min(
                         stat.details.length,
-                        Math.max(0, stat.offset + dir * 10)
+                        Math.max(0, stat.offset + dir * 5)
                     );
                 }
             });
