@@ -5,16 +5,14 @@ momentum.factory('category', [
     function ($q, $http) {
         var category = {};
 
-        category.list = function (sessionId, parent) {
+        category.list = function (sessionId) {
             return $http.post([
                 bvConfig.endpoint,
                 'dashboard/category/list'
             ].join(''), {
                 'session_id': sessionId,
-                'parent': Number(parent) || 0,
                 'cache': [
-                    sessionId,
-                    String(parent || 0)
+                    sessionId
                 ]
             }).then(function (response) {
                 return response.data;
@@ -22,39 +20,17 @@ momentum.factory('category', [
         };
 
         category.getWithSelected = function (sessionId) {
-            return category.getSelected(sessionId).then(function (cats) {
-                var cat1 = cats[0],
-                    cat2 = cats[1],
-                    cat3 = cats[2],
-                    promises = {},
-                    res = {
+            return $q.all([
+                category.getSelected(sessionId),
+                category.list(sessionId)
+            ]).then(function (res) {
+                var selectedCats = res[0],
+                    catMap = res[1],
+                    ret = {
                         'category': {
                             'data': null,
                             'selected': null,
-                            'label': 'Filter by category',
-                            'change': function () {
-                                res.subSubCategory.selected = 'all';
-                                res.subCategory.selected = 'all';
-                                res.subSubCategory.data = [{
-                                    'id': 'all',
-                                    'label': 'ALL'
-                                }];
-                                if (res.category.selected === 'all') {
-                                    res.subCategory.data = [{
-                                        'id': 'all',
-                                        'label': 'ALL'
-                                    }];
-                                } else {
-                                    res.subCategory.disabled = 1;
-                                    category.list(
-                                        sessionId,
-                                        res.category.selected
-                                    ).then(function (data) {
-                                        res.subCategory.data = data;
-                                        res.subCategory.disabled = 0;
-                                    });
-                                }
-                            }
+                            'label': 'Filter by category'
                         },
                         'subCategory': {
                             'data': [{
@@ -62,25 +38,7 @@ momentum.factory('category', [
                                 'label': 'ALL'
                             }],
                             'selected': 'all',
-                            'label': 'Filter by sub category',
-                            'change': function () {
-                                res.subSubCategory.selected = 'all';
-                                if (res.subCategory.selected === 'all') {
-                                    res.subSubCategory.data = [{
-                                        'id': 'all',
-                                        'label': 'ALL'
-                                    }];
-                                } else {
-                                    res.subSubCategory.disabled = 1;
-                                    category.list(
-                                        sessionId,
-                                        res.subCategory.selected
-                                    ).then(function (data) {
-                                        res.subSubCategory.data = data;
-                                        res.subSubCategory.disabled = 0;
-                                    });
-                                }
-                            }
+                            'label': 'Filter by sub category'
                         },
                         'subSubCategory': {
                             'data': [{
@@ -92,37 +50,87 @@ momentum.factory('category', [
                         }
                     };
 
-                promises['root'] = category.list(
-                    sessionId,
-                    0
-                ).then(function (data) {
-                    res.category.data = data;
-                    res.category.selected = cat1 || 'all';
-                });
+                function loadSubSubCategory () {
+                    ret.subSubCategory.data = [{
+                        'id': 'all',
+                        'label': 'ALL'
+                    }].concat(Object.keys(
+                        catMap[ret.category.selected] &&
+                        catMap[
+                            ret.category.selected
+                        ][ret.subCategory.selected] ||
+                        {}
+                    ).reduce(function (prev, act) {
+                        prev.push({
+                            'id': act,
+                            'label': decodeURIComponent(act)
+                        });
+                        return prev;
+                    }, []));
 
-                if (cat1) {
-                    promises['sub'] = category.list(
-                        sessionId,
-                        cat1
-                    ).then(function (data) {
-                        res.subCategory.data = data;
-                        res.subCategory.selected = cat2 || 'all';
-                    });
+                    ret.subSubCategory.selected = 'all';
                 }
 
-                if (cat2) {
-                    promises['subSub'] = category.list(
-                        sessionId,
-                        cat2
-                    ).then(function (data) {
-                        res.subSubCategory.data = data;
-                        res.subSubCategory.selected = cat3 || 'all';
-                    });
+                function loadSubCategory () {
+                    ret.subCategory.data = [{
+                        'id': 'all',
+                        'label': 'ALL'
+                    }].concat(Object.keys(
+                        catMap[ret.category.selected] || {}
+                    ).reduce(function (prev, act) {
+                        prev.push({
+                            'id': act,
+                            'label': decodeURIComponent(act)
+                        });
+                        return prev;
+                    }, []));
+
+                    ret.subCategory.selected = 'all';
+
+                    loadSubSubCategory ();
                 }
 
-                return $q.all(promises).then(function () {
-                    return res;
-                });
+                ret.category.data = [{
+                    'id': 'all',
+                    'label': 'ALL'
+                }].concat(Object.keys(
+                    catMap
+                ).reduce(function (prev, act) {
+                    prev.push({
+                        'id': act,
+                        'label': decodeURIComponent(act)
+                    });
+                    return prev;
+                }, []));
+
+                ret.category.selected = Object.keys(
+                    catMap
+                ).filter(function (act) {
+                    return act === selectedCats[0];
+                })[0] && selectedCats[0] || 'all';
+
+                loadSubCategory();
+
+                ret.subCategory.selected = Object.keys(
+                    catMap[ret.category.selected] || {}
+                ).filter(function (act) {
+                    return act === selectedCats[1];
+                })[0] && selectedCats[1] || 'all';
+
+                loadSubSubCategory();
+
+                ret.subSubCategory.selected = Object.keys(
+                    catMap[ret.category.selected] &&
+                    catMap[ret.category.selected][ret.subCategory.selected] ||
+                    {}
+                ).filter(function (act) {
+                    return act === selectedCats[2];
+                })[0] && selectedCats[2] || 'all';
+
+                ret.category.change = loadSubCategory;
+                ret.subCategory.change = loadSubSubCategory;
+
+                return ret;
             });
         };
 
