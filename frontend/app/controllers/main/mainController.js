@@ -79,7 +79,7 @@ momentum.controller('MainController', [
 
             $q.all(promises).then(function () {
                 $timeout(function () { $scope.viewLoaded = 1; });
-                poller = $timeout(oneMinutePoll, 10000);
+                poller = $timeout(oneMinutePoll, 60000);
             });
         }
 
