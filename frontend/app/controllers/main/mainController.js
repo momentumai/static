@@ -89,9 +89,9 @@ momentum.controller('MainController', [
             $scope.$on('loaded', oneMinutePoll);
         }
 
-        $scope.$watch('stateParams', function (stateParams) {
-            if (stateParams) {
-                checkContents($scope.posts, stateParams.contentId, 1);
+        $scope.$watch('stateParams.contentId', function (contentId) {
+            if (contentId) {
+                checkContents($scope.posts, contentId, 1);
             }
         });
 

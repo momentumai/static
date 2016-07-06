@@ -148,7 +148,7 @@ momentum.factory('content', ['$http', function ($http) {
             'dashboard/content/sources/history'
         ].join(''), {
             'session_id': sessionId,
-            'content_id': Number(contentId),
+            'content_id': contentId,
             'cache': [
                 sessionId,
                 contentId

@@ -8,7 +8,7 @@
       </div>
     </div>
 
-     <div 
+    <!--<div 
       mdl-upgrade
       campaigns
       ng-export="export"
@@ -18,12 +18,12 @@
       ng-model="content.campaigns"
       ng-if="viewLoaded"
       class="animate campaigns-card mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col">
-    </div>
+    </div> -->
 
     <div 
         mdl-upgrade
         source-stat
-        ng-repeat="stat in content.sourceStats track by stat.id"
+        ng-repeat="stat in sourceStats track by stat.id"
         ng-model="stat"
         ng-state="switchState"
         ng-page="switchPage"
