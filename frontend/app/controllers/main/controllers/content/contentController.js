@@ -79,10 +79,6 @@ momentum.controller('ContentController', [
                 'status': fb.isAutomatable(
                     $scope.sessionId,
                     $scope.content.id
-                ),
-                'og': fb.getContentOgData(
-                    $scope.sessionId,
-                    $scope.content.id
                 )
             };
 
@@ -130,10 +126,6 @@ momentum.controller('ContentController', [
             promises.status = promises.status.then(function (status) {
                 ret.automated = status !== 'inactive';
                 ret.status = status;
-            });
-
-            promises.og = promises.og.then(function (og) {
-                ret.og = og;
             });
 
             return $q.all(promises).then(function () {
@@ -215,7 +207,7 @@ momentum.controller('ContentController', [
                     'animate': !back,
                     'dialogClass': 'promote-dialog'
                 }).then(function () {
-                    var name = model.og.title ||
+                    var name = $scope.content.og.title ||
                         $scope.content.title ||
                         $scope.content.url,
                         byId = function (array, id) {
@@ -245,11 +237,11 @@ momentum.controller('ContentController', [
                     model.preview = {
                         'ad_account': $scope.form.adaccount.selected,
                         'page_id': model.page.selected,
-                        'description': model.og.description || '',
+                        'description': $scope.content.og.description || '',
                         'name': name,
                         'message': model.message,
-                        'caption': model.og.site_name || '',
-                        'image': model.og.image || '',
+                        'caption': $scope.content.og.site_name || '',
+                        'image': $scope.content.og.image || '',
                         'link': $scope.content.url,
                         'utm_source': model.utm_source,
                         'utm_medium': model.utm_medium,

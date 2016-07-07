@@ -67,7 +67,8 @@ function ($http) {
                     'team': posts[i].team,
                     'paid': posts[i].paid,
                     'source': posts[i].source,
-                    'blacklist': posts[i].blacklist
+                    'blacklist': posts[i].blacklist,
+                    'og': posts[i].ogdata || {}
                 });
             }
 

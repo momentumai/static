@@ -87,7 +87,7 @@ momentum.factory('fb', [
                 'promotion/autoschedule'
             ].join(''), {
                 'session_id': sessionId,
-                'content_id': Number(contentId)
+                'content_id': contentId
             }).then(function (resp) {
                 return resp.data;
             });
@@ -298,7 +298,7 @@ momentum.factory('fb', [
                 'promotion/post/preview'
             ].join(''), {
                 'session_id': sessionId,
-                'content_id': Number(contentId),
+                'content_id': contentId,
                 'settings': settings
             }).then(function (res) {
                 var ret = {},
