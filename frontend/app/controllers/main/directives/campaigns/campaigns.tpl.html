@@ -46,8 +46,8 @@
             <td class="mdl-data-table__cell--non-numeric">
                 <a
                     class="mdl-color-text--primary"
-                    ui-sref="root.main.content.info({contentId: c.cId})"
-                    ui-sref-opts="{reload:true}"
+                    ng-href="http://{{c.url}}"
+                    target="_blank"
                     title="{{c.name}}">
                     {{c.name}}
                 </a>
@@ -60,7 +60,7 @@
             <td>{{c.from}} - {{c.to}}</td>
           </tr>
         <tr class="spacer" ng-if="model.sum < 10">
-            <td colspan="9" style="height: calc(49px * ({{10 - model.sum}}))">
+            <td colspan="8" style="height: calc(49px * ({{10 - model.sum}}))">
                 {{model.sum ? 
                     '&nbsp' :
                     model.errorMessage ?
