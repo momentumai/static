@@ -146,8 +146,8 @@ momentum.factory('fb', [
                 params.offset = Number(offset);
             }
 
-            if (Number(contentId)) {
-                params.content_id = Number(contentId);
+            if (contentId) {
+                params.content_id = contentId;
             }
 
             params.cache = [
@@ -222,7 +222,7 @@ momentum.factory('fb', [
                 'promotion/ogdata'
             ].join(''), {
                 'session_id': sessionId,
-                'content_id': Number(contentId),
+                'content_id': contentId,
                 'cache': [
                     sessionId,
                     contentId
@@ -322,7 +322,7 @@ momentum.factory('fb', [
                 'promotion/create'
             ].join(''), {
                 'session_id': sessionId,
-                'content_id': Number(contentId),
+                'content_id': contentId,
                 'settings': settings
             }).then(function (res) {
                 if (res.data.errorMessage) {
@@ -403,7 +403,7 @@ momentum.factory('fb', [
             ];
 
             if (contentId) {
-                params['content_id'] = Number(contentId);
+                params['content_id'] = contentId;
                 params.cache.push(contentId);
             }
 
