@@ -1,4 +1,5 @@
 config/prod.config.json
+config/test.config.json
 .tmp
 dist
 .idea

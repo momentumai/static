@@ -5,3 +5,9 @@
 # Start development environment
 
     ./start.sh
+
+
+# Deploy frontend to dev environment
+
+    gulp deploy-frontend
+

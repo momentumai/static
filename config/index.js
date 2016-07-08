@@ -5,9 +5,11 @@ var extend = require('extend'),
     baseConfigPath = path.join(configPath, 'base.config.json'),
     devConfigPath = path.join(configPath, 'dev.config.json'),
     prodConfigPath = path.join(configPath, 'prod.config.json'),
+    testConfigPath = path.join(configPath, 'test.config.json'),
     config,
     devConfig,
-    prodConfig;
+    prodConfig,
+    testConfig;
 
 function getConfig (path) {
     var cfg;
@@ -23,12 +25,18 @@ function getConfig (path) {
 config = getConfig(baseConfigPath) || {};
 devConfig = getConfig(devConfigPath);
 prodConfig = getConfig(prodConfigPath);
+testConfig = getConfig(testConfigPath);
 
 if (process.env['NODE_ENV'] === 'production') {
     if (!prodConfig) {
         throw new Error('No production config');
     }
     config = extend(true, config, prodConfig);
+} else if (process.env['NODE_ENV'] === 'test') {
+    if (!testConfig) {
+        throw new Error('No test config');
+    }
+    config = extend(true, config, testConfig);
 } else if (devConfig) {
     config = extend(true, config, devConfig);
 }

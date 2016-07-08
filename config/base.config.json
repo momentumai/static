@@ -1,6 +1,4 @@
 {
-    "endpoint": "http://localhost:8081/api/",
-    "docBase": "http://localhost:8080",
     "autoprefixer": [
         "ie >= 10",
         "ie_mob >= 10",
@@ -13,15 +11,11 @@
         "bb >= 10"
     ],
     "facebook": {
-        "appId": "1711997195683402",
         "scope": [
             "manage_pages",
             "ads_management",
             "publish_pages"
         ]
-    },
-    "stripe": {
-        "public": "pk_test_yWBSSDXz7dmdms3KKiWXLV2a"
     },
     "ga": {
         "id": "UA-64108533-2",

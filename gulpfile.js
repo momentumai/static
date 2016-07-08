@@ -21,6 +21,8 @@ gulp.runSequence = require('gulp-run-sequence');
 gulp.replace = require('gulp-replace-task');
 gulp.autoprefixer = require('gulp-autoprefixer');
 gulp.watch = require('gulp-watch');
+gulp.awspublish = require('gulp-awspublish');
+gulp.cloudfront = require('gulp-cloudfront-invalidate');
 
 gulp.task('watch', function () {
     return gulp.watch([
@@ -221,6 +223,32 @@ gulp.task('cssmin', function () {
         .pipe(gulp.dest(distDir));
 });
 
+gulp.task('invalidate-cloudfront', function () {
+    var settings = {
+        'distribution': config.build.distribution,
+        'paths': ['/*']
+    };
+
+    return gulp.src('*')
+        .pipe(gulp.cloudfront(settings));
+});
+
+gulp.task('sync-s3', function () {
+    var publisher = gulp.awspublish.create({
+        'region': config.build.region,
+        'params': {
+            'Bucket': config.build.bucket
+        }
+    });
+
+    console.info('Deploy to ' + config.build.bucket);
+
+    return gulp.src(path.join(distDir, '**/*'))
+        .pipe(publisher.publish())
+        .pipe(publisher.sync())
+        .pipe(gulp.awspublish.reporter());
+});
+
 gulp.task('copy', [
     'copy:js',
     'copy:css',
@@ -243,11 +271,18 @@ gulp.task('dist', ['clean'], function (done) {
     );
 });
 
-gulp.task('package', function (done) {
+gulp.task('package', ['eslint'], function (done) {
     docBase = path.join(base, '/frontend/');
     tmpDir = path.join(docBase, '.tmp');
     distDir = path.join(docBase, 'dist');
     gulp.runSequence('dist', ['uglify', 'cssmin'], done);
+});
+
+gulp.task('deploy-frontend', function (done) {
+    docBase = path.join(base, '/frontend/');
+    tmpDir = path.join(docBase, '.tmp');
+    distDir = path.join(docBase, 'dist');
+    gulp.runSequence('package', 'sync-s3', 'invalidate-cloudfront', done);
 });
 
 gulp.task('extension:background', function (done) {
