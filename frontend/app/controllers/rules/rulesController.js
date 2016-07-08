@@ -45,6 +45,29 @@ momentum.controller('RulesController', [
         function refreshModel (model) {
             var promises = [];
 
+            if (!model.adaccount.selected) {
+                model.audiences = {
+                    'label': 'Audiences',
+                    'validators': [{
+                        'message': 'Please fill out this field.',
+                        'cond': function (item) {
+                            return !item;
+                        }
+                    }],
+                    'selected': null,
+                    'data': []
+                };
+
+                model.currency = {
+                    'name': 'USD',
+                    'offset': 100
+                };
+
+                model.budget = 20;
+
+                return model;
+            }
+
             promises.push(getAudiences(model));
             promises.push(getCurrency(model));
 
@@ -62,7 +85,7 @@ momentum.controller('RulesController', [
             });
         }
 
-        function getOptionsModel () {
+        function getOptionsModel (item) {
             var promises,
                 ret;
 
@@ -73,6 +96,13 @@ momentum.controller('RulesController', [
             ret = {};
 
             promises.assets = promises.assets.then(function (assets) {
+                var validators = [{
+                    'message': 'Please fill out this field.',
+                    'cond': function (item) {
+                        return !item;
+                    }
+                }];
+
                 (assets || []).forEach(function (item) {
                     ret[item.type] = ret[item.type] || {};
                     if (item.default) {
@@ -104,11 +134,24 @@ momentum.controller('RulesController', [
                     ret['adaccount'].selected = ret['adaccount'].data[0].id;
                 }
 
+                if (Object.keys(item.options).length && item.my) {
+                    if (ret['adaccount'].data.filter(function (elem) {
+                        return elem.id === item.options.ad_account;
+                    }).length) {
+                        ret['adaccount'].selected = item.options.ad_account;
+                    } else {
+                        ret['adaccount'].selected = null;
+                    }
+                }
+
                 ret['page'].label = 'Pages:';
+                ret['page'].validators = validators;
+
                 ret['adaccount'].label = 'Ad accounts:';
                 ret['adaccount'].change = function () {
                     return refreshModel(ret);
                 };
+                ret['adaccount'].validators = validators;
             });
 
             return $q.all(promises).then(function () {
@@ -193,12 +236,51 @@ momentum.controller('RulesController', [
                 });
             }
 
+            function mergeModel (model, item) {
+                var options = item.options;
+
+                model.max_duration = options.max_duration || 1;
+                model.budget = options.budget &&
+                    options.budget / (options.offset || 100) ||
+                    model.budget;
+                model.utm_source = options.utm_source || '';
+                model.utm_medium = options.utm_medium || '';
+                model.utm_campaign = options.utm_campaign || '';
+
+                if (model.page.data.filter(function (elem) {
+                    return elem.id === options.page_id;
+                }).length) {
+                    model.page.selected = options.page_id;
+                } else {
+                    model.page.selected = null;
+                }
+
+                if (model.audiences.data.filter(function (elem) {
+                    return elem.id === options.audience;
+                }).length) {
+                    model.audiences.selected = options.audience;
+                } else {
+                    model.audiences.selected = null;
+                }
+            }
+
+            function setDefaults (model) {
+                model.utm_source = 'facebook';
+                model.utm_medium = '';
+                model.utm_campaign = '';
+                model.max_duration = 1;
+            }
+
             promise.then(function () {
-                return getOptionsModel().then(function (model) {
+                return getOptionsModel(item).then(function (model) {
                     return refreshModel(model);
                 }).then(function (model) {
-                    model['max_duration'] = 1;
-
+                    if (Object.keys(item.options).length &&
+                        item.my) {
+                        mergeModel(model, item);
+                    } else {
+                        setDefaults(model);
+                    }
                     return dialog.open({
                         'title': 'Rule options',
                         'template': 'ruleOptions.tpl.html',
@@ -214,6 +296,9 @@ momentum.controller('RulesController', [
                             'audience': model.audiences.selected,
                             'max_duration': model.max_duration,
                             'budget': model.budget * model.currency.offset,
+                            'utm_source': model.utm_source,
+                            'utm_medium': model.utm_medium,
+                            'utm_campaign': model.utm_campaign,
                             'meta': {
                                 'page': model.page.data.filter(
                                     function (elem) {

@@ -13,11 +13,11 @@ momentum.factory('rule', ['category', '$q', '$http',
             var ret = [];
 
             [
-                item.cat1name,
-                item.cat2name,
-                item.cat3name
+                item.cat1,
+                item.cat2,
+                item.cat3
             ].forEach(function (cat) {
-                if (cat !== 'ALL') {
+                if (cat !== 'NONE') {
                     ret.push(decodeURIComponent(cat));
                 }
             });
@@ -71,7 +71,7 @@ momentum.factory('rule', ['category', '$q', '$http',
 
                 for (; i < ret.length; i += 1) {
                     if (ret[i] === 'all') {
-                        ret[i] = 0;
+                        ret[i] = 'NONE';
                     }
                 }
 
