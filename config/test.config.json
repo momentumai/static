@@ -1,0 +1,15 @@
+{
+    "endpoint": "https://localhost:8081/v1/api/",
+    "docBase": "https://testapp.momentum.ai",
+    "facebook": {
+        "appId": "1711996355683486"
+    },
+    "stripe": {
+        "public": "pk_live_LC4kGOnyBMQKTlUqnKs1glQ1"
+    },
+    "build": {
+        "region": "us-east-1",
+        "bucket": "static-frontend-test",
+        "distribution": "E2544IKNG88L2J"
+    }
+}
