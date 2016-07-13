@@ -8,13 +8,7 @@ momentum.controller('PreviewController', [
     function ($stateParams, $state, fb, content, $scope) {
         $scope.viewLoaded = 0;
         $scope.model = $stateParams.model;
-
-        function getInfo () {
-            return content.getInfo(
-                $scope.sessionId,
-                $stateParams.contentId
-            );
-        }
+        $scope.content = $stateParams.content;
 
         function loadPreview (info) {
             var model = $scope.model,
@@ -67,7 +61,7 @@ momentum.controller('PreviewController', [
 
             return fb.preview(
                 $scope.sessionId,
-                $stateParams.contentId,
+                $scope.content.id,
                 model.preview
             ).then(function (data) {
                 model.previewHtml = data.preview;
@@ -79,12 +73,12 @@ momentum.controller('PreviewController', [
         $scope.promote = function () {
             $state.go('promote', {
                 'model': $scope.model,
-                'contentId': $stateParams.contentId
+                'content': $scope.content
             });
         };
 
         function init () {
-            getInfo().then(loadPreview).then(function () {
+            loadPreview($scope.content).then(function () {
                 $scope.viewLoaded = 1;
             }).catch(function (err) {
                 $state.go('error', {

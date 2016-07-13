@@ -1,46 +1,55 @@
 /*global momentum, bvConfig*/
 momentum.controller('MainController', [
-    'content',
-    'recommended',
+    'post',
     'fb',
     '$q',
     '$scope',
-    function (content, recommended, fb, $q, $scope) {
+    function (post, fb, $q, $scope) {
         $scope.viewLoaded = 0;
         $scope.topPosts = null;
         $scope.currentPost = null;
         $scope.dashboardUrl = bvConfig.docBase;
+        $scope.content = null;
 
-        $scope.share = function (contentId) {
-            content.getInfo(
-                $scope.sessionId,
-                contentId
-            ).then(function (info) {
-                fb.share(info.share_link);
-            });
+        $scope.share = function (content) {
+            fb.share(content.shareLink);
         };
 
         function init () {
             var promises = {
-                'recommended': recommended.list(
-                    $scope.sessionId,
-                    2
+                'recommended': post.list(
+                    $scope.sessionId
                 ),
-                'currentTab': recommended.get(
+                'current': post.url(
                     $scope.sessionId,
                     $scope.tabUrl
                 )
             };
 
             promises['recommended'].then(function (posts) {
-                $scope.topPosts = posts.data;
+                $scope.topPosts = posts.data.slice(0, 2).filter(function (act) {
+                    return act.recommended;
+                });
             });
 
-            promises['currentTab'].then(function (currentPost) {
-                $scope.currentPost = currentPost;
-            });
+            return $q.all(promises).then(function (res) {
+                var min,
+                    hasCurrent;
 
-            return $q.all(promises).then(function () {
+                res['recommended'].data.forEach(function (act) {
+                    if ($scope.tabUrl.indexOf(act.url) !== -1) {
+                        hasCurrent = 1;
+                        $scope.currentPost = act;
+                    }
+                    min = act.momentum;
+                });
+
+                if (!hasCurrent && res['current']) {
+                    min = Number(min);
+                    $scope.currentPost = res['current'];
+                    $scope.currentPost.momentum = min && ('<' + min) || '0';
+                }
+
                 $scope.viewLoaded = 1;
             });
         }
