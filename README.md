@@ -7,7 +7,11 @@
     ./start.sh
 
 
-# Deploy frontend to dev environment
+# Deploy frontend
 
     gulp deploy-frontend
+
+## Change environment
+
+    NODE_ENV=new_env
 
