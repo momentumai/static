@@ -46,7 +46,7 @@ function ($stateProvider, $urlRouterProvider) {
         'url': '/promotion',
         'params': {
             'title': 'Promote content',
-            'contentId': null
+            'content': null
         },
         'views': {
             'container': {
@@ -60,7 +60,7 @@ function ($stateProvider, $urlRouterProvider) {
         'url': '/preview',
         'params': {
             'title': 'Preview content',
-            'contentId': null,
+            'content': null,
             'model': null,
             'info': null
         },
@@ -76,7 +76,7 @@ function ($stateProvider, $urlRouterProvider) {
         'url': '/promote',
         'params': {
             'title': 'Promote in progress...',
-            'contentId': null,
+            'content': null,
             'model': null
         },
         'views': {

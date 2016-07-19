@@ -28,12 +28,12 @@
         ng-model="$ctrl.model.chartData"
         color="rgba(0, 0, 0, 0.54)"></div>
     <button
-        ui-sref="promotion({contentId: $ctrl.model.id})"
+        ui-sref="promotion({content: $ctrl.model})"
         class="mdl-button
         mdl-button--primary
         mdl-button-js
         mdl-button-ripple-effect">Promote</button>
-    <button ng-click="$ctrl.share($ctrl.model.id)" class="mdl-button
+    <button ng-click="$ctrl.share($ctrl.model)" class="mdl-button
         mdl-button--primary
         mdl-button-js
         mdl-button-ripple-effect">Share</button>

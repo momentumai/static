@@ -8,7 +8,7 @@ momentum.controller('PromotionController', [
     function ($stateParams, $state, fb, $q, $scope) {
         $scope.form = null;
         $scope.viewLoaded = 0;
-        $scope.contentId = $stateParams.contentId;
+        $scope.content = $stateParams.content;
 
         function getCurrency () {
             return fb.currency(
@@ -63,11 +63,7 @@ momentum.controller('PromotionController', [
                 'assets': fb.listAssets($scope.sessionId),
                 'status': fb.isAutomatable(
                     $scope.sessionId,
-                    $scope.stateParams.contentId
-                ),
-                'og': fb.getContentOgData(
-                    $scope.sessionId,
-                    $scope.stateParams.contentId
+                    $scope.content.id
                 )
             };
 
@@ -99,10 +95,6 @@ momentum.controller('PromotionController', [
                 ret.status = status;
             });
 
-            promises.og.then(function (og) {
-                ret.og = og;
-            });
-
             return $q.all(promises).then(function () {
                 var now = new Date(),
                     oneYearAfter,
@@ -121,6 +113,8 @@ momentum.controller('PromotionController', [
                 ret.utm_source = 'facebook';
                 ret.utm_medium = '';
                 ret.utm_campaign = '';
+
+                ret.og = $scope.content.og;
 
                 ret.from = oneDayAfter.toISOString();
                 ret.to = oneYearAfter.toISOString();

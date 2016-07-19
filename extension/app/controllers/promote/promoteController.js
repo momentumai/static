@@ -6,7 +6,7 @@ momentum.controller('PromoteController', [
     '$scope',
     function ($stateParams, $state, fb, $scope) {
         $scope.viewLoaded = 0;
-        $scope.stateParams = $stateParams;
+        $scope.content = $stateParams.content;
 
         function init () {
             var model = $stateParams.model,
@@ -28,7 +28,7 @@ momentum.controller('PromoteController', [
 
             return fb.createPromotion(
                 $scope.sessionId,
-                $stateParams.contentId,
+                $scope.content.id,
                 params
             ).then(function () {
                 $scope.viewLoaded = 1;

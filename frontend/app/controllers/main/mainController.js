@@ -35,7 +35,7 @@ momentum.controller('MainController', [
             });
         };
 
-        function checkContents (posts, contentId, redirect) {
+        function checkContents (posts, contentId, redirect, first) {
             var hasPost = 0;
 
             if (!posts) {
@@ -57,13 +57,13 @@ momentum.controller('MainController', [
                 }
             });
 
-            if (!hasPost && $scope.content) {
+            if (!hasPost && ($scope.content || first)) {
                 $state.go('root.main.dashboard.info');
                 $scope.content = null;
             }
         }
 
-        function oneMinutePoll () {
+        function oneMinutePoll (first) {
             var promises = {
                 'posts': post.list($scope.sessionId, 20)
             };
@@ -74,7 +74,12 @@ momentum.controller('MainController', [
 
             promises.posts = promises.posts.then(function (posts) {
                 $scope.posts = posts.data;
-                checkContents($scope.posts, $scope.stateParams.contentId);
+                checkContents(
+                    $scope.posts,
+                    $scope.stateParams.contentId,
+                    0,
+                    first
+                );
             });
 
             $q.all(promises).then(function () {
@@ -84,14 +89,14 @@ momentum.controller('MainController', [
         }
 
         if ($scope.loaded) {
-            oneMinutePoll();
+            oneMinutePoll(1);
         } else {
-            $scope.$on('loaded', oneMinutePoll);
+            $scope.$on('loaded', oneMinutePoll.bind(null, 1));
         }
 
         $scope.$watch('stateParams.contentId', function (contentId) {
             if (contentId) {
-                checkContents($scope.posts, contentId, 1);
+                checkContents($scope.posts, contentId, 1, 0);
             }
         });
 
