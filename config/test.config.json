@@ -1,5 +1,5 @@
 {
-    "endpoint": "https://localhost:8081/v1/api/",
+    "endpoint": "https://node-api-dot-momentum-ai.appspot.com/api/",
     "docBase": "https://testapp.momentum.ai",
     "facebook": {
         "appId": "1711996355683486"
