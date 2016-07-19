@@ -1,4 +1,4 @@
-/*global momentum, URI, btoa, bvConfig */
+/*global momentum, URI, btoa, bvConfig, window */
 momentum.config([
     '$provide',
     '$httpProvider',
@@ -65,7 +65,6 @@ momentum.config([
                         var body,
                             status,
                             storage,
-                            //message,
                             state = $injector.get('$state');
 
                         if (response.data.errorMessage) {
@@ -73,21 +72,12 @@ momentum.config([
                             storage.invalidateCache();
                             body = response.data.errorMessage.split(':');
                             status = Number(body[1]);
-                            //message = body[2];
                             if (status === 401) {
-                                state.go('auth');
+                                storage.clearAuthData().then(function () {
+                                    state.go('auth');
+                                    window.location.reload(true);
+                                });
                             }
-                            /*if (status === 405 &&
-                                !state.is('root.facebook')
-                            ) {
-                                state.go(
-                                    'root.facebook',
-                                    {
-                                        'message': message
-                                    }
-                                );
-                                throw null;
-                            }*/
                         }
 
                         if (response.data.Type === 'Service') {
