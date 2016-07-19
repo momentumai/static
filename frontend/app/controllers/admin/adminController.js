@@ -122,12 +122,12 @@ momentum.controller('AdminController', [
         };
 
         function getTeamInactive () {
-            return admin.getTeamInactive(
+            /*return admin.getTeamInactive(
                 $scope.sessionId
             ).then(function (resp) {
                 $scope.inactivate.status = Number(resp.status);
                 $scope.inactivate.name = resp.name;
-            });
+            });*/
         }
 
         function getPayment () {
