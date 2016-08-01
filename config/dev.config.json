@@ -1,8 +1,8 @@
 {
-    "endpoint": "http://localhost:8081/v1/api/",
+    "endpoint": "http://localhost:8081/api/",
     "docBase": "http://localhost:8080",
     "facebook": {
-        "appId": "1711997195683402"
+        "appId": "1711996355683486"
     },
     "stripe": {
         "public": "pk_test_yWBSSDXz7dmdms3KKiWXLV2a"

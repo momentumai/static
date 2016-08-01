@@ -229,6 +229,10 @@ gulp.task('invalidate-cloudfront', function () {
         'paths': ['/*']
     };
 
+    if (!config.build.distribution) {
+        return 1;
+    }
+
     return gulp.src('*')
         .pipe(gulp.cloudfront(settings));
 });

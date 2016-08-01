@@ -5,11 +5,11 @@ var extend = require('extend'),
     baseConfigPath = path.join(configPath, 'base.config.json'),
     devConfigPath = path.join(configPath, 'dev.config.json'),
     prodConfigPath = path.join(configPath, 'prod.config.json'),
-    testConfigPath = path.join(configPath, 'test.config.json'),
+    stageConfigPath = path.join(configPath, 'stage.config.json'),
     config,
     devConfig,
     prodConfig,
-    testConfig;
+    stageConfig;
 
 function getConfig (path) {
     var cfg;
@@ -25,18 +25,18 @@ function getConfig (path) {
 config = getConfig(baseConfigPath) || {};
 devConfig = getConfig(devConfigPath);
 prodConfig = getConfig(prodConfigPath);
-testConfig = getConfig(testConfigPath);
+stageConfig = getConfig(stageConfigPath);
 
 if (process.env['NODE_ENV'] === 'production') {
     if (!prodConfig) {
         throw new Error('No production config');
     }
     config = extend(true, config, prodConfig);
-} else if (process.env['NODE_ENV'] === 'test') {
+} else if (process.env['NODE_ENV'] === 'stage') {
     if (!testConfig) {
-        throw new Error('No test config');
+        throw new Error('No stage config');
     }
-    config = extend(true, config, testConfig);
+    config = extend(true, config, stageConfig);
 } else if (devConfig) {
     config = extend(true, config, devConfig);
 }

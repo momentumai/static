@@ -1,6 +1,6 @@
 {
     "endpoint": "https://node-api-dot-momentum-ai.appspot.com/api/",
-    "docBase": "https://testapp.momentum.ai",
+    "docBase": "http://momentum-stage.s3-website-us-east-1.amazonaws.com/",
     "facebook": {
         "appId": "1711996355683486"
     },
@@ -9,7 +9,7 @@
     },
     "build": {
         "region": "us-east-1",
-        "bucket": "static-frontend-test",
-        "distribution": "E2544IKNG88L2J"
+        "bucket": "momentum-stage",
+        "distribution": ""
     }
 }
