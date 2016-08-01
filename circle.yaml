@@ -8,7 +8,6 @@ machine:
 
 dependencies:
   pre:
-    - pip install awscli
     - echo $STAGE_CONFIG | base64 --decode > ./config/stage.config.json
 
 deployment:
