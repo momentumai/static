@@ -1,0 +1,15 @@
+{
+    "endpoint": "https://node-api-dot-momentum-ai.appspot.com/api/",
+    "docBase": "https://app.momentum.ai",
+    "facebook": {
+        "appId": "1711996355683486"
+    },
+    "stripe": {
+        "public": "pk_live_LC4kGOnyBMQKTlUqnKs1glQ1"
+    },
+    "build": {
+        "region": "us-east-1",
+        "bucket": "static-frontend",
+        "distribution": "E3AZ1CD2OTJE1S"
+    }
+}

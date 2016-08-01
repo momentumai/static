@@ -1,5 +1,5 @@
 {
-    "endpoint": "https://node-api-dot-momentum-ai.appspot.com/api/",
+    "endpoint": "https://stage-dot-node-api-dot-momentum-ai.appspot.com/api/",
     "docBase": "http://momentum-stage.s3-website-us-east-1.amazonaws.com/",
     "facebook": {
         "appId": "1711996355683486"

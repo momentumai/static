@@ -1,4 +1,3 @@
-config/prod.config.json
 .tmp
 dist
 .idea

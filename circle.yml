@@ -6,10 +6,6 @@ machine:
   environment:
     GCLOUD_PROJECT: "momentum-ai"
 
-dependencies:
-  pre:
-    - echo $STAGE_CONFIG | base64 --decode > ./config/stage.config.json
-
 deployment:
     staging:
         branch: dev
