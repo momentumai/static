@@ -2,6 +2,7 @@ general:
   branches:
     only:
       - dev
+
 machine:
   environment:
     GCLOUD_PROJECT: "momentum-ai"
@@ -10,4 +11,4 @@ deployment:
     staging:
         branch: dev
         commands:
-        - NODE_ENV=stage gulp deploy-frontend
+          - NODE_ENV=stage gulp deploy-frontend
