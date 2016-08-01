@@ -33,7 +33,7 @@ if (process.env['NODE_ENV'] === 'production') {
     }
     config = extend(true, config, prodConfig);
 } else if (process.env['NODE_ENV'] === 'stage') {
-    if (!testConfig) {
+    if (!stageConfig) {
         throw new Error('No stage config');
     }
     config = extend(true, config, stageConfig);
