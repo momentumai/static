@@ -240,6 +240,8 @@ gulp.task('invalidate-cloudfront', function () {
 gulp.task('sync-s3', function () {
     var publisher = gulp.awspublish.create({
         'region': config.build.region,
+        'accessKeyId': process.env['AWS_KEY'],
+        'secretAccessKey': process.env['AWS_SECRET'],
         'params': {
             'Bucket': config.build.bucket
         }
