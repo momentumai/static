@@ -218,6 +218,80 @@ momentum.controller('RulesController', [
             });
         };
 
+        $scope.shareOptions = function (item) {
+            var promise = $q.resolve();
+
+            if (item.deleted) {
+                return false;
+            }
+
+            if (!item.my) {
+                promise = dialog.open({
+                    'htmlText': '<span>This rule edited by other user.<br/>' +
+                        'Are you sure you want to edit?</span>',
+                    'okText': 'Proceed',
+                    'destroy': false,
+                    'cancelText': 'Cancel',
+                    'showCancel': true
+                });
+            }
+
+            function mergeModel (model, item) {
+                var options = item.options;
+
+                model.utm_source = options.utm_source || '';
+                model.utm_medium = options.utm_medium || '';
+                model.utm_campaign = options.utm_campaign || '';
+
+                if (model.page.data.filter(function (elem) {
+                    return elem.id === options.page_id;
+                }).length) {
+                    model.page.selected = options.page_id;
+                } else {
+                    model.page.selected = null;
+                }
+            }
+
+            function setDefaults (model) {
+                model.utm_source = 'facebook';
+                model.utm_medium = '';
+                model.utm_campaign = '';
+            }
+
+            promise.then(function () {
+                return getOptionsModel(item).then(function (model) {
+                    return refreshModel(model);
+                }).then(function (model) {
+                    if (Object.keys(item.options).length &&
+                        item.my) {
+                        mergeModel(model, item);
+                    } else {
+                        setDefaults(model);
+                    }
+                    return dialog.open({
+                        'title': 'Rule options',
+                        'template': 'shareRuleOptions.tpl.html',
+                        'okText': 'Ok',
+                        'showCancel': true,
+                        'model': model,
+                        'animate': item.my,
+                        'dialogClass': 'rule-share-options-dialog'
+                    }).then(function (model) {
+                        var options = {
+                            'page_id': model.page.selected,
+                            'max_duration': model.max_duration,
+                            'utm_source': model.utm_source,
+                            'utm_medium': model.utm_medium,
+                            'utm_campaign': model.utm_campaign
+                        };
+
+                        item.my = 1;
+                        item.options = options;
+                    });
+                });
+            });
+        };
+
         $scope.options = function (item) {
             var promise = $q.resolve();
 
@@ -394,7 +468,7 @@ momentum.controller('RulesController', [
             if (['promotion_start', 'share'].indexOf(item.action) !== -1) {
                 return !Object.keys(item.options || {}).length;
             }
-            return 1;
+            return 0;
         };
 
         if ($scope.loaded) {
