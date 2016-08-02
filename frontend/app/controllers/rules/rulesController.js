@@ -391,10 +391,10 @@ momentum.controller('RulesController', [
         };
 
         $scope.emptyOptions = function (item) {
-            if (item.action === 'promotion_start') {
-                return !Object.keys(item.options).length;
+            if (['promotion_start', 'share'].indexOf(item.action) !== -1) {
+                return !Object.keys(item.options || {}).length;
             }
-            return 0;
+            return 1;
         };
 
         if ($scope.loaded) {

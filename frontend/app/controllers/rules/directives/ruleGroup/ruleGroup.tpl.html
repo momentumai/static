@@ -79,6 +79,9 @@
                     <option value="promotion_stop|promotion_finish">
                         stop promotion
                     </option>
+                    <option value="share">
+                        share on Facebook
+                    </option>
                 </select>
             </code>
             <span
@@ -91,6 +94,20 @@
                     }"
                     class="mdl-list__item-secondary-action"
                     ng-click="options(item)"
+                    href="javascript:void(0)">
+                    <i class="material-icons">build</i>
+                </a>
+            </span>
+            <span
+                ng-if="item.action === 'share'"
+                class="mdl-list__item-secondary-content">
+                <a
+                    ng-disabled="item.deleted"
+                    ng-class="{
+                        'disabled': item.deleted
+                    }"
+                    class="mdl-list__item-secondary-action"
+                    ng-click="share_options(item)"
                     href="javascript:void(0)">
                     <i class="material-icons">build</i>
                 </a>
