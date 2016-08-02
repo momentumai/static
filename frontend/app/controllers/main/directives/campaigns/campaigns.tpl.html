@@ -32,11 +32,12 @@
           <tr ng-repeat="c in model.data">
             <td class="mdl-data-table__cell--non-numeric">
                 <label
-                    ng-click="$event.preventDefault(); toggle(c.id, c.active);"
+                    ng-click="$event.preventDefault(); toggle(c.id, c.active, c.adset);"
                     class="mdl-switch mdl-js-switch mdl-js-ripple-effect"
                     for="switch-{{c.id}}">
                     <input
                         type="checkbox"
+                        ng-disabled="!c.adset"
                         ng-model="c.active"
                         id="switch-{{c.id}}"
                         class="mdl-switch__input" />
@@ -46,18 +47,19 @@
             <td class="mdl-data-table__cell--non-numeric">
                 <a
                     class="mdl-color-text--primary"
-                    ng-href="http://{{c.url}}"
-                    target="_blank"
+                    ng-href="{{c.adset ? 'http://' + c.url : '#/dashboard/settings/account'}}"
+                    target="{{c.adset ? '_blank' : ''}}"
                     title="{{c.name}}">
                     {{c.name}}
                 </a>
             </td>
-            <td>{{c.conversion}}</td>
-            <td>{{c.cpa}}</td>
-            <td>{{c.spend}}</td>
-            <td>{{c.click}}</td>
-            <td>{{c.landing}}</td>
-            <td>{{c.from}} - {{c.to}}</td>
+            <td ng-if="!c.adset" colspan="6">You don't have permission to access this campaign.</td>
+            <td ng-if="c.adset">{{c.conversion}}</td>
+            <td ng-if="c.adset">{{c.cpa}}</td>
+            <td ng-if="c.adset">{{c.spend}}</td>
+            <td ng-if="c.adset">{{c.click}}</td>
+            <td ng-if="c.adset">{{c.landing}}</td>
+            <td ng-if="c.adset">{{c.from}} - {{c.to}}</td>
           </tr>
         <tr class="spacer" ng-if="model.sum < 10">
             <td colspan="8" style="height: calc(49px * ({{10 - model.sum}}))">

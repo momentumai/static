@@ -1,0 +1,19 @@
+general:
+  branches:
+    only:
+      - dev
+      - master
+
+machine:
+  environment:
+    GCLOUD_PROJECT: "momentum-ai"
+
+deployment:
+    staging:
+        branch: dev
+        commands:
+          - NODE_ENV=production AWS_BUCKET="momentum-stage" gulp deploy-frontend
+    production:
+        branch: master
+        commands:
+          - NODE_ENV=production AWS_BUCKET="static-frontend" AWS_DISTRIBUTION="E3AZ1CD2OTJE1S" gulp deploy-frontend
