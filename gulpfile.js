@@ -226,7 +226,9 @@ gulp.task('cssmin', function () {
 gulp.task('invalidate-cloudfront', function () {
     var settings = {
         'distribution': process.env['AWS_DISTRIBUTION'],
-        'paths': ['/*']
+        'paths': ['/*'],
+        'accessKeyId': process.env['AWS_KEY'],
+        'secretAccessKey': process.env['AWS_SECRET']
     };
 
     if (!settings.distribution) {
