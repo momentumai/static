@@ -254,8 +254,8 @@ momentum.controller('RulesController', [
 
             function setDefaults (model) {
                 model.utm_source = 'facebook';
-                model.utm_medium = '';
-                model.utm_campaign = '';
+                model.utm_medium = 'momentum';
+                model.utm_campaign = 'organic';
             }
 
             promise.then(function () {
