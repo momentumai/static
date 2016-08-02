@@ -6,9 +6,5 @@
     },
     "stripe": {
         "public": "pk_live_LC4kGOnyBMQKTlUqnKs1glQ1"
-    },
-    "build": {
-        "bucket": "static-frontend",
-        "distribution": "E3AZ1CD2OTJE1S"
     }
 }
