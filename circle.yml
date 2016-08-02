@@ -2,6 +2,7 @@ general:
   branches:
     only:
       - dev
+      - master
 
 machine:
   environment:
@@ -12,3 +13,7 @@ deployment:
         branch: dev
         commands:
           - NODE_ENV=production AWS_BUCKET="momentum-stage" gulp deploy-frontend
+    staging:
+        branch: master
+        commands:
+          - NODE_ENV=production AWS_BUCKET="static-frontend" AWS_DISTRIBUTION="E3AZ1CD2OTJE1S" gulp deploy-frontend
