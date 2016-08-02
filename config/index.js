@@ -32,10 +32,9 @@ if (process.env['NODE_ENV'] === 'production') {
         throw new Error('No production config');
     }
     config = extend(true, config, prodConfig);
+    config = extend(true, config, versionConfig);
 } else if (devConfig) {
     config = extend(true, config, devConfig);
 }
-
-config = extend(true, config, versionConfig);
 
 module.exports = config;
