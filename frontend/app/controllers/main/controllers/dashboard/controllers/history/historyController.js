@@ -28,8 +28,12 @@ momentum.controller('HistoryController', [
             'campaigns': null
         };
 
-        $scope.toggle = function (id, active) {
+        $scope.toggle = function (id, active, adset) {
             var promise;
+
+            if (!adset) {
+                return;
+            }
 
             if (active) {
                 promise = dialog.open({
