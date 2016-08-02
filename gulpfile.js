@@ -225,11 +225,11 @@ gulp.task('cssmin', function () {
 
 gulp.task('invalidate-cloudfront', function () {
     var settings = {
-        'distribution': config.build.distribution,
+        'distribution': process.env['AWS_DISTRIBUTION'],
         'paths': ['/*']
     };
 
-    if (!config.build.distribution) {
+    if (!settings.distribution) {
         return 1;
     }
 
@@ -239,15 +239,15 @@ gulp.task('invalidate-cloudfront', function () {
 
 gulp.task('sync-s3', function () {
     var publisher = gulp.awspublish.create({
-        'region': config.build.region,
+        'region': 'us-east-1',
         'accessKeyId': process.env['AWS_KEY'],
         'secretAccessKey': process.env['AWS_SECRET'],
         'params': {
-            'Bucket': config.build.bucket
+            'Bucket': process.env['AWS_BUCKET']
         }
     });
 
-    console.info('Deploy to ' + config.build.bucket);
+    console.info('Deploy to ' + process.env['AWS_BUCKET']);
 
     return gulp.src(path.join(distDir, '**/*'))
         .pipe(publisher.publish())
