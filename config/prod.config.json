@@ -8,7 +8,6 @@
         "public": "pk_live_LC4kGOnyBMQKTlUqnKs1glQ1"
     },
     "build": {
-        "region": "us-east-1",
         "bucket": "static-frontend",
         "distribution": "E3AZ1CD2OTJE1S"
     }
