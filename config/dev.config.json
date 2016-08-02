@@ -6,10 +6,5 @@
     },
     "stripe": {
         "public": "pk_test_yWBSSDXz7dmdms3KKiWXLV2a"
-    },
-    "build": {
-        "region": "",
-        "bucket": "",
-        "distribution": ""
     }
 }
