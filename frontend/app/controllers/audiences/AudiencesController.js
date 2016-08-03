@@ -9,33 +9,23 @@ momentum.controller('AudiencesController', [
             'id': 'random_id',
             'name': 'Programozok akik hotfixelnek',
             'data': {
-                'custom_audiences': [{'id': 6004192254512}]
+                'custom_audiences': [{'id': '6042873124795'}]
             }
         }, {
             'id': 'random_id2',
             'name': 'Programozok akik meg mindig hotfixelnek',
             'data': {
-                'custom_audiences': [{'id': 6004192254512}]
+                'custom_audiences': [{'id': '6042873124795'}]
             }
         }, {
             'id': 'random_id3',
             'name': 'Programozok akik meg mindig hotfixelnek :(',
             'data': {
-                'custom_audiences': [{'id': 6004192254512}]
+                'custom_audiences': [{'id': '6042873124795'}]
             }
         }];
 
-        $scope.customAudiences = [{
-            'name': 'KEKBUR',
-            'id': 6004192254512
-        }, {
-            'name': 'lulz',
-            'id': 6004192254513
-        }];
-
-        $scope.customAudiences.unshift({
-            'name': 'Add custom audence'
-        });
+        $scope.customAudiences = null;
 
         $scope.deleteCustomAudience = function (audience, id) {
             var d = audience.data;
@@ -70,28 +60,65 @@ momentum.controller('AudiencesController', [
             })[0].name;
         };
 
-        $scope.open = function (audience) {
-            var isOpen = 0;
+        $scope.open = function (asset, audience) {
+            var willOpen;
 
             if (audience.open) {
                 return false;
             }
 
-            $scope.audiences.forEach(function (a) {
-                if (a.id === audience.id) {
-                    a.open = 1;
-                    isOpen = 1;
-                } else {
+            $scope.assets.forEach(function (asset) {
+                asset.audiences.isOpen = 0;
+                asset.audiences.forEach(function (a) {
                     a.open = 0;
+                });
+            });
+
+            asset.audiences.forEach(function (a) {
+                if (a.id === audience.id) {
+                    willOpen = a;
                 }
             });
 
-            $scope.audiences.isOpen = isOpen;
+            if (willOpen) {
+                return fb.get([
+                    '/',
+                    asset.id,
+                    '/customaudiences',
+                    '?fields=name'
+                ].join(''),
+                    $scope.user.fb_access_token
+                ).then(function (res) {
+                    $scope.customAudiences = res.data;
+                    $scope.customAudiences.unshift({
+                        'name': 'Add custom audence'
+                    });
+                    willOpen.open = 1;
+                    asset.audiences.isOpen = 1;
+                });
+            }
         };
 
         function init () {
-            fb.get('/me', $scope.user.fb_access_token);
-            $scope.viewLoaded = 1;
+            fb.listAssets(
+                $scope.sessionId
+            ).then(function (a) {
+                a = a.filter(function (act) {
+                    return act.type === 'adaccount';
+                }).sort(function (a, b) {
+                    return Number(b.default) - Number(a.default);
+                }).map(function (act) {
+                    return {
+                        'name': act.display,
+                        'id': act.value,
+                        'audiences': $scope.audiences
+                    };
+                });
+
+                $scope.assets = a;
+                $scope.viewLoaded = 1;
+            });
+            //fb.get('/me', $scope.user.fb_access_token);
         }
 
         if ($scope.loaded) {

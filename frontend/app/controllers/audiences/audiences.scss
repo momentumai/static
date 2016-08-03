@@ -1,3 +1,12 @@
+.asset-header {
+    padding-left: 16px;
+    padding-right: 16px;
+    font-size: 15px;
+    &.first {
+        padding-top: 16px;
+    }
+}
+
 .audiences {
     padding: 16px;
     .group {
