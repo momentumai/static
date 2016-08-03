@@ -13,6 +13,12 @@
 .audiences {
     padding: 16px;
     padding-top: 0;
+
+    .audience-name {
+        width: calc(100% - 32px);
+        margin-left: 16px;
+    }
+
     .group {
         &:not(.open):hover {
             background-color: unquote("rgb(#{$palette-grey-200})") !important;
@@ -62,7 +68,7 @@
                 display: flex;
             }
             &-label {
-                widht: 150px;
+                width: 150px;
                 padding: 16px;
                 flex-grow: 0;
                 flex-shrink: 0;
