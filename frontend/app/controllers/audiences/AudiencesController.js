@@ -41,7 +41,7 @@ momentum.controller('AudiencesController', [
                 return act.id && id && act.id === id;
             });
 
-            return cad[0] && cad[0].name || 'Custom audience does not exist';
+            return cad[0] && cad[0].name || 'Choose a custom audience';
         };
 
         $scope.close = function () {
@@ -88,7 +88,7 @@ momentum.controller('AudiencesController', [
                 ).then(function (res) {
                     $scope.customAudiences = res.data;
                     $scope.customAudiences.unshift({
-                        'name': 'Add custom audence'
+                        'name': 'Add custom audience'
                     });
                     willOpen.open = 1;
                     asset.audiences.isOpen = 1;
