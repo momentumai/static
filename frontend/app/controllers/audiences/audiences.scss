@@ -58,6 +58,15 @@
                 flex-grow: 0;
                 flex-shrink: 0;
             }
+            .audience-list {
+                margin: 0;
+                .mdl-list__item {
+                    padding-right: 0;
+                }
+            }
+            .audience-dropdown {
+                padding-top: 0;
+            }
         }
 
         &.isOpen:not(:last-child) {

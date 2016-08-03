@@ -17,22 +17,32 @@
             Custom audiences
         </div>
         <div class="group-content-value">
-            <ul>
-                <li>
-                    asdasdasd
-                </li>
-                <li>
-                    asdasdasd
+            <ul class="mdl-list audience-list">
+                <li
+                    class="mdl-list__item"
+                    ng-repeat="ca in audience.data.custom_audiences track by ca.id">
+                    <span class="mdl-list__item-primary-content">
+                        {{customAudienceByid(ca.id)}}
+                    </span>
+                    <span class="mdl-list__item-secondary-content">
+                        <a
+                            class="rule-delete mdl-list__item-secondary-action"
+                            ng-click="deleteCustomAudience(audience, ca.id)"
+                            href="javascript:void(0)">
+                            <i class="material-icons">delete_forever</i>
+                        </a>
+                    </span>
                 </li>
             </ul>
-            <!-- ng-model="model.selected"
-                ng-change="model.change()"
-                ng-options="item.id as item.label for item in model.data"-->
-            <select>
-                <option>
-                    Add audience
-                </option>
-            </select>
+            <div class="dropdown audience-dropdown">
+                <select
+                    ng-model="audience.$caValue"
+                    ng-change="addCustomAudience(audience)"
+                    ng-options="item.id as item.name
+                        for item in filteredCustomAudiences(audience)">
+                </select>
+                <label></label>
+            </div>
         </div>
     </div>
     <ul class="group-items mdl-list">

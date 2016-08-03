@@ -24,6 +24,51 @@ momentum.controller('AudiencesController', [
             }
         }];
 
+        $scope.customAudiences = [{
+            'name': 'KEKBUR',
+            'id': 6004192254512
+        }, {
+            'name': 'lulz',
+            'id': 6004192254513
+        }];
+
+        $scope.customAudiences.unshift({
+            'name': 'Add custom audence'
+        });
+
+        $scope.deleteCustomAudience = function (audience, id) {
+            var d = audience.data;
+
+            d.custom_audiences = d.custom_audiences.filter(function (act) {
+                return act.id && act.id !== id;
+            });
+        };
+
+        $scope.addCustomAudience = function (audience) {
+            if (audience.$caValue) {
+                audience.data.custom_audiences.push({
+                    'id': audience.$caValue
+                });
+            }
+            delete audience.$caValue;
+        };
+
+        $scope.filteredCustomAudiences = function (audience) {
+            var ca = audience.data.custom_audiences.map(function (act) {
+                return act.id;
+            });
+
+            return $scope.customAudiences.filter(function (act) {
+                return !act.id || ca.indexOf(act.id) === -1;
+            });
+        };
+
+        $scope.customAudienceByid = function (id) {
+            return $scope.customAudiences.filter(function (act) {
+                return act.id && id && act.id === id;
+            })[0].name;
+        };
+
         $scope.open = function (audience) {
             var isOpen = 0;
 
