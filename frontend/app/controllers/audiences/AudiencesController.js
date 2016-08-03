@@ -101,7 +101,9 @@ momentum.controller('AudiencesController', [
                 assets,
                 aus;
 
-            promises['au'] = audience.list().then(function (a) {
+            promises['au'] = audience.list(
+                $scope.sessionId
+            ).then(function (a) {
                 aus = a;
             });
 
