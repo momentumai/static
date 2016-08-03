@@ -3,9 +3,9 @@ momentum.controller('AudiencesController', [
     '$q',
     '$scope',
     'audience',
-    'dialog',
+    'toast',
     'fb',
-    function ($q, $scope, audience, dialog, fb) {
+    function ($q, $scope, audience, toast, fb) {
         $scope.viewLoaded = 0;
 
         $scope.assets = null;
@@ -158,7 +158,7 @@ momentum.controller('AudiencesController', [
                 assets = a;
             });
 
-            $q.all(promises).then(function () {
+            return $q.all(promises).then(function () {
                 Object.keys(aus).forEach(function (id) {
                     var asset = assets.filter(function (act) {
                         return act.id === id;
@@ -172,8 +172,30 @@ momentum.controller('AudiencesController', [
                 $scope.assets = assets;
                 $scope.viewLoaded = 1;
             });
-            //fb.get('/me', $scope.user.fb_access_token);
         }
+
+        $scope.save = function (aud) {
+            $scope.viewLoaded = 0;
+
+            if (aud.new) {
+                delete aud.new;
+                delete aud.id;
+            }
+
+            delete aud.$original;
+            delete aud.open;
+            delete aud.$caValue;
+
+            aud.session_id = $scope.sessionId;
+
+            return audience.save(aud).then(function () {
+                return init();
+            }).then(function () {
+                return toast.open({
+                    'htmlText': 'Audience saved successfully'
+                });
+            });
+        };
 
         if ($scope.loaded) {
             init();

@@ -27,5 +27,14 @@ momentum.factory('audience', ['$q', '$http', function ($q, $http) {
         });
     };
 
+    audience.save = function (params) {
+        return $http.post([
+            bvConfig.endpoint,
+            'audience/save'
+        ].join(''), params).then(function (resp) {
+            return resp.data;
+        });
+    };
+
     return audience;
 }]);
