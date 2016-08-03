@@ -18,7 +18,7 @@
         </div>
         <div class="group-content-value">
             <div class="mdl-textfield mdl-js-textfield">
-                <input ng-model="audience.name" class="mdl-textfield__input" type="text" id="{{audience.id}}-name">
+                <input required ng-model="audience.name" class="mdl-textfield__input" type="text" id="{{audience.id}}-name">
                 <label class="mdl-textfield__label" for="{{audience.id}}-name">Audience name</label>
             </div>
         </div>
@@ -47,6 +47,11 @@
             </ul>
             <div class="dropdown audience-dropdown">
                 <select
+                    validators="[{
+                        'message': 'Please fill out this field.',
+                        'cond': customAudienceValidator
+                    }]"
+                    validators-item="audience.data.custom_audiences"
                     ng-model="audience.$caValue"
                     ng-change="addCustomAudience(audience)"
                     ng-options="item.id as item.name
