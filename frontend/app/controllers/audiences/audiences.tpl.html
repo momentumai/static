@@ -1,5 +1,5 @@
 <div ng-if="viewLoaded" ng-repeat="asset in assets track by asset.id">
-    <div class="asset-header" ng-class="{'first': $first}">
+    <div class="asset-header">
         {{asset.name}} {{$first ? '(default)': ''}}
     </div>
     <div ng-if="asset.audiences.length" class="audiences" mdl-upgrade>
@@ -17,4 +17,13 @@
             </div>
         </div>
     </div>
+    <button class="asset-fab
+        mdl-button
+        mdl-js-button
+        mdl-button--fab
+        mdl-js-ripple-effect
+        mdl-button--mini-fab
+        mdl-button--colored">
+        <i class="material-icons">add</i>
+    </button>
 </div>

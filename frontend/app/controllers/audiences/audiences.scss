@@ -1,14 +1,15 @@
 .asset-header {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding: 16px;
     font-size: 15px;
-    &.first {
-        padding-top: 16px;
-    }
+}
+
+.asset-fab {
+    margin-left: 16px;
 }
 
 .audiences {
     padding: 16px;
+    padding-top: 0;
     .group {
         &:not(.open):hover {
             background-color: unquote("rgb(#{$palette-grey-200})") !important;
