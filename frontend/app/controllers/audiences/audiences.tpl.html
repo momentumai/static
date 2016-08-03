@@ -1,0 +1,15 @@
+<div ng-if="viewLoaded && audiences.length" class="audiences" mdl-upgrade>
+    <div class="group-cont"
+        ng-class="{'mdl-shadow--2dp mdl-color--white': !audiences.isOpen}">
+        <div ng-repeat="audience in audiences track by audience.id"
+            class="group"
+            ng-class="{
+                'isOpen mdl-shadow--2dp mdl-color--white': audiences.isOpen,
+                'open': audience.open
+            }"
+            ng-click="open(audience)"
+            ng-include="'audience.tpl.html'"
+            mdl-upgrade>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,130 @@
+.audiences {
+    padding: 16px;
+    .group {
+        &:not(.open):hover {
+            background-color: unquote("rgb(#{$palette-grey-200})") !important;
+            cursor: pointer;
+            & > .material-icons {
+                color: rgba(0, 0, 0, 0.54);
+            }
+        }
+
+        &.open > .group-header {
+            height: 64px;
+        }
+
+        &-header {
+            padding-left: 24px;
+            padding-right: 24px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            height: 48px;
+
+            & > * {
+                flex-grow: 0;
+                flex-shrink: 0;
+            }
+
+            & > .group-title {
+                font-size: 15px;
+                color: rgba(0, 0, 0, 0.87);
+                width: 512px;
+            }
+
+            & > .group-spacer {
+                flex-grow: 1;
+                flex-shrink: 1;
+            }
+
+            & > .material-icons {
+                font-size: 24px;
+                color: rgba(0, 0, 0, 0.38);
+            }
+        }
+
+        &-content {
+            width: 100%;
+            &-input {
+                display: flex;
+            }
+            &-label {
+                padding: 16px;
+                flex-grow: 0;
+                flex-shrink: 0;
+            }
+            &-value {
+                width: 320px;
+                flex-grow: 0;
+                flex-shrink: 0;
+            }
+        }
+
+        &.isOpen:not(:last-child) {
+            margin-bottom: 16px;
+        }
+
+        &:not(.isOpen):not(:last-child) {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+        }
+
+        &-items {
+            margin: 0;
+            padding: 0;
+            li {
+                height: 64px;
+            }
+            li.changed {
+                background: linear-gradient(
+                    to right,
+                    unquote("rgb(#{$color-accent})") 0px,
+                    unquote("rgb(#{$color-accent})") 8px,
+                    rgba(0, 0, 0, 0) 8px,
+                    rgba(0, 0, 0, 0) 100%);
+            }
+            li:not(:last-child) {
+                border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+            }
+        }
+
+        &-footer {
+            height: 68px;
+            border-top: 1px solid rgba(0, 0, 0, 0.12);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            button {
+                margin-right: 8px;
+                flex-grow: 0;
+                flex-shrink: 0;
+                &:first-child {
+                    margin-left: 8px;
+                }
+            }
+            &-spacer {
+                flex-grow: 1;
+                flex-shrink: 1;
+            }
+        }
+
+        .rule-input {
+            font-size: 16px;
+            line-height: 16px;
+            margin-left: 8px;
+            margin-right: 8px;
+            font-family: monospace;
+        }
+
+        .rule-delete {
+            color: rgba(0,0,0, 0.87);
+        }
+
+        .mdl-list__item-secondary-action.disabled {
+            color: rgba(0,0,0, 0.54);
+            cursor: default;
+            &:hover {
+                cursor: default;
+            }
+        }
+    }
+}

@@ -1,0 +1,161 @@
+<div class="group-header">
+    <div class="group-title">
+        {{audience.name}}
+    </div>
+    <div class="group-spacer"></div>
+    <i class="material-icons" ng-if="!group.active">
+        keyboard_arrow_{{audience.open && 'up' || 'down'}}
+    </i>
+</div>
+<form
+    ng-if="audience.open"
+    ng-click="$event.stopPropagation();"
+    ng-submit="save(audience)"
+    class="group-content" mdl-upgrade>
+    <div class="group-content-input">
+        <div class="group-content-label">
+            Custom audiences
+        </div>
+        <div class="group-content-value">
+            <ul>
+                <li>
+                    asdasdasd
+                </li>
+                <li>
+                    asdasdasd
+                </li>
+            </ul>
+            <!-- ng-model="model.selected"
+                ng-change="model.change()"
+                ng-options="item.id as item.label for item in model.data"-->
+            <select>
+                <option>
+                    Add audience
+                </option>
+            </select>
+        </div>
+    </div>
+    <ul class="group-items mdl-list">
+        <li
+            ng-class="{
+                'changed': changed(item),
+                'mdl-color--grey-200': item.deleted
+            }"
+            class="mdl-list__item"
+            ng-repeat="item in group.items track by item.id" mdl-upgrade>
+            <code class="mdl-list__item-primary-content">
+                if Momentum score is
+                <select
+                    validators="[{
+                        'message': 'Please fill out this field.',
+                        'cond': condNoneCheck
+                    }]"
+                    validators-item="item"
+                    ng-disabled="item.deleted"
+                    ng-model="item.condition"
+                    class="rule-input">
+                    <option
+                        ng-if="item.condition === 'NONE'"
+                        value="NONE">condition</option>
+                    <option value="LT">less</option>
+                    <option value="GT">greater</option>
+                </select>
+                than
+                <input
+                    required
+                    ng-disabled="item.deleted"
+                    class="rule-input"
+                    min="1"
+                    max="99"
+                    step="1"
+                    type="number"
+                    ng-model="item.value"></input>
+                then
+                <select
+                    validators="[{
+                        'message': 'Please fill out this field.',
+                        'cond': actionNoneCheck
+                    }, {
+                        'message': 'Please fill out the options form.',
+                        'cond': emptyOptions
+                    }]"
+                    validators-item="item"
+                    ng-disabled="item.deleted"
+                    ng-model="item.action"
+                    ng-change="actionChange(item)"
+                    class="rule-input">
+                    <option
+                        ng-if="item.action === 'NONE'"
+                        value="NONE">action</option>
+                    <option value="slack|alert_make">
+                        recommend
+                    </option>
+                    <option value="promotion_stop|alert_remove">
+                        stop recommending
+                    </option>
+                    <option value="promotion_start">
+                        create a new promotion
+                    </option>
+                    <option value="promotion_stop|promotion_finish">
+                        stop promotion
+                    </option>
+                </select>
+            </code>
+            <span
+                ng-if="item.action === 'promotion_start'"
+                class="mdl-list__item-secondary-content">
+                <a
+                    ng-disabled="item.deleted"
+                    ng-class="{
+                        'disabled': item.deleted
+                    }"
+                    class="mdl-list__item-secondary-action"
+                    ng-click="options(item)"
+                    href="javascript:void(0)">
+                    <i class="material-icons">build</i>
+                </a>
+            </span>
+            <span class="mdl-list__item-secondary-content">
+                <a
+                    ng-class="{
+                        'disabled': item.deleted
+                    }"
+                    class="rule-delete mdl-list__item-secondary-action"
+                    ng-click="delete(group, item)"
+                    href="javascript:void(0)">
+                    <i class="material-icons">delete_forever</i>
+                </a>
+            </span>
+        </li>
+    </ul>
+    <div
+        class="group-footer">
+        <button
+            type="button"
+            class="mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect"
+            ng-click="$event.stopPropagation(); delete(audience)">
+            Delete
+        </button>
+        <div class="group-footer-spacer"></div>
+        <button
+            ng-if="!group.active"
+            type="button"
+            class="mdl-button mdl-js-button mdl-js-ripple-effect"
+            ng-click="$event.stopPropagation(); close()">
+            Cancel
+        </button>
+        <button
+            ng-if="group.active"
+            type="button"
+            class="mdl-button mdl-js-button mdl-js-ripple-effect"
+            ng-click="$event.stopPropagation(); reset(group)">
+            Reset
+        </button>
+        <button
+            ng-disabled="!user.is_admin"
+            type="submit"
+            class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+            Save
+        </button>
+    </div>
+</form>
