@@ -1,0 +1,32 @@
+<div ng-if="!viewLoaded" class="fill-full" mdl-upgrade>
+    <div
+        class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active">
+    </div>
+</div>
+
+<div ng-if="viewLoaded" ng-repeat="asset in assets track by asset.id">
+    <div class="asset-header">
+        {{asset.name}} {{$first ? '(default)': ''}}
+    </div>
+    <div ng-if="asset.audiences.length" class="audiences" mdl-upgrade>
+        <div class="group-cont"
+            ng-class="{'mdl-shadow--2dp mdl-color--white': !asset.audiences.isOpen}">
+            <div ng-repeat="audience in asset.audiences track by audience.id"
+                class="group"
+                ng-class="{
+                    'isOpen mdl-shadow--2dp mdl-color--white': asset.audiences.isOpen,
+                    'open': audience.open
+                }"
+                ng-click="open(asset, audience)"
+                ng-include="'audience.tpl.html'"
+                mdl-upgrade>
+            </div>
+        </div>
+    </div>
+    <button
+        ng-class="{'last': $last}"
+        ng-click="create(asset)" 
+        class="asset-btn mdl-button mdl-js-button mdl-button--accent">
+        Add new
+    </button>
+</div>
