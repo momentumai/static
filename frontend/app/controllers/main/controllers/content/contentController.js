@@ -37,7 +37,8 @@ momentum.controller('ContentController', [
                     $scope.form.adaccount.selected
                 ).then(function (res) {
                     if (!res.data.length) {
-                        throw 'You must have at least one saved audience';
+                        $state.go('root.audiences');
+                        throw 'You must have at least one audience';
                     }
                     return res;
                 });
