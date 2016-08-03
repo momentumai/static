@@ -37,7 +37,7 @@ momentum.controller('ContentController', [
                     $scope.form.adaccount.selected
                 ).then(function (res) {
                     if (!res.data.length) {
-                        dialog.close();
+                        dialog.destroy();
                         $state.go('root.audiences');
                         throw 'You must have at least one audience';
                     }
