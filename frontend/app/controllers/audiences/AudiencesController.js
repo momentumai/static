@@ -3,10 +3,12 @@ momentum.controller('AudiencesController', [
     '$q',
     '$scope',
     'audience',
+    'dialog',
     'fb',
-    function ($q, $scope, audience, fb) {
+    function ($q, $scope, audience, dialog, fb) {
         $scope.viewLoaded = 0;
 
+        $scope.assets = null;
         $scope.customAudiences = null;
 
         $scope.deleteCustomAudience = function (audience, id) {
@@ -46,11 +48,30 @@ momentum.controller('AudiencesController', [
 
         $scope.close = function () {
             $scope.assets.forEach(function (asset) {
-                asset.audiences.isOpen = 0;
+                asset.audiences = asset.audiences.filter(function (a) {
+                    return !a.new;
+                });
                 asset.audiences.forEach(function (a) {
                     a.open = 0;
                 });
             });
+        };
+
+        $scope.create = function (asset) {
+            var au = {
+                'id': String(Date.now()),
+                'new': 1,
+                'ad_account': asset.id,
+                'name': 'New audience',
+                'data': {
+                    'custom_audiences': []
+                }
+            };
+
+            asset.audiences.push(au);
+
+            au.$original = angular.copy(au);
+            $scope.open(asset, au);
         };
 
         $scope.open = function (asset, audience) {
@@ -62,6 +83,11 @@ momentum.controller('AudiencesController', [
 
             $scope.assets.forEach(function (asset) {
                 asset.audiences.isOpen = 0;
+
+                asset.audiences = asset.audiences.filter(function (a) {
+                    return !a.new || audience.id === a.id;
+                });
+
                 asset.audiences.forEach(function (a, index) {
                     a.open = 0;
                     asset.audiences[index] = asset.audiences[index].$original;

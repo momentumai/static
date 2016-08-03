@@ -3,8 +3,11 @@
     font-size: 15px;
 }
 
-.asset-fab {
+.asset-btn {
     margin-left: 16px;
+    &.last {
+        margin-bottom: 16px;
+    }
 }
 
 .audiences {
@@ -59,9 +62,11 @@
                 display: flex;
             }
             &-label {
+                widht: 150px;
                 padding: 16px;
                 flex-grow: 0;
                 flex-shrink: 0;
+                align-self: center;
             }
             &-value {
                 width: 320px;

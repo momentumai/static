@@ -17,13 +17,10 @@
             </div>
         </div>
     </div>
-    <button class="asset-fab
-        mdl-button
-        mdl-js-button
-        mdl-button--fab
-        mdl-js-ripple-effect
-        mdl-button--mini-fab
-        mdl-button--colored">
-        <i class="material-icons">add</i>
+    <button
+        ng-class="{'last': $last}"
+        ng-click="create(asset)" 
+        class="asset-btn mdl-button mdl-js-button mdl-button--accent">
+        Add new
     </button>
 </div>
