@@ -1,29 +1,11 @@
 /*global momentum */
 momentum.controller('AudiencesController', [
+    '$q',
     '$scope',
+    'audience',
     'fb',
-    function ($scope, fb) {
+    function ($q, $scope, audience, fb) {
         $scope.viewLoaded = 0;
-
-        $scope.audiences = [{
-            'id': 'random_id',
-            'name': 'Programozok akik hotfixelnek',
-            'data': {
-                'custom_audiences': [{'id': '6042873124795'}]
-            }
-        }, {
-            'id': 'random_id2',
-            'name': 'Programozok akik meg mindig hotfixelnek',
-            'data': {
-                'custom_audiences': [{'id': '6042873124795'}]
-            }
-        }, {
-            'id': 'random_id3',
-            'name': 'Programozok akik meg mindig hotfixelnek :(',
-            'data': {
-                'custom_audiences': [{'id': '6042873124795'}]
-            }
-        }];
 
         $scope.customAudiences = null;
 
@@ -102,7 +84,15 @@ momentum.controller('AudiencesController', [
         };
 
         function init () {
-            fb.listAssets(
+            var promises = {},
+                assets,
+                aus;
+
+            promises['au'] = audience.list().then(function (a) {
+                aus = a;
+            });
+
+            promises['fb'] = fb.listAssets(
                 $scope.sessionId
             ).then(function (a) {
                 a = a.filter(function (act) {
@@ -113,11 +103,25 @@ momentum.controller('AudiencesController', [
                     return {
                         'name': act.display,
                         'id': act.value,
-                        'audiences': $scope.audiences
+                        'audiences': []
                     };
                 });
 
-                $scope.assets = a;
+                assets = a;
+            });
+
+            $q.all(promises).then(function () {
+                Object.keys(aus).forEach(function (id) {
+                    var asset = assets.filter(function (act) {
+                        return act.id === id;
+                    })[0];
+
+                    if (asset) {
+                        asset.audiences = aus[id];
+                    }
+                });
+
+                $scope.assets = assets;
                 $scope.viewLoaded = 1;
             });
             //fb.get('/me', $scope.user.fb_access_token);
