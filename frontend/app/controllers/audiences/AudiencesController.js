@@ -11,6 +11,13 @@ momentum.controller('AudiencesController', [
         $scope.assets = null;
         $scope.customAudiences = null;
 
+        $scope.customAudienceValidator = function (customAudiences) {
+            if (!customAudiences.length) {
+                return true;
+            }
+            return false;
+        };
+
         $scope.deleteCustomAudience = function (audience, id) {
             var d = audience.data;
 
