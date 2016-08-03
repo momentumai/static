@@ -17,6 +17,7 @@
             "publish_pages"
         ]
     },
+    "facebookEndpoint": "https://graph.facebook.com/v2.7",
     "ga": {
         "id": "UA-78998862-1",
         "options": null,

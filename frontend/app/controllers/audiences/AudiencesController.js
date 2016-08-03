@@ -1,7 +1,8 @@
 /*global momentum */
 momentum.controller('AudiencesController', [
     '$scope',
-    function ($scope) {
+    'fb',
+    function ($scope, fb) {
         $scope.viewLoaded = 0;
 
         $scope.audiences = [{
@@ -89,6 +90,7 @@ momentum.controller('AudiencesController', [
         };
 
         function init () {
+            fb.get('/me', $scope.user.fb_access_token);
             $scope.viewLoaded = 1;
         }
 
