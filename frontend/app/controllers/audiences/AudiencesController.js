@@ -55,9 +55,11 @@ momentum.controller('AudiencesController', [
         };
 
         $scope.customAudienceByid = function (id) {
-            return $scope.customAudiences.filter(function (act) {
+            var cad = $scope.customAudiences.filter(function (act) {
                 return act.id && id && act.id === id;
-            })[0].name;
+            });
+
+            return cad[0] && cad[0].name || 'Custom audience does not exist';
         };
 
         $scope.open = function (asset, audience) {
