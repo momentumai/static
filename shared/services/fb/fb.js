@@ -5,6 +5,16 @@ momentum.factory('fb', [
     function ($q, $http) {
         var fb = {};
 
+        function updateQueryString (uri, key, value) {
+            var re = new RegExp('([?&])' + key + '=.*?(&|$)', 'i'),
+                separator = uri.indexOf('?') !== -1 ? '&' : '?';
+
+            if (uri.match(re)) {
+                return uri.replace(re, '$1' + key + '=' + value + '$2');
+            }
+            return uri + separator + key + '=' + value;
+        }
+
         fb.init = function () {
             window.fbAsyncInit = function () {
                 FB.init({
@@ -24,6 +34,32 @@ momentum.factory('fb', [
                 js.src = 'https://connect.facebook.net/en_US/sdk.js';
                 fjs.parentNode.insertBefore(js, fjs);
             }(document, 'script', 'facebook-jssdk'));
+        };
+
+        fb.get = function (endpoint, token) {
+            var url = [
+                bvConfig.facebookEndpoint,
+                endpoint
+            ].join('');
+
+            url = updateQueryString(url, 'access_token', token);
+
+            return $http.get(url).then(function (resp) {
+                return resp.data;
+            });
+        };
+
+        fb.post = function (endpoint, params, token) {
+            var url = [
+                bvConfig.facebookEndpoint,
+                endpoint
+            ].join('');
+
+            url = updateQueryString(url, 'access_token', token);
+
+            return $http.post(url, params).then(function (resp) {
+                return resp.data;
+            });
         };
 
         fb.token = function (sessionId, accessToken) {
