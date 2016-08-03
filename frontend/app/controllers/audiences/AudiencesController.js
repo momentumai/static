@@ -1,4 +1,4 @@
-/*global momentum */
+/*global momentum, angular */
 momentum.controller('AudiencesController', [
     '$q',
     '$scope',
@@ -44,6 +44,15 @@ momentum.controller('AudiencesController', [
             return cad[0] && cad[0].name || 'Custom audience does not exist';
         };
 
+        $scope.close = function () {
+            $scope.assets.forEach(function (asset) {
+                asset.audiences.isOpen = 0;
+                asset.audiences.forEach(function (a) {
+                    a.open = 0;
+                });
+            });
+        };
+
         $scope.open = function (asset, audience) {
             var willOpen;
 
@@ -53,8 +62,12 @@ momentum.controller('AudiencesController', [
 
             $scope.assets.forEach(function (asset) {
                 asset.audiences.isOpen = 0;
-                asset.audiences.forEach(function (a) {
+                asset.audiences.forEach(function (a, index) {
                     a.open = 0;
+                    asset.audiences[index] = asset.audiences[index].$original;
+                    asset.audiences[index].$original = angular.copy(
+                        asset.audiences[index]
+                    );
                 });
             });
 

@@ -1,4 +1,4 @@
-/*global momentum, bvConfig*/
+/*global momentum, bvConfig, angular */
 momentum.factory('audience', ['$q', '$http', function ($q, $http) {
     var audience = {};
 
@@ -25,6 +25,12 @@ momentum.factory('audience', ['$q', '$http', function ($q, $http) {
                     }
                 }]
             };
+
+            Object.keys(res).forEach(function (accountId) {
+                res[accountId].forEach(function (audience) {
+                    audience.$original = angular.copy(audience);
+                });
+            });
 
             return res;
         });
