@@ -66,6 +66,47 @@ momentum.controller('AudiencesController', [
             );
         }
 
+        function getGender (aud) {
+            var g = aud.data.genders || [],
+                c;
+
+            c = g.join();
+
+            if (c.length === 1) {
+                return c;
+            }
+
+            return '0';
+        }
+
+        function getAgeData () {
+            var ret = [],
+                i = 13;
+
+            for (; i < 66; i += 1) {
+                ret.push({
+                    'id': i,
+                    'name': i === 65 ? '65+' : String(i)
+                });
+            }
+
+            return ret;
+        }
+
+        $scope.ageData = getAgeData();
+
+        $scope.ageMinChange = function (aud) {
+            if (aud.$ageMinValue > aud.$ageMaxValue) {
+                aud.$ageMaxValue = aud.$ageMinValue;
+            }
+        };
+
+        $scope.ageMaxChange = function (aud) {
+            if (aud.$ageMaxValue < aud.$ageMinValue) {
+                aud.$ageMinValue = aud.$ageMaxValue;
+            }
+        };
+
         $scope.audienceValidator = function (audience) {
             var d = audience.data,
                 len = (d.geo_locations && Object.keys(
@@ -183,7 +224,10 @@ momentum.controller('AudiencesController', [
             });
 
             if (willOpen) {
+                willOpen.$ageMinValue = willOpen.data.age_min || 18;
+                willOpen.$ageMaxValue = willOpen.data.age_max || 65;
                 willOpen.$locations = getLocations(willOpen);
+                willOpen.$gnValue = getGender(willOpen);
                 return fb.get([
                     '/',
                     asset.id,
@@ -248,7 +292,12 @@ momentum.controller('AudiencesController', [
         }
 
         $scope.save = function (aud) {
-            var a = angular.copy(aud);
+            var a = angular.copy(aud),
+                genderMap = {
+                    '0': [1, 2],
+                    '1': [1],
+                    '2': [2]
+                };
 
             $scope.viewLoaded = 0;
 
@@ -258,6 +307,10 @@ momentum.controller('AudiencesController', [
                 delete a.new;
                 delete a.id;
             }
+
+            a.data.genders = genderMap[aud.$gnValue];
+            a.data.age_min = aud.$ageMinValue;
+            a.data.age_max = aud.$ageMaxValue;
 
             a.session_id = $scope.sessionId;
 

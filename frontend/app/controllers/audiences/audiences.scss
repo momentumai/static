@@ -44,6 +44,18 @@
 .audiences {
     padding: 16px;
     padding-top: 0;
+
+    .gender-chooser {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .age-chooser {
+        display: flex;
+        justify-content: space-around;
+    }
+
     .audience-name {
         width: calc(100% - 32px);
         margin-left: 16px;
