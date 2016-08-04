@@ -84,10 +84,10 @@
             <div class="dropdown audience-dropdown">
                 <select
                     validators="[{
-                        'message': 'Please fill out this field.',
-                        'cond': customAudienceValidator
+                        'message': 'Please choose atleast one location or a custom audience',
+                        'cond': audienceValidator
                     }]"
-                    validators-item="audience.data.custom_audiences"
+                    validators-item="audience"
                     ng-model="audience.$caValue"
                     ng-change="addCustomAudience(audience)"
                     ng-options="item.id as item.name
@@ -103,7 +103,7 @@
             ng-if="!group.active"
             type="button"
             class="mdl-button mdl-js-button mdl-js-ripple-effect"
-            ng-click="$event.stopPropagation(); close()">
+            ng-click="$event.stopPropagation(); close(audience)">
             Cancel
         </button>
         <button

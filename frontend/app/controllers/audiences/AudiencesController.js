@@ -15,8 +15,69 @@ momentum.controller('AudiencesController', [
             data[param] = data[param] || what;
         }
 
-        $scope.customAudienceValidator = function (customAudiences) {
-            if (!customAudiences.length) {
+        function getLocations (aud) {
+            var loc = aud.data.geo_locations || {},
+                cities = loc.cities || [],
+                regions = loc.regions || [],
+                zips = loc.zips || [],
+                countries = loc.countries || [];
+
+            return [].concat(
+                cities.map(function (act) {
+                    return {
+                        'id': act.key,
+                        'type': 'city',
+                        'name': aud.meta[[
+                            'city',
+                            act.key
+                        ].join('_')]
+                    };
+                }),
+                regions.map(function (act) {
+                    return {
+                        'id': act.key,
+                        'type': 'region',
+                        'name': aud.meta[[
+                            'region',
+                            act.key
+                        ].join('_')]
+                    };
+                }),
+                zips.map(function (act) {
+                    return {
+                        'id': act.key,
+                        'type': 'zip',
+                        'name': aud.meta[[
+                            'zip',
+                            act.key
+                        ].join('_')]
+                    };
+                }),
+                countries.map(function (act) {
+                    return {
+                        'id': act,
+                        'type': 'country',
+                        'name': aud.meta[[
+                            'country',
+                            act
+                        ].join('_')]
+                    };
+                })
+            );
+        }
+
+        $scope.audienceValidator = function (audience) {
+            var d = audience.data,
+                len = (d.geo_locations && Object.keys(
+                    d.geo_locations
+                ).reduce(function (prev, key) {
+                    return prev + d.geo_locations[key].length;
+                }, 0) || 0) + (
+                    d.custom_audiences &&
+                    d.custom_audiences.length || 0
+                );
+
+            if (!len) {
                 return true;
             }
             return false;
@@ -64,7 +125,8 @@ momentum.controller('AudiencesController', [
             return cad[0] && cad[0].name || 'Choose a custom audience';
         };
 
-        $scope.close = function () {
+        $scope.close = function (aud) {
+            aud.name = aud.$original.name;
             $scope.assets.forEach(function (asset) {
                 asset.audiences = asset.audiences.filter(function (a) {
                     return !a.new;
@@ -121,6 +183,7 @@ momentum.controller('AudiencesController', [
             });
 
             if (willOpen) {
+                willOpen.$locations = getLocations(willOpen);
                 return fb.get([
                     '/',
                     asset.id,
@@ -225,57 +288,6 @@ momentum.controller('AudiencesController', [
             });
         };
 
-        function getLocations (aud) {
-            var loc = aud.data.geo_locations || {},
-                cities = loc.cities || [],
-                regions = loc.regions || [],
-                zips = loc.zips || [],
-                countries = loc.countries || [];
-
-            return [].concat(
-                cities.map(function (act) {
-                    return {
-                        'id': act.key,
-                        'type': 'city',
-                        'name': aud.meta[[
-                            'city',
-                            act.key
-                        ].join('_')]
-                    };
-                }),
-                regions.map(function (act) {
-                    return {
-                        'id': act.key,
-                        'type': 'region',
-                        'name': aud.meta[[
-                            'region',
-                            act.key
-                        ].join('_')]
-                    };
-                }),
-                zips.map(function (act) {
-                    return {
-                        'id': act.key,
-                        'type': 'zip',
-                        'name': aud.meta[[
-                            'zip',
-                            act.key
-                        ].join('_')]
-                    };
-                }),
-                countries.map(function (act) {
-                    return {
-                        'id': act,
-                        'type': 'country',
-                        'name': aud.meta[[
-                            'country',
-                            act
-                        ].join('_')]
-                    };
-                })
-            );
-        }
-
         $scope.addAudienceLocation = function (aud, value) {
             var hash = [value.type, value.key].join('_'),
                 arr,
@@ -344,6 +356,35 @@ momentum.controller('AudiencesController', [
             aud.$locations = getLocations(aud);
 
             $scope.$apply();
+        };
+
+        $scope.deleteLocation = function (audience, location) {
+            var hash = [
+                    location.type,
+                    location.id
+                ].join('_'),
+                locs = audience.data.geo_locations,
+                typeMap = {
+                    'region': 'regions',
+                    'zip': 'zips',
+                    'city': 'cities'
+                };
+
+            delete audience.meta[hash];
+
+            if (location.type === 'country') {
+                locs.countries = locs.countries.filter(function (c) {
+                    return c !== location.id;
+                });
+            } else {
+                locs[typeMap[location.type]] = locs[
+                    typeMap[location.type]
+                ].filter(function (a) {
+                    return a.key !== location.id;
+                });
+            }
+
+            audience.$locations = getLocations(audience);
         };
 
         if ($scope.loaded) {
