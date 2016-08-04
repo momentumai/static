@@ -10,9 +10,51 @@
     }
 }
 
+.audience-locations {
+
+    &.empty {
+        display: none;
+    }
+
+    border: 1px solid unquote("rgb(#{$palette-grey-200})");
+    background: white;
+    padding: 8px;
+    & > div:last-child > .audience-location-item {
+        border-bottom: 0;
+    }
+    .selected {
+        background: unquote("rgb(#{$palette-grey-200})");
+    }
+    .audience-location-item {
+        cursor: pointer;
+        display: flex;
+        border-bottom: 1px solid unquote("rgb(#{$palette-grey-200})");
+        .name {
+            flex-grow: 1;
+            flex-shrink: 1;
+        }
+        .type {
+            width: 50px;
+            flex-grow: 0;
+            flex-shrink: 0;
+            text-align: right;
+        }
+    }
+}
 .audiences {
     padding: 16px;
     padding-top: 0;
+
+    .gender-chooser {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .age-chooser {
+        display: flex;
+        justify-content: space-around;
+    }
 
     .audience-name {
         width: calc(100% - 32px);

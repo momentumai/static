@@ -1,5 +1,9 @@
 @import 'variables.scss';
 
+html, body {
+    background-color: rgb(250,250,250);
+}
+
 .mdl-layout-title {
   white-space: nowrap;
   flex-shrink: 1;

@@ -48,10 +48,10 @@
             <div class="dropdown audience-dropdown">
                 <select
                     validators="[{
-                        'message': 'Please fill out this field.',
-                        'cond': customAudienceValidator
+                        'message': 'Please choose atleast one location or a custom audience',
+                        'cond': audienceValidator
                     }]"
-                    validators-item="audience.data.custom_audiences"
+                    validators-item="audience"
                     ng-model="audience.$caValue"
                     ng-change="addCustomAudience(audience)"
                     ng-options="item.id as item.name
@@ -61,13 +61,110 @@
             </div>
         </div>
     </div>
+    <div class="group-content-input">
+        <div class="group-content-label">
+            Location
+        </div>
+        <div class="group-content-value">
+            <ul class="mdl-list audience-list">
+                <li
+                    class="mdl-list__item"
+                    ng-repeat="loc in audience.$locations track by loc.id">
+                    <span class="mdl-list__item-primary-content">
+                        {{loc.name}}
+                    </span>
+                    <span class="mdl-list__item-secondary-content">
+                        <a
+                            class="rule-delete mdl-list__item-secondary-action"
+                            ng-click="deleteLocation(audience, loc)"
+                            href="javascript:void(0)">
+                            <i class="material-icons">delete_forever</i>
+                        </a>
+                    </span>
+                </li>
+            </ul>
+            <div class="audience-name mdl-textfield mdl-js-textfield">
+                <input auto-complete="queryLocation"
+                    ng-model="audience.$loValue"
+                    item-template="locationItem.tpl.html"
+                    item-action="addAudienceLocation"
+                    item-action-self="audience"
+                    container-class="audience-locations"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="{{audience.id}}-location">
+                <label class="mdl-textfield__label" for="{{audience.id}}-location">Add location</label>
+            </div>
+        </div>
+    </div>
+    <div class="group-content-input">
+        <div class="group-content-label">
+            Age
+        </div>
+        <div class="group-content-value age-chooser">
+            <div class="dropdown">
+                <select
+                    ng-model="audience.$ageMinValue"
+                    ng-change="ageMinChange(audience)"
+                    ng-options="item.id as item.name for item in ageData">
+                </select>
+                <label>Min age</label>
+            </div>
+            <span style="align-self: center">―</span>
+            <div class="dropdown">
+                <select
+                    ng-model="audience.$ageMaxValue"
+                    ng-change="ageMaxChange(audience)"
+                    ng-options="item.id as item.name for item in ageData">
+                </select>
+                <label>Max age</label>
+            </div>
+        </div>
+    </div>
+    <div class="group-content-input">
+        <div class="group-content-label">
+            Gender
+        </div>
+        <div class="group-content-value gender-chooser">
+            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="gender-1">
+                <input
+                    type="radio"
+                    id="gender-1"
+                    class="mdl-radio__button"
+                    value="0"
+                    ng-model="audience.$gnValue"
+                    name="genders"/>
+              <span class="mdl-radio__label">All</span>
+            </label>
+            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="gender-2">
+                <input
+                    type="radio"
+                    id="gender-2"
+                    class="mdl-radio__button"
+                    value="1"
+                    ng-model="audience.$gnValue"
+                    name="genders"/>
+                <span class="mdl-radio__label">Men</span>
+            </label>
+            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="gender-3">
+                <input
+                    type="radio"
+                    id="gender-3"
+                    class="mdl-radio__button"
+                    value="2"
+                    ng-model="audience.$gnValue"
+                    name="genders"/>
+                <span class="mdl-radio__label">Women</span>
+            </label>
+        </div>
+    </div>
     <div class="group-footer">
         <div class="group-footer-spacer"></div>
         <button
             ng-if="!group.active"
             type="button"
             class="mdl-button mdl-js-button mdl-js-ripple-effect"
-            ng-click="$event.stopPropagation(); close()">
+            ng-click="$event.stopPropagation(); close(audience)">
             Cancel
         </button>
         <button
