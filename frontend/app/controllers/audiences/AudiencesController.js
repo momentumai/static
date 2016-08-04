@@ -53,6 +53,37 @@ momentum.controller('AudiencesController', [
             return cad[0] && cad[0].name || 'Choose a custom audience';
         };
 
+        $scope.setGender = function (aud, act) {
+            console.log('1', aud);
+            console.log('2', act);
+            if (act === 1) {
+                aud.data.genders = [1];
+            } else if (act === 2) {
+                aud.data.genders = [2];
+            } else {
+                aud.data.genders = [1, 2];
+            }
+            console.log('3', aud);
+        };
+
+        function getGenderFromArray (array) {
+            var gender = JSON.stringify(array);
+
+            if (gender === '[1]') {
+                return 1;
+            } else if (gender === '[2]') {
+                return 2;
+            }
+
+            return 0;
+        }
+
+        $scope.getGender = function (aud, act) {
+            var gender = getGenderFromArray(aud.data.genders);
+
+            return (act === gender);
+        };
+
         $scope.close = function () {
             $scope.assets.forEach(function (asset) {
                 asset.audiences = asset.audiences.filter(function (a) {
@@ -185,6 +216,7 @@ momentum.controller('AudiencesController', [
             delete aud.$original;
             delete aud.open;
             delete aud.$caValue;
+            delete aud.genders;
 
             aud.session_id = $scope.sessionId;
 

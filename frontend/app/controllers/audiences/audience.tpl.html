@@ -61,6 +61,72 @@
             </div>
         </div>
     </div>
+    <div class="group-content-input">
+        <div class="group-content-label">
+            Gender
+        </div>
+        <div class="group-content-value">
+            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="gender-1">
+              <input
+                      type="radio"
+                      id="gender-1"
+                      class="mdl-radio__button"
+                      name="genders"
+                      ng-model="audience.genders"
+                      ng-change="setGender(audience, 0)"
+                      ng-checked="getGender(audience, 0)"
+              />
+              <span class="mdl-radio__label">All</span>
+            </label>
+            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="gender-2">
+              <input
+                      type="radio"
+                      id="gender-2"
+                      class="mdl-radio__button"
+                      name="genders"
+                      ng-model="audience.genders"
+                      ng-change="setGender(audience, 1)"
+                      ng-checked="getGender(audience, 1)"
+              />
+              <span class="mdl-radio__label">Men</span>
+            </label>
+            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="gender-3">
+              <input
+                      type="radio"
+                      id="gender-3"
+                      class="mdl-radio__button"
+                      name="genders"
+                      ng-model="audience.genders"
+                      ng-change="setGender(audience, 2)"
+                      ng-checked="getGender(audience, 2)"
+              />
+              <span class="mdl-radio__label">Women</span>
+            </label>
+        </div>
+    </div>
+    <div class="group-content-input">
+        <div class="group-content-label">
+            Age
+        </div>
+        <div class="group-content-value">
+            <div class="dropdown audience-dropdown">
+                <select
+                    ng-model="audience.data.age_min"
+                    ng-change="addCustomAudience(audience)"
+                    ng-options="item.id as item.name
+                        for item in filteredCustomAudiences(audience)">
+                </select>
+                <label></label>
+                <select
+                    ng-model="audience.$caValue"
+                    ng-change="addCustomAudience(audience)"
+                    ng-options="item.id as item.name
+                        for item in filteredCustomAudiences(audience)">
+                </select>
+                <label></label>
+            </div>
+        </div>
+    </div>
     <div class="group-footer">
         <div class="group-footer-spacer"></div>
         <button
