@@ -11,6 +11,10 @@ momentum.controller('AudiencesController', [
         $scope.assets = null;
         $scope.customAudiences = null;
 
+        function makeIfFalsy (data, param, what) {
+            data[param] = data[param] || what;
+        }
+
         $scope.customAudienceValidator = function (customAudiences) {
             if (!customAudiences.length) {
                 return true;
@@ -19,15 +23,17 @@ momentum.controller('AudiencesController', [
         };
 
         $scope.deleteCustomAudience = function (audience, id) {
-            var d = audience.data;
+            var d = audience.data,
+                ca = d.custom_audiences || [];
 
-            d.custom_audiences = d.custom_audiences.filter(function (act) {
+            d.custom_audiences = ca.filter(function (act) {
                 return act.id && act.id !== id;
             });
         };
 
         $scope.addCustomAudience = function (audience) {
             if (audience.$caValue) {
+                makeIfFalsy(audience.data, 'custom_audiences', []);
                 audience.data.custom_audiences.push({
                     'id': audience.$caValue
                 });
@@ -36,9 +42,14 @@ momentum.controller('AudiencesController', [
         };
 
         $scope.filteredCustomAudiences = function (audience) {
-            var ca = audience.data.custom_audiences.map(function (act) {
-                return act.id;
-            });
+            var ad = audience.data,
+                ca = ad.custom_audiences || [];
+
+            ca = ca.map(
+                function (act) {
+                    return act.id;
+                }
+            ) || [];
 
             return $scope.customAudiences.filter(function (act) {
                 return !act.id || ca.indexOf(act.id) === -1;
@@ -70,9 +81,8 @@ momentum.controller('AudiencesController', [
                 'new': 1,
                 'ad_account': asset.id,
                 'name': 'New audience',
-                'data': {
-                    'custom_audiences': []
-                }
+                'data': {},
+                'meta': {}
             };
 
             asset.audiences.push(au);
@@ -175,26 +185,165 @@ momentum.controller('AudiencesController', [
         }
 
         $scope.save = function (aud) {
+            var a = angular.copy(aud);
+
             $scope.viewLoaded = 0;
 
-            if (aud.new) {
-                delete aud.new;
-                delete aud.id;
+            delete a.open;
+
+            if (a.new) {
+                delete a.new;
+                delete a.id;
             }
 
-            delete aud.$original;
-            delete aud.open;
-            delete aud.$caValue;
+            a.session_id = $scope.sessionId;
 
-            aud.session_id = $scope.sessionId;
-
-            return audience.save(aud).then(function () {
+            return audience.save(a).then(function () {
                 return init();
             }).then(function () {
                 return toast.open({
                     'htmlText': 'Audience saved successfully'
                 });
             });
+        };
+
+        $scope.queryLocation = function (value) {
+            return fb.get([
+                '/search?type=adgeolocation&q=',
+                value
+            ].join(''),
+                $scope.user.fb_access_token
+            ).then(function (res) {
+                return res.data.filter(function (act) {
+                    return [
+                        'city',
+                        'country',
+                        'region',
+                        'zip'
+                    ].indexOf(act.type) !== -1;
+                });
+            });
+        };
+
+        function getLocations (aud) {
+            var loc = aud.data.geo_locations || {},
+                cities = loc.cities || [],
+                regions = loc.regions || [],
+                zips = loc.zips || [],
+                countries = loc.countries || [];
+
+            return [].concat(
+                cities.map(function (act) {
+                    return {
+                        'id': act.key,
+                        'type': 'city',
+                        'name': aud.meta[[
+                            'city',
+                            act.key
+                        ].join('_')]
+                    };
+                }),
+                regions.map(function (act) {
+                    return {
+                        'id': act.key,
+                        'type': 'region',
+                        'name': aud.meta[[
+                            'region',
+                            act.key
+                        ].join('_')]
+                    };
+                }),
+                zips.map(function (act) {
+                    return {
+                        'id': act.key,
+                        'type': 'zip',
+                        'name': aud.meta[[
+                            'zip',
+                            act.key
+                        ].join('_')]
+                    };
+                }),
+                countries.map(function (act) {
+                    return {
+                        'id': act,
+                        'type': 'country',
+                        'name': aud.meta[[
+                            'country',
+                            act
+                        ].join('_')]
+                    };
+                })
+            );
+        }
+
+        $scope.addAudienceLocation = function (aud, value) {
+            var hash = [value.type, value.key].join('_'),
+                arr,
+                elem;
+
+            makeIfFalsy(aud.data, 'geo_locations', {});
+            makeIfFalsy(aud, 'meta', {});
+
+            if (value.type === 'country') {
+                makeIfFalsy(aud.data.geo_locations, 'countries', []);
+                arr = aud.data.geo_locations.countries;
+                if (arr.indexOf(value.key) === -1) {
+                    aud.data.geo_locations.countries.push(value.key);
+                    aud.meta[hash] = value.name;
+                }
+            } else if (value.type === 'region') {
+                makeIfFalsy(aud.data.geo_locations, 'regions', []);
+                arr = aud.data.geo_locations.regions;
+                elem = arr.filter(function (e) {
+                    return e.key === value.key;
+                })[0];
+                if (!elem) {
+                    arr.push({
+                        'key': value.key
+                    });
+                    aud.meta[hash] = [
+                        value.name,
+                        value.country_name
+                    ].join(', ');
+                }
+            } else if (value.type === 'city') {
+                makeIfFalsy(aud.data.geo_locations, 'cities', []);
+                arr = aud.data.geo_locations.cities;
+                elem = arr.filter(function (e) {
+                    return e.key === value.key;
+                })[0];
+                if (!elem) {
+                    arr.push({
+                        'key': value.key
+                    });
+                    aud.meta[hash] = [
+                        value.name,
+                        value.region,
+                        value.country_name
+                    ].join(', ');
+                }
+            } else if (value.type === 'zip') {
+                makeIfFalsy(aud.data.geo_locations, 'zips', []);
+                arr = aud.data.geo_locations.zips;
+                elem = arr.filter(function (e) {
+                    return e.key === value.key;
+                })[0];
+                if (!elem) {
+                    arr.push({
+                        'key': value.key
+                    });
+                    aud.meta[hash] = [
+                        value.name,
+                        value.region,
+                        value.country_name
+                    ].join(', ');
+                }
+            }
+
+            aud.$loValue = '';
+            aud.$locations = getLocations(aud);
+
+            $scope.$apply();
         };
 
         if ($scope.loaded) {

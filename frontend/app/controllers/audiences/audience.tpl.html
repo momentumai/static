@@ -25,6 +25,42 @@
     </div>
     <div class="group-content-input">
         <div class="group-content-label">
+            Location
+        </div>
+        <div class="group-content-value">
+            <ul class="mdl-list audience-list">
+                <li
+                    class="mdl-list__item"
+                    ng-repeat="loc in audience.$locations track by loc.id">
+                    <span class="mdl-list__item-primary-content">
+                        {{loc.name}}
+                    </span>
+                    <span class="mdl-list__item-secondary-content">
+                        <a
+                            class="rule-delete mdl-list__item-secondary-action"
+                            ng-click="deleteLocation(audience, loc)"
+                            href="javascript:void(0)">
+                            <i class="material-icons">delete_forever</i>
+                        </a>
+                    </span>
+                </li>
+            </ul>
+            <div class="audience-name mdl-textfield mdl-js-textfield">
+                <input auto-complete="queryLocation"
+                    ng-model="audience.$loValue"
+                    item-template="locationItem.tpl.html"
+                    item-action="addAudienceLocation"
+                    item-action-self="audience"
+                    container-class="audience-locations"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="{{audience.id}}-location">
+                <label class="mdl-textfield__label" for="{{audience.id}}-location">Add location</label>
+            </div>
+        </div>
+    </div>
+    <div class="group-content-input">
+        <div class="group-content-label">
             Custom audiences
         </div>
         <div class="group-content-value">
