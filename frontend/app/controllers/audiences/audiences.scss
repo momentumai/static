@@ -108,8 +108,18 @@
 
         &-content {
             width: 100%;
+            
+            .dropdown {
+                width: calc(100% - 32px);
+                margin-left: 16px;
+            }
+
             &-input {
                 display: flex;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+                &.last {
+                    border-bottom: 0;
+                }
             }
             &-label {
                 width: 150px;
