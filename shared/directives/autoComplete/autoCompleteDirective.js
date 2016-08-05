@@ -83,7 +83,10 @@ momentum.directive('autoComplete', [
                         return;
                     }
 
-                    $scope.getter(value).then(function (res) {
+                    $scope.getter(
+                        value,
+                        $scope.itemActionSelf
+                    ).then(function (res) {
                         var i = 0;
 
                         cont.innerHTML = '';
@@ -128,7 +131,8 @@ momentum.directive('autoComplete', [
                 'containerClass': '@containerClass',
                 'value': '=ngModel',
                 'itemAction': '=itemAction',
-                'itemActionSelf': '=itemActionSelf'
+                'itemActionSelf': '=itemActionSelf',
+                'searchParams': '=itemParams'
             },
             'link': link
         };

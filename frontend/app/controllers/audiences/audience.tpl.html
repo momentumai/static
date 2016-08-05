@@ -204,6 +204,42 @@
             </div>
         </div>
     </div>
+    <div class="group-content-input">
+        <div class="group-content-label">
+            Detailed
+        </div>
+        <div class="group-content-value">
+            <ul class="mdl-list audience-list">
+                <li
+                    class="mdl-list__item"
+                    ng-repeat="detail in audience.$details track by detail.id">
+                    <span class="mdl-list__item-primary-content">
+                        {{detail.name}} ({{detail.type}})
+                    </span>
+                    <span class="mdl-list__item-secondary-content">
+                        <a
+                            class="rule-delete mdl-list__item-secondary-action"
+                            ng-click="deleteDetail(audience, detail)"
+                            href="javascript:void(0)">
+                            <i class="material-icons">delete_forever</i>
+                        </a>
+                    </span>
+                </li>
+            </ul>
+            <div class="audience-name mdl-textfield mdl-js-textfield">
+                <input auto-complete="queryDetail"
+                    ng-model="audience.$detValue"
+                    item-template="detailItem.tpl.html"
+                    item-action="addAudienceDetail"
+                    item-action-self="audience"
+                    container-class="audience-details"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="{{audience.id}}-detail">
+                <label class="mdl-textfield__label" for="{{audience.id}}-detail">Add detailed target</label>
+            </div>
+        </div>
+    </div>
     <div class="group-footer">
         <div class="group-footer-spacer"></div>
         <button

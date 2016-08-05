@@ -14,6 +14,26 @@ momentum.controller('AudiencesController', [
         function makeIfFalsy (data, param, what) {
             data[param] = data[param] || what;
         }
+
+        function getDetails (aud) {
+            var keys,
+                result = [];
+
+            makeIfFalsy(aud, 'meta', {});
+            makeIfFalsy(aud.meta, 'details', {});
+            keys = Object.keys(aud.meta.details);
+
+            keys.forEach(function (id) {
+                result.push({
+                    'id': id,
+                    'name': aud.meta.details[id].name,
+                    'type': aud.meta.details[id].type
+                });
+            });
+
+            return result;
+        }
+
         function getLanguages (aud) {
             var lang = aud.data.locales || [];
 
@@ -253,6 +273,7 @@ momentum.controller('AudiencesController', [
                 willOpen.$ageMaxValue = willOpen.data.age_max || 65;
                 willOpen.$locations = getLocations(willOpen);
                 willOpen.$langs = getLanguages(willOpen);
+                willOpen.$details = getDetails(willOpen);
                 willOpen.$gnValue = getGender(willOpen);
                 willOpen.$loTypeValue = getlocationType(willOpen);
                 return fb.get([
@@ -359,6 +380,19 @@ momentum.controller('AudiencesController', [
             });
         };
 
+        $scope.queryDetail = function (value, aud) {
+            return fb.get([
+                '/',
+                aud.ad_account,
+                '/targetingsearch?q=',
+                value
+            ].join(''),
+                $scope.user.fb_access_token
+            ).then(function (res) {
+                return res.data;
+            });
+        };
+
         $scope.queryLocation = function (value) {
             return fb.get([
                 '/search?type=adgeolocation&q=',
@@ -386,6 +420,27 @@ momentum.controller('AudiencesController', [
             ).then(function (res) {
                 return res.data;
             });
+        };
+
+        $scope.addAudienceDetail = function (aud, value) {
+            var arr;
+
+            makeIfFalsy(aud.data, value.type, []);
+            makeIfFalsy(aud, 'meta', {});
+            makeIfFalsy(aud.meta, 'details', {});
+
+            arr = aud.data[value.type];
+            if (arr.indexOf(value.id) === -1) {
+                arr.push(value.id);
+                aud.meta.details[value.id] = {
+                    'name': value.name,
+                    'type': value.type
+                };
+            }
+            aud.$detValue = '';
+            aud.$details = getDetails(aud);
+
+            $scope.$apply();
         };
 
         $scope.addAudienceLanguage = function (aud, value) {
@@ -475,6 +530,19 @@ momentum.controller('AudiencesController', [
             aud.$locations = getLocations(aud);
 
             $scope.$apply();
+        };
+
+        $scope.deleteDetail = function (audience, det) {
+            var details = audience.meta.details,
+                data = audience.data[det.type];
+
+            delete details[det.id];
+
+            audience.data[det.type] = data.filter(function (c) {
+                return c !== det.id;
+            });
+
+            audience.$details = getDetails(audience);
         };
 
         $scope.deleteLanguage = function (audience, lang) {
