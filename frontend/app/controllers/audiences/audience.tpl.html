@@ -112,7 +112,7 @@
             Age
         </div>
         <div class="group-content-value age-chooser">
-            <div class="dropdown">
+            <div class="dropdown min">
                 <select
                     ng-model="audience.$ageMinValue"
                     ng-change="ageMinChange(audience)"
@@ -121,7 +121,7 @@
                 <label>Min age</label>
             </div>
             <span style="align-self: center">―</span>
-            <div class="dropdown">
+            <div class="dropdown min">
                 <select
                     ng-model="audience.$ageMaxValue"
                     ng-change="ageMaxChange(audience)"
@@ -204,22 +204,30 @@
             </div>
         </div>
     </div>
-    <div class="group-content-input last">
+    <div
+        ng-class="{'no-border': !$last}"
+        class="group-content-input last"
+        ng-repeat="flex in audience.$flexibleSpec" mdl-upgrade>
         <div class="group-content-label">
-            Detailed
+            {{ $first ? 'Detailed' : '' }}
         </div>
         <div class="group-content-value">
+            <div class="group-content-help">
+                {{ $first ?
+                    'INCLUDE people who match at least ONE of the following' :
+                    'and MUST ALSO match at least ONE of the following' }}
+            </div>
             <ul class="mdl-list audience-list">
                 <li
                     class="mdl-list__item"
-                    ng-repeat="detail in audience.$details track by detail.id">
+                    ng-repeat="detail in flex track by detail.id">
                     <span class="mdl-list__item-primary-content">
-                        {{detail.name}} ({{detail.type}})
+                        {{detail.name}} ({{detail.path}})
                     </span>
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteDetail(audience, detail)"
+                            ng-click="deleteDetail(audience, detail, $parent.$index)"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -228,16 +236,31 @@
             </ul>
             <div class="audience-name mdl-textfield mdl-js-textfield">
                 <input auto-complete="queryDetail"
-                    ng-model="audience.$detValue"
+                    ng-model="flex.$detValue"
                     item-template="detailItem.tpl.html"
                     item-action="addAudienceDetail"
-                    item-action-self="audience"
+                    item-action-self="{
+                        'audience': audience,
+                        'index': $index,
+                        'flex': flex
+                    }"
                     container-class="audience-details"
                     class="mdl-textfield__input"
                     type="text"
-                    id="{{audience.id}}-detail">
-                <label class="mdl-textfield__label" for="{{audience.id}}-detail">Add detailed target</label>
+                    id="{{audience.id}}-detail-{{$index}}">
+                <label
+                    class="mdl-textfield__label"
+                    for="{{audience.id}}-detail-{{$index}}">
+                    Add detailed target
+                </label>
             </div>
+            <button
+                ng-if="$last && flex.length"
+                type="button"
+                class="detail-button mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored"
+                ng-click="$event.stopPropagation(); addNewDetailGroup(audience)">
+                Narrow audience
+            </button>
         </div>
     </div>
     <div class="group-footer">
