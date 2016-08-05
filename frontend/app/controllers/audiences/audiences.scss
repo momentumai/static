@@ -10,7 +10,7 @@
     }
 }
 
-.audience-locations {
+.audience-locations, .audience-languages{
 
     &.empty {
         display: none;
@@ -19,13 +19,13 @@
     border: 1px solid unquote("rgb(#{$palette-grey-200})");
     background: white;
     padding: 8px;
-    & > div:last-child > .audience-location-item {
+    & > div:last-child > .audience-location-item, & > div:last-child > .audience-language-item {
         border-bottom: 0;
     }
     .selected {
         background: unquote("rgb(#{$palette-grey-200})");
     }
-    .audience-location-item {
+    .audience-location-item, .audience-language-item {
         cursor: pointer;
         display: flex;
         border-bottom: 1px solid unquote("rgb(#{$palette-grey-200})");
