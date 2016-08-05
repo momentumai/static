@@ -78,6 +78,20 @@ momentum.controller('AudiencesController', [
 
             return '0';
         }
+        function getlocationType (aud) {
+            var l = aud.data.geo_locations.location_types;
+
+            if (!l || l.indexOf('recent') !== -1 && l.indexOf('home') !== -1) {
+                return '1';
+            } else if (l.indexOf('travel_in') !== -1) {
+                return '4';
+            } else if (l.indexOf('recent') !== -1) {
+                return '3';
+            } else if (l.indexOf('home') !== -1) {
+                return '2';
+            }
+            return '1';
+        }
 
         function getAgeData () {
             var ret = [],
@@ -118,10 +132,7 @@ momentum.controller('AudiencesController', [
                     d.custom_audiences.length || 0
                 );
 
-            if (!len) {
-                return true;
-            }
-            return false;
+            return (!len);
         };
 
         $scope.deleteCustomAudience = function (audience, id) {
@@ -228,6 +239,7 @@ momentum.controller('AudiencesController', [
                 willOpen.$ageMaxValue = willOpen.data.age_max || 65;
                 willOpen.$locations = getLocations(willOpen);
                 willOpen.$gnValue = getGender(willOpen);
+                willOpen.$loTypeValue = getlocationType(willOpen);
                 return fb.get([
                     '/',
                     asset.id,
@@ -297,6 +309,12 @@ momentum.controller('AudiencesController', [
                     '0': [1, 2],
                     '1': [1],
                     '2': [2]
+                },
+                locationMap = {
+                    '1': ['recent', 'home'],
+                    '2': ['home'],
+                    '3': ['recent'],
+                    '4': ['travel_in']
                 };
 
             $scope.viewLoaded = 0;
@@ -311,6 +329,9 @@ momentum.controller('AudiencesController', [
             a.data.genders = genderMap[aud.$gnValue];
             a.data.age_min = aud.$ageMinValue;
             a.data.age_max = aud.$ageMaxValue;
+            a.data.geo_locations = a.data.geo_locations || {};
+            a.data.geo_locations.location_types =
+                locationMap[aud.$loTypeValue];
 
             a.session_id = $scope.sessionId;
 
