@@ -14,6 +14,19 @@ momentum.controller('AudiencesController', [
         function makeIfFalsy (data, param, what) {
             data[param] = data[param] || what;
         }
+        function getLanguages (aud) {
+            var lang = aud.data.locales || [];
+
+            return lang.map(function (act) {
+                return {
+                    'id': act,
+                    'name': aud.meta[[
+                        'locale',
+                        act
+                    ].join('_')]
+                };
+            });
+        }
 
         function getLocations (aud) {
             var loc = aud.data.geo_locations || {},
@@ -79,7 +92,8 @@ momentum.controller('AudiencesController', [
             return '0';
         }
         function getlocationType (aud) {
-            var l = aud.data.geo_locations.location_types;
+            var l = aud.data.geo_locations &&
+                aud.data.geo_locations.location_types;
 
             if (!l || l.indexOf('recent') !== -1 && l.indexOf('home') !== -1) {
                 return '1';
@@ -238,6 +252,7 @@ momentum.controller('AudiencesController', [
                 willOpen.$ageMinValue = willOpen.data.age_min || 18;
                 willOpen.$ageMaxValue = willOpen.data.age_max || 65;
                 willOpen.$locations = getLocations(willOpen);
+                willOpen.$langs = getLanguages(willOpen);
                 willOpen.$gnValue = getGender(willOpen);
                 willOpen.$loTypeValue = getlocationType(willOpen);
                 return fb.get([
@@ -362,6 +377,36 @@ momentum.controller('AudiencesController', [
             });
         };
 
+        $scope.queryLanguage = function (value) {
+            return fb.get([
+                '/search?type=adlocale&q=',
+                value
+            ].join(''),
+                $scope.user.fb_access_token
+            ).then(function (res) {
+                return res.data;
+            });
+        };
+
+        $scope.addAudienceLanguage = function (aud, value) {
+            var hash = ['locale', value.key].join('_'),
+                arr;
+
+            makeIfFalsy(aud.data, 'locales', []);
+            makeIfFalsy(aud, 'meta', {});
+
+            arr = aud.data.locales;
+            if (arr.indexOf(value.key) === -1) {
+                aud.data.locales.push(value.key);
+                aud.meta[hash] = value.name;
+            }
+
+            aud.$langValue = '';
+            aud.$langs = getLanguages(aud);
+
+            $scope.$apply();
+        };
+
         $scope.addAudienceLocation = function (aud, value) {
             var hash = [value.type, value.key].join('_'),
                 arr,
@@ -430,6 +475,22 @@ momentum.controller('AudiencesController', [
             aud.$locations = getLocations(aud);
 
             $scope.$apply();
+        };
+
+        $scope.deleteLanguage = function (audience, lang) {
+            var hash = [
+                    'locale',
+                    lang.id
+                ].join('_'),
+                langs = audience.data.locales;
+
+            delete audience.meta[hash];
+
+            audience.data.locales = langs.filter(function (c) {
+                return c !== lang.id;
+            });
+
+            audience.$langs = getLanguages(audience);
         };
 
         $scope.deleteLocation = function (audience, location) {
