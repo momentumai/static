@@ -66,6 +66,16 @@
             Location
         </div>
         <div class="group-content-value">
+            <div class="dropdown">
+                <select
+                    ng-model="audience.$loTypeValue">
+                    <option value="1">Everyone in this location</option>
+                    <option value="2">People who live in this location</option>
+                    <option value="3">People recently in this location</option>
+                    <option value="4">People traveling in this location</option>
+                </select>
+                <label></label>
+            </div>
             <ul class="mdl-list audience-list">
                 <li
                     class="mdl-list__item"
