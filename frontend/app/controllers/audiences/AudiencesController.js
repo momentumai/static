@@ -694,7 +694,9 @@ momentum.controller('AudiencesController', [
                 return dialog.open({
                     'template': 'detailBrowserDialog.tpl.html',
                     'model': model,
-                    'dialogClass': 'detail-browser'
+                    'dialogClass': 'detail-browser',
+                    'showCancel': true,
+                    'okText': 'Add targets'
                 }).then(function () {
                     var checked = model.getChecked();
 
