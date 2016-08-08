@@ -76,10 +76,13 @@ momentum.directive('autoComplete', [
 
                 outerDiv.appendChild(cont);
 
-                function valueChange (value) {
+                function valueChange (value, oldValue) {
                     var getter = $scope.getter;
 
-                    if (!value && typeof $scope.initGetter === 'function') {
+                    if (!value &&
+                        oldValue &&
+                        typeof $scope.initGetter === 'function'
+                    ) {
                         getter = $scope.initGetter;
                     } else if (!value) {
                         cont.innerHTML = '';
@@ -112,7 +115,7 @@ momentum.directive('autoComplete', [
 
                 element.addEventListener('focus', function () {
                     recalcPosition(cont, outerDiv);
-                    valueChange($scope.value);
+                    valueChange($scope.value, 'init');
                 });
 
                 element.addEventListener('blur', function () {
