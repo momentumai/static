@@ -406,6 +406,18 @@ momentum.controller('AudiencesController', [
             });
         };
 
+        $scope.queryDetailSuggestion = function (ignore, self) {
+            return fb.get([
+                '/',
+                self.audience.ad_account,
+                '/targetingsuggestions'
+            ].join(''),
+                $scope.user.fb_access_token
+            ).then(function (res) {
+                return res.data;
+            });
+        };
+
         $scope.queryLocation = function (value) {
             return fb.get([
                 '/search?type=adgeolocation&q=',
