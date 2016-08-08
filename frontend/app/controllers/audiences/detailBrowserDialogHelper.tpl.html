@@ -1,0 +1,24 @@
+<li
+    ng-if="!item.type || item.id"
+    ng-class="{'open': item.open && !item.id, 'close': !item.open && !item.id}"
+    ng-repeat="item in model.query(item.key)">
+    <label 
+        ng-mouseenter="model.desc = item"
+        ng-mouseleave="model.desc = 0"
+        class="db-item"
+        ng-if="item.id"
+        for="dbitem-{{item.id}}">
+        <span>{{item.name}}</span>
+        <input
+            id="dbitem-{{item.id}}"
+            type="checkbox"
+            ng-model="item.checked"></input>
+    </label>
+    <div
+        ng-click="item.open = !item.open"
+        class="db-item"
+        ng-if="!item.id">
+        {{item.name}}
+    </div>
+    <ul class="db-ul" ng-click="$event.stopPropagation()" ng-if="item.open" ng-include="'detailBrowserDialogHelper.tpl.html'"></ul>
+</li>

@@ -234,26 +234,34 @@
                     </span>
                 </li>
             </ul>
-            <div class="audience-name mdl-textfield mdl-js-textfield">
-                <input auto-complete="queryDetail"
-                    ng-model="flex.$detValue"
-                    item-template="detailItem.tpl.html"
-                    item-action="addAudienceDetail"
-                    init-query="queryDetailSuggestion"
-                    item-action-self="{
-                        'audience': audience,
-                        'index': $index,
-                        'flex': flex
-                    }"
-                    container-class="audience-details"
-                    class="mdl-textfield__input"
-                    type="text"
-                    id="{{audience.id}}-detail-{{$index}}">
-                <label
-                    class="mdl-textfield__label"
-                    for="{{audience.id}}-detail-{{$index}}">
-                    Add detailed target
-                </label>
+            <div class="audience-name multi">
+                <div class="mdl-textfield mdl-js-textfield">
+                    <input auto-complete="queryDetail"
+                        ng-model="flex.$detValue"
+                        item-template="detailItem.tpl.html"
+                        item-action="addAudienceDetail"
+                        init-query="queryDetailSuggestion"
+                        item-action-self="{
+                            'audience': audience,
+                            'index': $index,
+                            'flex': flex
+                        }"
+                        container-class="audience-details"
+                        class="mdl-textfield__input"
+                        type="text"
+                        id="{{audience.id}}-detail-{{$index}}">
+                    <label
+                        class="mdl-textfield__label"
+                        for="{{audience.id}}-detail-{{$index}}">
+                        Add detailed target
+                    </label>
+                </div>
+                <button
+                    type="button"
+                    class="mdl-button mdl-js-button mdl-js-ripple-effect"
+                    ng-click="$event.stopPropagation(); openDetailBrowse(audience, $index);">
+                    Browse
+                </button>
             </div>
             <button
                 ng-if="$last && flex.length"

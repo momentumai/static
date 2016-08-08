@@ -65,6 +65,20 @@
     .audience-name {
         width: calc(100% - 32px);
         margin-left: 16px;
+        &.multi {
+            display: flex;
+            align-items: center;
+            .mdl-textfield {
+                width: auto;
+                flex-grow: 1;
+                flex-shrink: 1;
+            }
+            button {
+                margin-left: 16px;
+                flex-grow: 0;
+                flex-shrink: 0;
+            }
+        }
     }
 
     .group {
@@ -144,6 +158,9 @@
             .audience-list {
                 margin: 0;
                 padding: 0;
+                .mdl-list__item-primary-content {
+                    word-break: break-all;
+                }
                 .mdl-list__item {
                     padding-right: 0;
                 }

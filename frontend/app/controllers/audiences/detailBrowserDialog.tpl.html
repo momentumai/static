@@ -1,0 +1,34 @@
+<div class="cont">
+    <div class="split first">
+        <ul class="db-ul" ng-init="item = {'key': '__ROOT__'}"
+            ng-include="'detailBrowserDialogHelper.tpl.html'"></ul>
+    </div>
+    <div ng-if="!model.desc" class="split">
+        <ul class="mdl-list">
+            <li
+                class="mdl-list__item"
+                ng-repeat="item in model.getChecked()">
+                <span class="mdl-list__item-primary-content">
+                    {{item.name}} ({{item.path.join('/')}})
+                </span>
+                <span class="mdl-list__item-secondary-content">
+                    <a
+                        class="mdl-list__item-secondary-action"
+                        ng-click="item.checked = false"
+                        href="javascript:void(0)">
+                        <i class="material-icons">delete_forever</i>
+                    </a>
+                </span>
+            </li>
+        </ul>
+    </div>
+    <div ng-if="model.desc" class="desc" class="split">
+        <div class="desc-title first">
+            <b>{{model.formatNumber(model.desc.audience_size)}}</b> people
+        </div>
+        <div class="desc-path">{{model.desc.key}}</div>
+        <div class="desc-desc" ng-if="model.desc.description"><b>Description:</b>
+            {{model.desc.description}}
+        </div>
+    </div>
+</div>
