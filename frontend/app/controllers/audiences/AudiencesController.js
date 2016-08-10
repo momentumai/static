@@ -214,6 +214,15 @@ momentum.controller('AudiencesController', [
             });
         };
 
+        $scope.deleteCustomAudienceExclude = function (audience, id) {
+            var d = audience.data,
+                ca = d.excluded_custom_audiences || [];
+
+            d.excluded_custom_audiences = ca.filter(function (act) {
+                return act.id && act.id !== id;
+            });
+        };
+
         $scope.addCustomAudience = function (audience) {
             if (audience.$caValue) {
                 makeIfFalsy(audience.data, 'custom_audiences', []);
@@ -224,18 +233,30 @@ momentum.controller('AudiencesController', [
             delete audience.$caValue;
         };
 
+        $scope.addCustomAudienceExclude = function (audience) {
+            if (audience.$caExcludeValue) {
+                makeIfFalsy(audience.data, 'excluded_custom_audiences', []);
+                audience.data.excluded_custom_audiences.push({
+                    'id': audience.$caExcludeValue
+                });
+            }
+            delete audience.$caExcludeValue;
+        };
+
         $scope.filteredCustomAudiences = function (audience) {
             var ad = audience.data,
-                ca = ad.custom_audiences || [];
+                ca = ad.custom_audiences || [],
+                cae = ad.excluded_custom_audiences || [],
+                arr = ca.concat(cae);
 
-            ca = ca.map(
+            arr = arr.map(
                 function (act) {
                     return act.id;
                 }
             ) || [];
 
             return $scope.customAudiences.filter(function (act) {
-                return !act.id || ca.indexOf(act.id) === -1;
+                return !act.id || arr.indexOf(act.id) === -1;
             });
         };
 
@@ -325,7 +346,7 @@ momentum.controller('AudiencesController', [
                 ).then(function (res) {
                     $scope.customAudiences = res.data;
                     $scope.customAudiences.unshift({
-                        'name': 'Add custom audience'
+                        'name': 'Choose an audience'
                     });
                     willOpen.open = 1;
                     asset.audiences.isOpen = 1;

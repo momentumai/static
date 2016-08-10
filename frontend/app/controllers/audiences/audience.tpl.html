@@ -23,7 +23,7 @@
             </div>
         </div>
     </div>
-    <div class="group-content-input">
+    <div class="group-content-input no-border">
         <div class="group-content-label">
             Custom audiences
         </div>
@@ -44,6 +44,21 @@
                         </a>
                     </span>
                 </li>
+                <li
+                    class="mdl-list__item"
+                    ng-repeat="ca in audience.data.excluded_custom_audiences track by ca.id">
+                    <span class="mdl-list__item-primary-content">
+                        Excluded: {{customAudienceByid(ca.id)}}
+                    </span>
+                    <span class="mdl-list__item-secondary-content">
+                        <a
+                            class="rule-delete mdl-list__item-secondary-action"
+                            ng-click="deleteCustomAudienceExclude(audience, ca.id)"
+                            href="javascript:void(0)">
+                            <i class="material-icons">delete_forever</i>
+                        </a>
+                    </span>
+                </li>
             </ul>
             <div class="dropdown audience-dropdown">
                 <select
@@ -57,7 +72,22 @@
                     ng-options="item.id as item.name
                         for item in filteredCustomAudiences(audience)">
                 </select>
-                <label></label>
+                <label>Add a custom audience:</label>
+            </div>
+        </div>
+    </div>
+    <div class="group-content-input">
+        <div class="group-content-label">
+        </div>
+        <div class="group-content-value">
+            <div class="dropdown audience-dropdown">
+                <select
+                    ng-model="audience.$caExcludeValue"
+                    ng-change="addCustomAudienceExclude(audience)"
+                    ng-options="item.id as item.name
+                        for item in filteredCustomAudiences(audience)">
+                </select>
+                <label>Or exclude a custom audience:</label>
             </div>
         </div>
     </div>
