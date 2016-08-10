@@ -2,6 +2,61 @@
     width: 768px;
     height: 496px;
 
+    .dialog-search-ac {
+        &.empty {
+            display: none;
+        }
+        background: white;
+        padding: 0 16px;
+
+        & > div:last-child > .ac-item {
+            border-bottom: 0;
+        }
+        .selected {
+            background: unquote("rgb(#{$palette-grey-200})");
+        }
+        .ac-item {
+            cursor: pointer;
+            display: flex;
+            border-bottom: 1px solid unquote("rgb(#{$palette-grey-200})");
+            padding: 8px;
+            .name {
+                flex-grow: 1;
+                flex-shrink: 1;
+                min-width: 50%;
+            }
+            .type {
+                padding-left: 16px;
+                flex-grow: 0;
+                flex-shrink: 0;
+                font-size: 14px;
+                color: unquote("rgb(#{$palette-grey-600})");
+            }
+        }
+    }
+
+    .search {
+        .header {
+            display: flex;
+            align-items: center;
+            height: 67px;
+            button {
+                flex-shrink: 0;
+                flex-grow: 0;
+            }
+            .field {
+                margin-left: 16px;
+                margin-right: 16px;
+                flex-grow: 1;
+                flex-shrink: 1;
+            }
+        }
+        .results {
+            height: 352px;
+            overflow-y: auto;
+        }
+    }
+
     .desc {
         padding: 16px;
         & > div:not(.first) {
