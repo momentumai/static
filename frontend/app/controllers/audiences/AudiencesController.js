@@ -201,42 +201,24 @@ momentum.controller('AudiencesController', [
             }
         };
 
-        $scope.audienceValidator = function (audience) {
+        $scope.deleteCustomAudience = function (audience, id, exclude) {
             var d = audience.data,
-                len = (d.geo_locations && Object.keys(
-                    d.geo_locations
-                ).reduce(function (prev, key) {
-                    return prev + d.geo_locations[key].length;
-                }, 0) || 0) + (
-                    d.custom_audiences &&
-                    d.custom_audiences.length || 0
-                );
+                ca,
+                key = exclude ?
+                    'excluded_custom_audiences' :
+                    'custom_audiences';
 
-            return (!len);
-        };
+            ca = d[key] || [];
 
-        $scope.deleteCustomAudience = function (audience, id) {
-            var d = audience.data,
-                ca = d.custom_audiences || [];
-
-            d.custom_audiences = ca.filter(function (act) {
-                return act.id && act.id !== id;
-            });
-        };
-
-        $scope.deleteCustomAudienceExclude = function (audience, id) {
-            var d = audience.data,
-                ca = d.excluded_custom_audiences || [];
-
-            d.excluded_custom_audiences = ca.filter(function (act) {
+            d[key] = ca.filter(function (act) {
                 return act.id && act.id !== id;
             });
         };
 
         $scope.addCustomAudience = function (audience) {
             if (audience.$caValue) {
-                makeIfFalsy(audience.data, 'custom_audiences', []);
-                audience.data.custom_audiences.push({
+                makeIfFalsy(audience.data, audience.$custMethod, []);
+                audience.data[audience.$custMethod].push({
                     'id': audience.$caValue
                 });
             }
@@ -354,6 +336,7 @@ momentum.controller('AudiencesController', [
                 willOpen.$cons = getConnections(willOpen);
                 willOpen.$consFriend = getConnectionsFriend(willOpen);
                 willOpen.$consExclude = getConnectionsExclude(willOpen);
+                willOpen.$custMethod = 'custom_audiences';
                 return fb.get([
                     '/',
                     asset.id,
