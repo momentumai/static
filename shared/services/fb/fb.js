@@ -45,6 +45,9 @@ momentum.factory('fb', [
             url = updateQueryString(url, 'access_token', token);
 
             return $http.get(url).then(function (resp) {
+                if (resp.data.error) {
+                    throw resp.data.error;
+                }
                 return resp.data;
             });
         };
@@ -58,6 +61,9 @@ momentum.factory('fb', [
             url = updateQueryString(url, 'access_token', token);
 
             return $http.post(url, params).then(function (resp) {
+                if (resp.data.error) {
+                    throw resp.data.error;
+                }
                 return resp.data;
             });
         };

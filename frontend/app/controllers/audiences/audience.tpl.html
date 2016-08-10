@@ -38,7 +38,7 @@
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteCustomAudience(audience, ca.id)"
+                            ng-click="deleteCustomAudience(audience, ca.id); verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -53,7 +53,7 @@
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteCustomAudienceExclude(audience, ca.id)"
+                            ng-click="deleteCustomAudienceExclude(audience, ca.id); verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -68,7 +68,7 @@
                     }]"
                     validators-item="audience"
                     ng-model="audience.$caValue"
-                    ng-change="addCustomAudience(audience)"
+                    ng-change="addCustomAudience(audience); verify(audience);"
                     ng-options="item.id as item.name
                         for item in filteredCustomAudiences(audience)">
                 </select>
@@ -83,7 +83,7 @@
             <div class="dropdown audience-dropdown">
                 <select
                     ng-model="audience.$caExcludeValue"
-                    ng-change="addCustomAudienceExclude(audience)"
+                    ng-change="addCustomAudienceExclude(audience); verify(audience);"
                     ng-options="item.id as item.name
                         for item in filteredCustomAudiences(audience)">
                 </select>
@@ -98,6 +98,7 @@
         <div class="group-content-value">
             <div class="dropdown">
                 <select
+                    ng-change="verify(audience);"
                     ng-model="audience.$loTypeValue">
                     <option value="1">Everyone in this location</option>
                     <option value="2">People who live in this location</option>
@@ -116,7 +117,7 @@
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteLocation(audience, loc)"
+                            ng-click="deleteLocation(audience, loc); verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -145,7 +146,7 @@
             <div class="dropdown min">
                 <select
                     ng-model="audience.$ageMinValue"
-                    ng-change="ageMinChange(audience)"
+                    ng-change="ageMinChange(audience); verify(audience);"
                     ng-options="item.id as item.name for item in ageData">
                 </select>
                 <label>Min age</label>
@@ -154,7 +155,7 @@
             <div class="dropdown min">
                 <select
                     ng-model="audience.$ageMaxValue"
-                    ng-change="ageMaxChange(audience)"
+                    ng-change="ageMaxChange(audience); verify(audience);"
                     ng-options="item.id as item.name for item in ageData">
                 </select>
                 <label>Max age</label>
@@ -173,6 +174,7 @@
                     class="mdl-radio__button"
                     value="0"
                     ng-model="audience.$gnValue"
+                    ng-change="verify(audience);"
                     name="genders"/>
               <span class="mdl-radio__label">All</span>
             </label>
@@ -183,6 +185,7 @@
                     class="mdl-radio__button"
                     value="1"
                     ng-model="audience.$gnValue"
+                    ng-change="verify(audience);"
                     name="genders"/>
                 <span class="mdl-radio__label">Men</span>
             </label>
@@ -193,6 +196,7 @@
                     class="mdl-radio__button"
                     value="2"
                     ng-model="audience.$gnValue"
+                    ng-change="verify(audience);"
                     name="genders"/>
                 <span class="mdl-radio__label">Women</span>
             </label>
@@ -213,7 +217,7 @@
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteLanguage(audience, lang)"
+                            ng-click="deleteLanguage(audience, lang); verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -256,7 +260,7 @@
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteDetail(audience, detail, $parent.$index)"
+                            ng-click="deleteDetail(audience, detail, $parent.$index); verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -319,7 +323,7 @@
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteConnection(audience, con)"
+                            ng-click="deleteConnection(audience, con); verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -358,7 +362,7 @@
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteConnectionFriend(audience, con)"
+                            ng-click="deleteConnectionFriend(audience, con);verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -397,7 +401,7 @@
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteConnectionExclude(audience, con)"
+                            ng-click="deleteConnectionExclude(audience, con); verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -419,6 +423,14 @@
             </div>
         </div>
     </div>
+    <div class="group-content">
+        <div class="group-title" ng-if="audience.error">
+            {{audience.error.error_user_msg}}
+        </div>
+        <div class="group-title" ng-if="!audience.error">
+            Potential Reach: {{audience.info.users.toLocaleString()}} people
+        </div>
+    </div>
     <div class="group-footer">
         <div class="group-footer-spacer"></div>
         <button
@@ -436,7 +448,7 @@
             Reset
         </button>
         <button
-            ng-disabled="!user.is_admin"
+            ng-disabled="audience.error"
             type="submit"
             class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
             Save

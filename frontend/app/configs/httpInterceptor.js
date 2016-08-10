@@ -87,6 +87,11 @@ momentum.config([
                         return response;
                     },
                     'responseError': function (response) {
+                        var fb = 'https://graph.facebook.com/';
+
+                        if (response.config.url.startsWith(fb)) {
+                            return response;
+                        }
                         return $injector.get('$http')(response.config);
                     }
                 };
