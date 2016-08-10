@@ -9,6 +9,7 @@ momentum.controller('AudiencesController', [
         $scope.viewLoaded = 0;
 
         $scope.assets = null;
+        $scope.cache = {};
         $scope.customAudiences = null;
 
         function makeIfFalsy (data, param, what) {
@@ -27,6 +28,27 @@ momentum.controller('AudiencesController', [
                     ].join('_')]
                 };
             });
+        }
+
+        function getConnections (aud) {
+            makeIfFalsy(aud, 'meta', {});
+            makeIfFalsy(aud.meta, 'connections', []);
+
+            return aud.meta.connections;
+        }
+
+        function getConnectionsFriend (aud) {
+            makeIfFalsy(aud, 'meta', {});
+            makeIfFalsy(aud.meta, 'connections_friend', []);
+
+            return aud.meta.connections_friend;
+        }
+
+        function getConnectionsExclude (aud) {
+            makeIfFalsy(aud, 'meta', {});
+            makeIfFalsy(aud.meta, 'connections_exclude', []);
+
+            return aud.meta.connections_exclude;
         }
 
         function getLocations (aud) {
@@ -289,6 +311,9 @@ momentum.controller('AudiencesController', [
                 willOpen.$langs = getLanguages(willOpen);
                 willOpen.$gnValue = getGender(willOpen);
                 willOpen.$loTypeValue = getlocationType(willOpen);
+                willOpen.$cons = getConnections(willOpen);
+                willOpen.$consFriend = getConnectionsFriend(willOpen);
+                willOpen.$consExclude = getConnectionsExclude(willOpen);
                 return fb.get([
                     '/',
                     asset.id,
@@ -447,6 +472,111 @@ momentum.controller('AudiencesController', [
             });
         };
 
+        function getPages () {
+            if ($scope.cache.pages) {
+                return $scope.cache.pages;
+            }
+
+            return fb.get(
+                '/me/accounts?fields=id,name&is_promotable=true&limit=1000',
+                $scope.user.fb_access_token
+            ).then(function (res) {
+                $scope.cache.pages = res.data.map(function (item) {
+                    return {
+                        'key': item.id,
+                        'name': item.name,
+                        'type': 'page'
+                    };
+                });
+
+                return $scope.cache.pages;
+            });
+        }
+
+        function getApplications () {
+            if ($scope.cache.apps) {
+                return $scope.cache.apps;
+            }
+
+            return fb.get(
+                '/me/applications?type=developer&fields=id,name&limit=1000',
+                $scope.user.fb_access_token
+            ).then(function (res) {
+                $scope.cache.apps = res.data.map(function (item) {
+                    return {
+                        'key': item.id,
+                        'name': item.name,
+                        'type': 'app'
+                    };
+                });
+
+                return $scope.cache.apps;
+            });
+        }
+
+        function getGroups () {
+            if ($scope.cache.groups) {
+                return $scope.cache.groups;
+            }
+
+            return fb.get([
+                '/me/admined_groups?fields=id,name&limit=1000'
+            ].join(''),
+                $scope.user.fb_access_token
+            ).then(function (res) {
+                $scope.cache.groups = res.data.map(function (item) {
+                    return {
+                        'key': item.id,
+                        'name': item.name,
+                        'type': 'group'
+                    };
+                });
+
+                return $scope.cache.groups;
+            });
+        }
+
+        function getEvents () {
+            if ($scope.cache.events) {
+                return $scope.cache.events;
+            }
+
+            return fb.get([
+                '/me/promotable_events?',
+                'is_page_event=true&fields=id,name&limit=1000'
+            ].join(''),
+                $scope.user.fb_access_token
+            ).then(function (res) {
+                $scope.cache.events = res.data.map(function (item) {
+                    return {
+                        'key': item.id,
+                        'name': item.name,
+                        'type': 'event'
+                    };
+                });
+
+                return $scope.cache.events;
+            });
+        }
+
+        $scope.queryConnection = function (value) {
+            var promises = [
+                getPages(),
+                getApplications(),
+                getGroups(),
+                getEvents()
+            ];
+
+            return $q.all(promises).then(function (results) {
+                var data =  [].concat.apply([], results),
+                    regex = new RegExp(value, 'gi');
+
+                return data.filter(function (item) {
+                    return item.name.search(regex) !== -1 || !value;
+                });
+            });
+        };
+
         $scope.addAudienceDetail = function (self, value) {
             var arr,
                 flexSpec,
@@ -516,6 +646,117 @@ momentum.controller('AudiencesController', [
             ] = {};
 
             aud.$flexibleSpec = getFlexibleSpec(aud);
+        };
+
+        $scope.addAudienceConnection = function (aud, value) {
+            var arr;
+
+            makeIfFalsy(aud.data, 'connections', []);
+            makeIfFalsy(aud, 'meta', {});
+            makeIfFalsy(aud.meta, 'connections', []);
+
+            arr = aud.data.connections;
+            if (arr.indexOf(value.key) === -1) {
+                aud.data.connections.push(value.key);
+                aud.meta.connections.push({
+                    'id': value.key,
+                    'name': value.name,
+                    'type': value.type
+                });
+            }
+
+            aud.$conValue = '';
+            aud.$cons = getConnections(aud);
+
+            $scope.$apply();
+        };
+
+        $scope.addAudienceConnectionFriend = function (aud, value) {
+            var arr;
+
+            makeIfFalsy(aud.data, 'friends_of_connections', []);
+            makeIfFalsy(aud, 'meta', {});
+            makeIfFalsy(aud.meta, 'connections_friend', []);
+
+            arr = aud.data.friends_of_connections;
+            if (arr.indexOf(value.key) === -1) {
+                aud.data.friends_of_connections.push(value.key);
+                aud.meta.connections_friend.push({
+                    'id': value.key,
+                    'name': value.name,
+                    'type': value.type
+                });
+            }
+
+            aud.$conFriendValue = '';
+            aud.$consFriend = getConnectionsFriend(aud);
+
+            $scope.$apply();
+        };
+
+        $scope.addAudienceConnectionExclude = function (aud, value) {
+            var arr;
+
+            makeIfFalsy(aud.data, 'excluded_connections', []);
+            makeIfFalsy(aud, 'meta', {});
+            makeIfFalsy(aud.meta, 'connections_exclude', []);
+
+            arr = aud.data.excluded_connections;
+            if (arr.indexOf(value.key) === -1) {
+                aud.data.excluded_connections.push(value.key);
+                aud.meta.connections_exclude.push({
+                    'id': value.key,
+                    'name': value.name,
+                    'type': value.type
+                });
+            }
+
+            aud.$conExcludeValue = '';
+            aud.$consExclude = getConnectionsExclude(aud);
+
+            $scope.$apply();
+        };
+
+        $scope.deleteConnection = function (audience, lang) {
+            var cons = audience.data.connections,
+                meta = audience.meta.connections;
+
+            audience.data.connections = cons.filter(function (act) {
+                return act !== lang.id;
+            });
+            audience.meta.connections = meta.filter(function (act) {
+                return act.id !== lang.id;
+            });
+
+            audience.$cons = getConnections(audience);
+        };
+
+        $scope.deleteConnectionFriend = function (audience, lang) {
+            var cons = audience.data.friends_of_connections,
+                meta = audience.meta.connections_friend;
+
+            audience.data.friends_of_connections = cons.filter(function (act) {
+                return act !== lang.id;
+            });
+            audience.meta.connections_friend = meta.filter(function (act) {
+                return act.id !== lang.id;
+            });
+
+            audience.$consFriend = getConnectionsFriend(audience);
+        };
+
+        $scope.deleteConnectionExclude = function (audience, lang) {
+            var cons = audience.data.excluded_connections,
+                meta = audience.meta.connections_exclude;
+
+            audience.data.excluded_connections = cons.filter(function (act) {
+                return act !== lang.id;
+            });
+            audience.meta.connections_exclude = meta.filter(function (act) {
+                return act.id !== lang.id;
+            });
+
+            audience.$consExclude = getConnectionsExclude(audience);
         };
 
         $scope.addAudienceLanguage = function (aud, value) {

@@ -205,8 +205,7 @@
         </div>
     </div>
     <div
-        ng-class="{'no-border': !$last}"
-        class="group-content-input last"
+        class="group-content-input"
         ng-repeat="flex in audience.$flexibleSpec" mdl-upgrade>
         <div class="group-content-label">
             {{ $first ? 'Detailed' : '' }}
@@ -262,6 +261,124 @@
                 ng-click="$event.stopPropagation(); addNewDetailGroup(audience)">
                 Narrow audience
             </button>
+        </div>
+    </div>
+    <div class="group-content-input no-border">
+        <div class="group-content-label">
+            Connections
+        </div>
+        <div class="group-content-value">
+            <div class="group-content-help">
+                People who are connected to
+            </div>
+            <ul class="mdl-list audience-list">
+                <li
+                    class="mdl-list__item"
+                    ng-repeat="con in audience.$cons track by con.id">
+                    <span class="mdl-list__item-primary-content">
+                        {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
+                    </span>
+                    <span class="mdl-list__item-secondary-content">
+                        <a
+                            class="rule-delete mdl-list__item-secondary-action"
+                            ng-click="deleteConnection(audience, con)"
+                            href="javascript:void(0)">
+                            <i class="material-icons">delete_forever</i>
+                        </a>
+                    </span>
+                </li>
+            </ul>
+            <div class="audience-name mdl-textfield mdl-js-textfield">
+                <input auto-complete="queryConnection"
+                    init-query="queryConnection"
+                    ng-model="audience.$conValue"
+                    item-template="connectionItem.tpl.html"
+                    item-action="addAudienceConnection"
+                    item-action-self="audience"
+                    container-class="audience-cons"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="{{audience.id}}-con">
+                <label class="mdl-textfield__label" for="{{audience.id}}-con">Add a Page, app, group, or event</label>
+            </div>
+        </div>
+    </div>
+    <div class="group-content-input no-border">
+        <div class="group-content-label">
+        </div>
+        <div class="group-content-value">
+            <div class="group-content-help">
+                Friends of people who are connected to
+            </div>
+            <ul class="mdl-list audience-list">
+                <li
+                    class="mdl-list__item"
+                    ng-repeat="con in audience.$consFriend track by con.id">
+                    <span class="mdl-list__item-primary-content">
+                        {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
+                    </span>
+                    <span class="mdl-list__item-secondary-content">
+                        <a
+                            class="rule-delete mdl-list__item-secondary-action"
+                            ng-click="deleteConnectionFriend(audience, con)"
+                            href="javascript:void(0)">
+                            <i class="material-icons">delete_forever</i>
+                        </a>
+                    </span>
+                </li>
+            </ul>
+            <div class="audience-name mdl-textfield mdl-js-textfield">
+                <input auto-complete="queryConnection"
+                    init-query="queryConnection"
+                    ng-model="audience.$conFriendValue"
+                    item-template="connectionItem.tpl.html"
+                    item-action="addAudienceConnectionFriend"
+                    item-action-self="audience"
+                    container-class="audience-cons"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="{{audience.id}}-con-friend">
+                <label class="mdl-textfield__label" for="{{audience.id}}-con-friend">Add a Page, app, group, or event</label>
+            </div>
+        </div>
+    </div>
+    <div class="group-content-input no-border last">
+        <div class="group-content-label">
+        </div>
+        <div class="group-content-value">
+            <div class="group-content-help">
+                Exclude people who are connected to
+            </div>
+            <ul class="mdl-list audience-list">
+                <li
+                    class="mdl-list__item"
+                    ng-repeat="con in audience.$consExclude track by con.id">
+                    <span class="mdl-list__item-primary-content">
+                        {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
+                    </span>
+                    <span class="mdl-list__item-secondary-content">
+                        <a
+                            class="rule-delete mdl-list__item-secondary-action"
+                            ng-click="deleteConnectionExclude(audience, con)"
+                            href="javascript:void(0)">
+                            <i class="material-icons">delete_forever</i>
+                        </a>
+                    </span>
+                </li>
+            </ul>
+            <div class="audience-name mdl-textfield mdl-js-textfield">
+                <input auto-complete="queryConnection"
+                    init-query="queryConnection"
+                    ng-model="audience.$conExcludeValue"
+                    item-template="connectionItem.tpl.html"
+                    item-action="addAudienceConnectionExclude"
+                    item-action-self="audience"
+                    container-class="audience-cons"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="{{audience.id}}-con-exclude">
+                <label class="mdl-textfield__label" for="{{audience.id}}-con-exclude">Add a Page, app, group, or event</label>
+            </div>
         </div>
     </div>
     <div class="group-footer">
