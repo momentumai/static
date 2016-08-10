@@ -14,7 +14,9 @@
         "scope": [
             "manage_pages",
             "ads_management",
-            "publish_pages"
+            "publish_pages",
+            "user_managed_groups",
+            "user_events"
         ]
     },
     "facebookEndpoint": "https://graph.facebook.com/v2.7",

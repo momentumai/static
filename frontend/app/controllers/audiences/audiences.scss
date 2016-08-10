@@ -10,7 +10,7 @@
     }
 }
 
-.audience-locations, .audience-languages, .audience-details{
+.audience-locations, .audience-languages, .audience-details, .audience-cons {
 
     &.empty {
         display: none;
@@ -21,13 +21,17 @@
     padding: 8px;
     & > div:last-child > .audience-location-item,
     & > div:last-child > .audience-language-item,
-    & > div:last-child > .audience-detail-item {
+    & > div:last-child > .audience-detail-item,
+    & > div:last-child > .audience-con-item {
         border-bottom: 0;
     }
     .selected {
         background: unquote("rgb(#{$palette-grey-200})");
     }
-    .audience-location-item, .audience-language-item, .audience-detail-item {
+    .audience-location-item,
+    .audience-language-item,
+    .audience-detail-item,
+    .audience-con-item {
         cursor: pointer;
         display: flex;
         border-bottom: 1px solid unquote("rgb(#{$palette-grey-200})");
@@ -42,6 +46,10 @@
             flex-shrink: 0;
         }
     }
+    .audience-con-item > .type::first-letter,
+    .audience-location-item > .type::first-letter {
+        text-transform: capitalize;
+    }
 }
 .audiences {
     padding: 16px;
@@ -49,6 +57,10 @@
 
     .detail-button {
         margin-bottom: 16px;
+    }
+
+    .uppercase-first::first-letter {
+        text-transform: capitalize;
     }
 
     .gender-chooser {
@@ -65,6 +77,20 @@
     .audience-name {
         width: calc(100% - 32px);
         margin-left: 16px;
+        &.multi {
+            display: flex;
+            align-items: center;
+            .mdl-textfield {
+                width: auto;
+                flex-grow: 1;
+                flex-shrink: 1;
+            }
+            button {
+                margin-left: 16px;
+                flex-grow: 0;
+                flex-shrink: 0;
+            }
+        }
     }
 
     .group {
@@ -144,6 +170,9 @@
             .audience-list {
                 margin: 0;
                 padding: 0;
+                .mdl-list__item-primary-content {
+                    word-break: break-all;
+                }
                 .mdl-list__item {
                     padding-right: 0;
                 }
