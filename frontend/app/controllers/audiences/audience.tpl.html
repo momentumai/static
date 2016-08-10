@@ -23,7 +23,7 @@
             </div>
         </div>
     </div>
-    <div class="group-content-input">
+    <div class="group-content-input no-border">
         <div class="group-content-label">
             Custom audiences
         </div>
@@ -38,7 +38,22 @@
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteCustomAudience(audience, ca.id)"
+                            ng-click="deleteCustomAudience(audience, ca.id); verify(audience);"
+                            href="javascript:void(0)">
+                            <i class="material-icons">delete_forever</i>
+                        </a>
+                    </span>
+                </li>
+                <li
+                    class="mdl-list__item"
+                    ng-repeat="ca in audience.data.excluded_custom_audiences track by ca.id">
+                    <span class="mdl-list__item-primary-content">
+                        Excluded: {{customAudienceByid(ca.id)}}
+                    </span>
+                    <span class="mdl-list__item-secondary-content">
+                        <a
+                            class="rule-delete mdl-list__item-secondary-action"
+                            ng-click="deleteCustomAudienceExclude(audience, ca.id); verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -53,11 +68,26 @@
                     }]"
                     validators-item="audience"
                     ng-model="audience.$caValue"
-                    ng-change="addCustomAudience(audience)"
+                    ng-change="addCustomAudience(audience); verify(audience);"
                     ng-options="item.id as item.name
                         for item in filteredCustomAudiences(audience)">
                 </select>
-                <label></label>
+                <label>Add a custom audience:</label>
+            </div>
+        </div>
+    </div>
+    <div class="group-content-input">
+        <div class="group-content-label">
+        </div>
+        <div class="group-content-value">
+            <div class="dropdown audience-dropdown">
+                <select
+                    ng-model="audience.$caExcludeValue"
+                    ng-change="addCustomAudienceExclude(audience); verify(audience);"
+                    ng-options="item.id as item.name
+                        for item in filteredCustomAudiences(audience)">
+                </select>
+                <label>Or exclude a custom audience:</label>
             </div>
         </div>
     </div>
@@ -68,6 +98,7 @@
         <div class="group-content-value">
             <div class="dropdown">
                 <select
+                    ng-change="verify(audience);"
                     ng-model="audience.$loTypeValue">
                     <option value="1">Everyone in this location</option>
                     <option value="2">People who live in this location</option>
@@ -86,7 +117,7 @@
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteLocation(audience, loc)"
+                            ng-click="deleteLocation(audience, loc); verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -99,7 +130,7 @@
                     item-template="locationItem.tpl.html"
                     item-action="addAudienceLocation"
                     item-action-self="audience"
-                    container-class="audience-locations"
+                    container-class="audience-ac"
                     class="mdl-textfield__input"
                     type="text"
                     id="{{audience.id}}-location">
@@ -115,7 +146,7 @@
             <div class="dropdown min">
                 <select
                     ng-model="audience.$ageMinValue"
-                    ng-change="ageMinChange(audience)"
+                    ng-change="ageMinChange(audience); verify(audience);"
                     ng-options="item.id as item.name for item in ageData">
                 </select>
                 <label>Min age</label>
@@ -124,7 +155,7 @@
             <div class="dropdown min">
                 <select
                     ng-model="audience.$ageMaxValue"
-                    ng-change="ageMaxChange(audience)"
+                    ng-change="ageMaxChange(audience); verify(audience);"
                     ng-options="item.id as item.name for item in ageData">
                 </select>
                 <label>Max age</label>
@@ -143,6 +174,7 @@
                     class="mdl-radio__button"
                     value="0"
                     ng-model="audience.$gnValue"
+                    ng-change="verify(audience);"
                     name="genders"/>
               <span class="mdl-radio__label">All</span>
             </label>
@@ -153,6 +185,7 @@
                     class="mdl-radio__button"
                     value="1"
                     ng-model="audience.$gnValue"
+                    ng-change="verify(audience);"
                     name="genders"/>
                 <span class="mdl-radio__label">Men</span>
             </label>
@@ -163,6 +196,7 @@
                     class="mdl-radio__button"
                     value="2"
                     ng-model="audience.$gnValue"
+                    ng-change="verify(audience);"
                     name="genders"/>
                 <span class="mdl-radio__label">Women</span>
             </label>
@@ -183,7 +217,7 @@
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteLanguage(audience, lang)"
+                            ng-click="deleteLanguage(audience, lang); verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -196,7 +230,7 @@
                     item-template="languageItem.tpl.html"
                     item-action="addAudienceLanguage"
                     item-action-self="audience"
-                    container-class="audience-languages"
+                    container-class="audience-ac"
                     class="mdl-textfield__input"
                     type="text"
                     id="{{audience.id}}-language">
@@ -226,7 +260,7 @@
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteDetail(audience, detail, $parent.$index)"
+                            ng-click="deleteDetail(audience, detail, $parent.$index); verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -245,7 +279,7 @@
                             'index': $index,
                             'flex': flex
                         }"
-                        container-class="audience-details"
+                        container-class="audience-ac"
                         class="mdl-textfield__input"
                         type="text"
                         id="{{audience.id}}-detail-{{$index}}">
@@ -283,13 +317,15 @@
                 <li
                     class="mdl-list__item"
                     ng-repeat="con in audience.$cons track by con.id">
-                    <span class="mdl-list__item-primary-content">
-                        {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
-                    </span>
+                    <div class="mdl-list__item-primary-content">
+                        <div style="width: 100%">
+                            {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
+                        </div>
+                    </div>
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteConnection(audience, con)"
+                            ng-click="deleteConnection(audience, con); verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -303,7 +339,7 @@
                     item-template="connectionItem.tpl.html"
                     item-action="addAudienceConnection"
                     item-action-self="audience"
-                    container-class="audience-cons"
+                    container-class="audience-ac"
                     class="mdl-textfield__input"
                     type="text"
                     id="{{audience.id}}-con">
@@ -322,13 +358,15 @@
                 <li
                     class="mdl-list__item"
                     ng-repeat="con in audience.$consFriend track by con.id">
-                    <span class="mdl-list__item-primary-content">
-                        {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
-                    </span>
+                    <div class="mdl-list__item-primary-content">
+                        <div style="width: 100%">
+                            {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
+                        </div>
+                    </div>
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteConnectionFriend(audience, con)"
+                            ng-click="deleteConnectionFriend(audience, con);verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -342,7 +380,7 @@
                     item-template="connectionItem.tpl.html"
                     item-action="addAudienceConnectionFriend"
                     item-action-self="audience"
-                    container-class="audience-cons"
+                    container-class="audience-ac"
                     class="mdl-textfield__input"
                     type="text"
                     id="{{audience.id}}-con-friend">
@@ -361,13 +399,15 @@
                 <li
                     class="mdl-list__item"
                     ng-repeat="con in audience.$consExclude track by con.id">
-                    <span class="mdl-list__item-primary-content">
-                        {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
-                    </span>
+                    <div class="mdl-list__item-primary-content">
+                        <div style="width: 100%">
+                            {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
+                        </div>
+                    </div>
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
-                            ng-click="deleteConnectionExclude(audience, con)"
+                            ng-click="deleteConnectionExclude(audience, con); verify(audience);"
                             href="javascript:void(0)">
                             <i class="material-icons">delete_forever</i>
                         </a>
@@ -381,7 +421,7 @@
                     item-template="connectionItem.tpl.html"
                     item-action="addAudienceConnectionExclude"
                     item-action-self="audience"
-                    container-class="audience-cons"
+                    container-class="audience-ac"
                     class="mdl-textfield__input"
                     type="text"
                     id="{{audience.id}}-con-exclude">
@@ -390,6 +430,12 @@
         </div>
     </div>
     <div class="group-footer">
+        <div class="msg mdl-color-text--accent" ng-if="audience.error">
+            {{audience.error.error_user_msg}}
+        </div>
+        <div class="msg" ng-if="!audience.error">
+            Potential Reach: {{audience.info.users.toLocaleString()}} people
+        </div>
         <div class="group-footer-spacer"></div>
         <button
             ng-if="!group.active"
@@ -406,7 +452,7 @@
             Reset
         </button>
         <button
-            ng-disabled="!user.is_admin"
+            ng-disabled="audience.error"
             type="submit"
             class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
             Save

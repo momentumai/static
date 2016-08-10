@@ -214,6 +214,15 @@ momentum.controller('AudiencesController', [
             });
         };
 
+        $scope.deleteCustomAudienceExclude = function (audience, id) {
+            var d = audience.data,
+                ca = d.excluded_custom_audiences || [];
+
+            d.excluded_custom_audiences = ca.filter(function (act) {
+                return act.id && act.id !== id;
+            });
+        };
+
         $scope.addCustomAudience = function (audience) {
             if (audience.$caValue) {
                 makeIfFalsy(audience.data, 'custom_audiences', []);
@@ -222,20 +231,34 @@ momentum.controller('AudiencesController', [
                 });
             }
             delete audience.$caValue;
+            $scope.verify(audience);
+        };
+
+        $scope.addCustomAudienceExclude = function (audience) {
+            if (audience.$caExcludeValue) {
+                makeIfFalsy(audience.data, 'excluded_custom_audiences', []);
+                audience.data.excluded_custom_audiences.push({
+                    'id': audience.$caExcludeValue
+                });
+            }
+            delete audience.$caExcludeValue;
+            $scope.verify(audience);
         };
 
         $scope.filteredCustomAudiences = function (audience) {
             var ad = audience.data,
-                ca = ad.custom_audiences || [];
+                ca = ad.custom_audiences || [],
+                cae = ad.excluded_custom_audiences || [],
+                arr = ca.concat(cae);
 
-            ca = ca.map(
+            arr = arr.map(
                 function (act) {
                     return act.id;
                 }
             ) || [];
 
             return $scope.customAudiences.filter(function (act) {
-                return !act.id || ca.indexOf(act.id) === -1;
+                return !act.id || arr.indexOf(act.id) === -1;
             });
         };
 
@@ -325,10 +348,11 @@ momentum.controller('AudiencesController', [
                 ).then(function (res) {
                     $scope.customAudiences = res.data;
                     $scope.customAudiences.unshift({
-                        'name': 'Add custom audience'
+                        'name': 'Choose an audience'
                     });
                     willOpen.open = 1;
                     asset.audiences.isOpen = 1;
+                    $scope.verify(willOpen);
                 });
             }
         };
@@ -612,6 +636,7 @@ momentum.controller('AudiencesController', [
                 self.audience.$flexibleSpec = getFlexibleSpec(self.audience);
                 $scope.$apply();
             }
+            $scope.verify(self.audience);
         };
 
         $scope.deleteDetail = function (audience, det, index) {
@@ -671,6 +696,7 @@ momentum.controller('AudiencesController', [
             aud.$cons = getConnections(aud);
 
             $scope.$apply();
+            $scope.verify(aud);
         };
 
         $scope.addAudienceConnectionFriend = function (aud, value) {
@@ -694,6 +720,7 @@ momentum.controller('AudiencesController', [
             aud.$consFriend = getConnectionsFriend(aud);
 
             $scope.$apply();
+            $scope.verify(aud);
         };
 
         $scope.addAudienceConnectionExclude = function (aud, value) {
@@ -717,6 +744,7 @@ momentum.controller('AudiencesController', [
             aud.$consExclude = getConnectionsExclude(aud);
 
             $scope.$apply();
+            $scope.verify(aud);
         };
 
         $scope.deleteConnection = function (audience, lang) {
@@ -778,6 +806,7 @@ momentum.controller('AudiencesController', [
             aud.$langs = getLanguages(aud);
 
             $scope.$apply();
+            $scope.verify(aud);
         };
 
         $scope.addAudienceLocation = function (aud, value) {
@@ -848,6 +877,7 @@ momentum.controller('AudiencesController', [
             aud.$locations = getLocations(aud);
 
             $scope.$apply();
+            $scope.verify(aud);
         };
 
         $scope.deleteLanguage = function (audience, lang) {
@@ -898,6 +928,10 @@ momentum.controller('AudiencesController', [
         $scope.openDetailBrowse = function (aud, index) {
             var model = {};
 
+            model.audience = aud;
+
+            model.selected = [];
+
             model.query = function (key) {
                 return model.data.filter(function (act) {
                     return act.key !== '__ROOT__' &&
@@ -908,7 +942,7 @@ momentum.controller('AudiencesController', [
             model.getChecked = function () {
                 return model.data.filter(function (act) {
                     return act.checked;
-                });
+                }).concat(model.selected);
             };
 
             model.formatNumber = function (num) {
@@ -921,6 +955,52 @@ momentum.controller('AudiencesController', [
                 n = String(n);
 
                 return n.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            };
+
+            model.querySearch = function (value, item) {
+                return fb.get([
+                    '/',
+                    model.audience.ad_account,
+                    '/targetingsearch?q=',
+                    value,
+                    '&limit_type=',
+                    item.type
+                ].join(''),
+                    $scope.user.fb_access_token
+                ).then(function (res) {
+                    return res.data;
+                });
+            };
+
+            model.searchMouseEnter = function (item) {
+                model.desc = item;
+            };
+
+            model.searchMouseLeave = function () {
+                model.desc = null;
+            };
+
+            model.resetSearch = function () {
+                model.desc = null;
+                model.search = null;
+                model.$searchValue = null;
+            };
+
+            model.searchClick = function (self, item) {
+                model.$searchValue = null;
+                model.desc = null;
+                model.selected = model.selected.filter(function (act) {
+                    return act.id !== item.id;
+                });
+                item.path.splice(-1, 1);
+                model.selected.push(item);
+            };
+
+            model.delete = function (item) {
+                item.checked = false;
+                model.selected = model.selected.filter(function (act) {
+                    return act.id !== item.id;
+                });
             };
 
             return fb.get(
@@ -951,6 +1031,23 @@ momentum.controller('AudiencesController', [
 
                     aud.$flexibleSpec = getFlexibleSpec(aud);
                 });
+            });
+        };
+
+        $scope.verify = function (aud) {
+            return fb.get([
+                '/',
+                aud.ad_account,
+                '/reachestimate?optimize_for=LINK_CLICKS&targeting_spec=',
+                JSON.stringify(aud.data)
+            ].join(''),
+                $scope.user.fb_access_token
+            ).then(function (res) {
+                aud.info = res.data;
+                delete aud.error;
+            }).catch(function (err) {
+                aud.error = err;
+                delete aud.info;
             });
         };
 
