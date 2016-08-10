@@ -317,9 +317,11 @@
                 <li
                     class="mdl-list__item"
                     ng-repeat="con in audience.$cons track by con.id">
-                    <span class="mdl-list__item-primary-content">
-                        {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
-                    </span>
+                    <div class="mdl-list__item-primary-content">
+                        <div style="width: 100%">
+                            {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
+                        </div>
+                    </div>
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
@@ -356,9 +358,11 @@
                 <li
                     class="mdl-list__item"
                     ng-repeat="con in audience.$consFriend track by con.id">
-                    <span class="mdl-list__item-primary-content">
-                        {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
-                    </span>
+                    <div class="mdl-list__item-primary-content">
+                        <div style="width: 100%">
+                            {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
+                        </div>
+                    </div>
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
@@ -395,9 +399,11 @@
                 <li
                     class="mdl-list__item"
                     ng-repeat="con in audience.$consExclude track by con.id">
-                    <span class="mdl-list__item-primary-content">
-                        {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
-                    </span>
+                    <div class="mdl-list__item-primary-content">
+                        <div style="width: 100%">
+                            {{con.name}} (<span class="uppercase-first">{{con.type}}</span>)
+                        </div>
+                    </div>
                     <span class="mdl-list__item-secondary-content">
                         <a
                             class="rule-delete mdl-list__item-secondary-action"
@@ -423,15 +429,13 @@
             </div>
         </div>
     </div>
-    <div class="group-content">
-        <div class="group-title" ng-if="audience.error">
+    <div class="group-footer">
+        <div class="msg mdl-color-text--accent" ng-if="audience.error">
             {{audience.error.error_user_msg}}
         </div>
-        <div class="group-title" ng-if="!audience.error">
+        <div class="msg" ng-if="!audience.error">
             Potential Reach: {{audience.info.users.toLocaleString()}} people
         </div>
-    </div>
-    <div class="group-footer">
         <div class="group-footer-spacer"></div>
         <button
             ng-if="!group.active"
