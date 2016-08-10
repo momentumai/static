@@ -985,7 +985,6 @@ momentum.controller('AudiencesController', [
         };
 
         $scope.verify = function (aud) {
-            console.log(aud);
             return fb.get([
                 '/',
                 aud.ad_account,
