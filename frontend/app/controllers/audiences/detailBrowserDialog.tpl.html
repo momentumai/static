@@ -1,5 +1,35 @@
 <div class="cont">
-    <div class="split first">
+    <div ng-if="model.search" class="split first" mdl-upgrade>
+        <div class="search">
+            <div class="header">
+                <button
+                    ng-click="$event.stopPropagation(); model.resetSearch()"
+                    class="mdl-button mdl-js-button mdl-button--icon">
+                    <i class="material-icons">arrow_back</i>
+                </button>
+                <div class="field mdl-textfield mdl-js-textfield">
+                    <input auto-complete="model.querySearch"
+                        ng-model="model.$searchValue"
+                        item-template="detailBrowserDialogSearchItem.tpl.html"
+                        item-action="model.searchClick"
+                        item-action-self="model.search"
+                        container="dialog-browser-results"
+                        container-class="dialog-search-ac"
+                        mouse-enter="model.searchMouseEnter"
+                        mouse-leave="model.searchMouseLeave"
+                        class="mdl-textfield__input"
+                        type="text"
+                        id="{{model.search.type}}-sf">
+                    <label
+                        class="mdl-textfield__label"
+                        for="{{model.search.type}}-sf">Search {{model.search.name}}</label>
+                </div>
+            </div>
+            <div id="dialog-browser-results" class="results">
+            </div>
+        </div>
+    </div>
+    <div ng-if="!model.search" class="split first">
         <ul class="db-ul" ng-init="item = {'key': '__ROOT__'}"
             ng-include="'detailBrowserDialogHelper.tpl.html'"></ul>
     </div>
@@ -14,7 +44,7 @@
                 <span class="mdl-list__item-secondary-content">
                     <a
                         class="mdl-list__item-secondary-action"
-                        ng-click="item.checked = false"
+                        ng-click="model.delete(item)"
                         href="javascript:void(0)">
                         <i class="material-icons">delete_forever</i>
                     </a>

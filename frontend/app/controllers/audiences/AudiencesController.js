@@ -919,6 +919,10 @@ momentum.controller('AudiencesController', [
         $scope.openDetailBrowse = function (aud, index) {
             var model = {};
 
+            model.audience = aud;
+
+            model.selected = [];
+
             model.query = function (key) {
                 return model.data.filter(function (act) {
                     return act.key !== '__ROOT__' &&
@@ -929,7 +933,7 @@ momentum.controller('AudiencesController', [
             model.getChecked = function () {
                 return model.data.filter(function (act) {
                     return act.checked;
-                });
+                }).concat(model.selected);
             };
 
             model.formatNumber = function (num) {
@@ -942,6 +946,52 @@ momentum.controller('AudiencesController', [
                 n = String(n);
 
                 return n.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            };
+
+            model.querySearch = function (value, item) {
+                return fb.get([
+                    '/',
+                    model.audience.ad_account,
+                    '/targetingsearch?q=',
+                    value,
+                    '&limit_type=',
+                    item.type
+                ].join(''),
+                    $scope.user.fb_access_token
+                ).then(function (res) {
+                    return res.data;
+                });
+            };
+
+            model.searchMouseEnter = function (item) {
+                model.desc = item;
+            };
+
+            model.searchMouseLeave = function () {
+                model.desc = null;
+            };
+
+            model.resetSearch = function () {
+                model.desc = null;
+                model.search = null;
+                model.$searchValue = null;
+            };
+
+            model.searchClick = function (self, item) {
+                model.$searchValue = null;
+                model.desc = null;
+                model.selected = model.selected.filter(function (act) {
+                    return act.id !== item.id;
+                });
+                item.path.splice(-1, 1);
+                model.selected.push(item);
+            };
+
+            model.delete = function (item) {
+                item.checked = false;
+                model.selected = model.selected.filter(function (act) {
+                    return act.id !== item.id;
+                });
             };
 
             return fb.get(

@@ -12,6 +12,10 @@ momentum.directive('autoComplete', [
                 var element = $element[0],
                     pos = element.getBoundingClientRect();
 
+                if ($scope.container) {
+                    return;
+                }
+
                 cont.style.left = pos.left + 'px';
                 /* header height */
                 cont.style.top = (pos.bottom - 64 + outerDiv.scrollTop) + 'px';
@@ -33,6 +37,16 @@ momentum.directive('autoComplete', [
                     ),
                     element = document.createElement('div');
 
+                if ($scope.mouseEnter) {
+                    scope.mouseEnter = $scope.mouseEnter.bind(null, item);
+                }
+
+                if ($scope.mouseLeave) {
+                    scope.mouseLeave = $scope.mouseLeave.bind(null, item);
+                }
+
+                scope.mouseLeave = $scope.mouseLeave;
+
                 element.innerHTML = template;
 
                 element.addEventListener('mouseenter', function () {
@@ -45,9 +59,9 @@ momentum.directive('autoComplete', [
 
                 element.addEventListener('mousedown', function (e) {
                     e.preventDefault();
+
                     click(self, item);
-                    cont.innerHTML = '';
-                    $(cont).addClass('empty');
+
                     $timeout(function () {
                         recalcPosition(cont, outerDiv);
                     });
@@ -65,12 +79,13 @@ momentum.directive('autoComplete', [
                     itemTpl = $templateCache.get($scope.itemTemplate),
                     outerDiv;
 
-                cont.style.position = 'absolute';
-                cont.style.zIndex = 99999;
-                cont.style.boxSizing = 'border-box';
                 cont.className = $scope.containerClass;
 
-                outerDiv = document.body.getElementsByTagName('main')[0];
+                if (!$scope.container) {
+                    outerDiv = document.body.getElementsByTagName('main')[0];
+                } else {
+                    outerDiv = document.getElementById($scope.container);
+                }
 
                 recalcPosition(cont, outerDiv);
 
@@ -119,8 +134,10 @@ momentum.directive('autoComplete', [
                 });
 
                 element.addEventListener('blur', function () {
-                    cont.innerHTML = '';
-                    $(cont).addClass('empty');
+                    if (!$scope.container) {
+                        cont.innerHTML = '';
+                        $(cont).addClass('empty');
+                    }
                 });
 
                 $element.on('$destroy', function () {
@@ -136,10 +153,13 @@ momentum.directive('autoComplete', [
                 'initGetter': '=initQuery',
                 'itemTemplate': '@itemTemplate',
                 'containerClass': '@containerClass',
+                'container': '@container',
                 'value': '=ngModel',
                 'itemAction': '=itemAction',
                 'itemActionSelf': '=itemActionSelf',
-                'searchParams': '=itemParams'
+                'searchParams': '=itemParams',
+                'mouseEnter': '=mouseEnter',
+                'mouseLeave': '=mouseLeave'
             },
             'link': link
         };

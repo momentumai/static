@@ -10,7 +10,10 @@
     }
 }
 
-.audience-locations, .audience-languages, .audience-details, .audience-cons {
+.audience-ac {
+    position: absolute;
+    z-index: 99999;
+    box-sizing: border-box;
 
     &.empty {
         display: none;
@@ -35,6 +38,7 @@
         cursor: pointer;
         display: flex;
         border-bottom: 1px solid unquote("rgb(#{$palette-grey-200})");
+        padding: 4px 8px;
         .name {
             flex-grow: 1;
             flex-shrink: 1;
@@ -44,6 +48,8 @@
             padding-left: 8px;
             flex-grow: 0;
             flex-shrink: 0;
+            font-size: 14px;
+            color: unquote("rgb(#{$palette-grey-600})");
         }
     }
     .audience-con-item > .type::first-letter,
