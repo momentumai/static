@@ -63,6 +63,11 @@
 
     .detail-button {
         margin-bottom: 16px;
+        &-sep {
+            vertical-align: middle;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
     }
 
     .uppercase-first::first-letter {
@@ -149,6 +154,14 @@
                 width: calc(100% - 32px);
                 margin-left: 16px;
             }
+
+            .dropdown.loc-method {
+                margin-right: 8px;
+                select {
+                    height: 27px;
+                }
+            }
+
             &-input {
                 display: flex;
             }
