@@ -231,6 +231,7 @@ momentum.controller('AudiencesController', [
                 });
             }
             delete audience.$caValue;
+            $scope.verify(audience);
         };
 
         $scope.addCustomAudienceExclude = function (audience) {
@@ -241,6 +242,7 @@ momentum.controller('AudiencesController', [
                 });
             }
             delete audience.$caExcludeValue;
+            $scope.verify(audience);
         };
 
         $scope.filteredCustomAudiences = function (audience) {
@@ -350,6 +352,7 @@ momentum.controller('AudiencesController', [
                     });
                     willOpen.open = 1;
                     asset.audiences.isOpen = 1;
+                    $scope.verify(willOpen);
                 });
             }
         };
@@ -633,6 +636,7 @@ momentum.controller('AudiencesController', [
                 self.audience.$flexibleSpec = getFlexibleSpec(self.audience);
                 $scope.$apply();
             }
+            $scope.verify(self.audience);
         };
 
         $scope.deleteDetail = function (audience, det, index) {
@@ -692,6 +696,7 @@ momentum.controller('AudiencesController', [
             aud.$cons = getConnections(aud);
 
             $scope.$apply();
+            $scope.verify(aud);
         };
 
         $scope.addAudienceConnectionFriend = function (aud, value) {
@@ -715,6 +720,7 @@ momentum.controller('AudiencesController', [
             aud.$consFriend = getConnectionsFriend(aud);
 
             $scope.$apply();
+            $scope.verify(aud);
         };
 
         $scope.addAudienceConnectionExclude = function (aud, value) {
@@ -738,6 +744,7 @@ momentum.controller('AudiencesController', [
             aud.$consExclude = getConnectionsExclude(aud);
 
             $scope.$apply();
+            $scope.verify(aud);
         };
 
         $scope.deleteConnection = function (audience, lang) {
@@ -799,6 +806,7 @@ momentum.controller('AudiencesController', [
             aud.$langs = getLanguages(aud);
 
             $scope.$apply();
+            $scope.verify(aud);
         };
 
         $scope.addAudienceLocation = function (aud, value) {
@@ -869,6 +877,7 @@ momentum.controller('AudiencesController', [
             aud.$locations = getLocations(aud);
 
             $scope.$apply();
+            $scope.verify(aud);
         };
 
         $scope.deleteLanguage = function (audience, lang) {
@@ -975,7 +984,8 @@ momentum.controller('AudiencesController', [
             });
         };
 
-        $scope.verifyAudience = function (aud) {
+        $scope.verify = function (aud) {
+            console.log(aud);
             return fb.get([
                 '/',
                 aud.ad_account,
@@ -984,9 +994,11 @@ momentum.controller('AudiencesController', [
             ].join(''),
                 $scope.user.fb_access_token
             ).then(function (res) {
-                console.log('res', res);
+                aud.info = res.data;
+                delete aud.error;
             }).catch(function (err) {
-                console.error('err', err);
+                aud.error = err;
+                delete aud.info;
             });
         };
 
