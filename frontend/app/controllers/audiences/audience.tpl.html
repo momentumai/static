@@ -297,12 +297,77 @@
                 </button>
             </div>
             <button
+                ng-if="$last && !audience.$excludeOpen"
+                type="button"
+                class="detail-button mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored"
+                ng-click="$event.stopPropagation(); audience.$excludeOpen = 1">
+                Exclude people
+            </button>
+            <span
+                class="detail-button-sep"
+                ng-if="$last &&
+                    flex.length &&
+                    !audience.$excludeOpen">or</span>
+            <button
                 ng-if="$last && flex.length"
                 type="button"
                 class="detail-button mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored"
                 ng-click="$event.stopPropagation(); addNewDetailGroup(audience)">
                 Narrow audience
             </button>
+        </div>
+    </div>
+    <div
+        class="group-content-input"
+        ng-if="audience.$excludeOpen" mdl-upgrade>
+        <div class="group-content-label"></div>
+        <div class="group-content-value">
+            <div class="group-content-help">
+                EXCLUDE people who match at least ONE of the following
+            </div>
+            <ul class="mdl-list audience-list">
+                <li
+                    class="mdl-list__item"
+                    ng-repeat="detail in audience.$flexibleSpecEx track by detail.id">
+                    <span class="mdl-list__item-primary-content">
+                        {{detail.name}} ({{detail.path}})
+                    </span>
+                    <span class="mdl-list__item-secondary-content">
+                        <a
+                            class="rule-delete mdl-list__item-secondary-action"
+                            ng-click="deleteDetailEx(audience, detail); verify(audience);"
+                            href="javascript:void(0)">
+                            <i class="material-icons">delete_forever</i>
+                        </a>
+                    </span>
+                </li>
+            </ul>
+            <div class="audience-name multi">
+                <div class="mdl-textfield mdl-js-textfield">
+                    <input auto-complete="queryDetail"
+                        ng-model="audience.$detExValue"
+                        item-template="detailItem.tpl.html"
+                        item-action="addAudienceDetailEx"
+                        item-action-self="{
+                            'audience': audience
+                        }"
+                        container-class="audience-ac"
+                        class="mdl-textfield__input"
+                        type="text"
+                        id="{{audience.id}}-detail-ex">
+                    <label
+                        class="mdl-textfield__label"
+                        for="{{audience.id}}-detail-ex">
+                        Add detailed target
+                    </label>
+                </div>
+                <button
+                    type="button"
+                    class="mdl-button mdl-js-button mdl-js-ripple-effect"
+                    ng-click="$event.stopPropagation(); openDetailExcludeBrowse(audience);">
+                    Browse
+                </button>
+            </div>
         </div>
     </div>
     <div class="group-content-input no-border">

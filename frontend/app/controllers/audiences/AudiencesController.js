@@ -163,6 +163,21 @@ momentum.controller('AudiencesController', [
             return result;
         }
 
+        function getFlexibleSpecEx (aud) {
+            makeIfFalsy(aud, 'meta', {});
+            makeIfFalsy(aud.meta, 'details_ex', {});
+
+            return Object.keys(aud.meta.details_ex).reduce(function (prev, id) {
+                prev.push({
+                    'id': id,
+                    'name': aud.meta.details_ex[id].name,
+                    'type': aud.meta.details_ex[id].type,
+                    'path': aud.meta.details_ex[id].path
+                });
+                return prev;
+            }, []);
+        }
+
         function getAgeData () {
             var ret = [],
                 i = 13;
@@ -332,6 +347,10 @@ momentum.controller('AudiencesController', [
                 willOpen.$ageMaxValue = willOpen.data.age_max || 65;
                 willOpen.$locations = getLocations(willOpen);
                 willOpen.$flexibleSpec = getFlexibleSpec(willOpen);
+                willOpen.$flexibleSpecEx = getFlexibleSpecEx(willOpen);
+                if (willOpen.$flexibleSpecEx.length) {
+                    willOpen.$excludeOpen = 1;
+                }
                 willOpen.$langs = getLanguages(willOpen);
                 willOpen.$gnValue = getGender(willOpen);
                 willOpen.$loTypeValue = getlocationType(willOpen);
@@ -639,6 +658,38 @@ momentum.controller('AudiencesController', [
             $scope.verify(self.audience);
         };
 
+        $scope.addAudienceDetailEx = function (self, value, internal) {
+            var ex,
+                arr;
+
+            makeIfFalsy(self.audience.data, 'exclusions', {});
+            ex = self.audience.data.exclusions;
+
+            makeIfFalsy(ex, value.type, []);
+            makeIfFalsy(self.audience, 'meta', {});
+            makeIfFalsy(self.audience.meta, 'details_ex', {});
+
+            arr = ex[value.type];
+
+            if (arr.indexOf(value.id) === -1) {
+                arr.push(value.id);
+                self.audience.meta.details_ex[value.id] = {
+                    'name': value.name,
+                    'type': value.type,
+                    'path': value.path.slice(0, -1).join('/')
+                };
+            }
+
+            if (!internal) {
+                self.audience.$detExValue = '';
+                self.audience.$flexibleSpecEx = getFlexibleSpecEx(
+                    self.audience
+                );
+                $scope.$apply();
+            }
+            $scope.verify(self.audience);
+        };
+
         $scope.deleteDetail = function (audience, det, index) {
             var details = audience.meta.details[index],
                 data = audience.data.flexible_spec[index],
@@ -665,6 +716,28 @@ momentum.controller('AudiencesController', [
             }
 
             audience.$flexibleSpec = getFlexibleSpec(audience);
+        };
+
+        $scope.deleteDetailEx = function (audience, det) {
+            var details = audience.meta.details_ex,
+                data = audience.data.exclusions;
+
+            delete details[det.id];
+
+            data[det.type] = data[det.type].filter(function (c) {
+                return c !== det.id;
+            });
+
+            if (!data[det.type].length) {
+                delete data[det.type];
+            }
+
+            if (!Object.keys(data).length) {
+                delete audience.meta.details_ex;
+                audience.$excludeOpen = 0;
+            }
+
+            audience.$flexibleSpecEx = getFlexibleSpecEx(audience);
         };
 
         $scope.addNewDetailGroup = function (aud) {
@@ -925,7 +998,7 @@ momentum.controller('AudiencesController', [
             audience.$locations = getLocations(audience);
         };
 
-        $scope.openDetailBrowse = function (aud, index) {
+        function getDetailBrowseModel (aud) {
             var model = {};
 
             model.audience = aud;
@@ -1003,6 +1076,12 @@ momentum.controller('AudiencesController', [
                 });
             };
 
+            return model;
+        }
+
+        $scope.openDetailBrowse = function (aud, index) {
+            var model = getDetailBrowseModel(aud);
+
             return fb.get(
                 [
                     '/',
@@ -1030,6 +1109,39 @@ momentum.controller('AudiencesController', [
                     });
 
                     aud.$flexibleSpec = getFlexibleSpec(aud);
+                });
+            });
+        };
+
+        $scope.openDetailExcludeBrowse = function (aud) {
+            var model = getDetailBrowseModel(aud);
+
+            return fb.get(
+                [
+                    '/',
+                    aud.ad_account,
+                    '/targetingbrowse?include_nodes=true'
+                ].join(''),
+                $scope.user.fb_access_token
+            ).then(function (res) {
+                model.data = res.data;
+                return dialog.open({
+                    'template': 'detailBrowserDialog.tpl.html',
+                    'model': model,
+                    'dialogClass': 'detail-browser',
+                    'showCancel': true,
+                    'okText': 'Add targets'
+                }).then(function () {
+                    var checked = model.getChecked();
+
+                    checked.forEach(function (c) {
+                        c.path.push(null);
+                        $scope.addAudienceDetailEx({
+                            'audience': aud
+                        }, c, 1);
+                    });
+
+                    aud.$flexibleSpecEx = getFlexibleSpecEx(aud);
                 });
             });
         };

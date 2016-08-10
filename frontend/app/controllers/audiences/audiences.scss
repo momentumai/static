@@ -63,6 +63,11 @@
 
     .detail-button {
         margin-bottom: 16px;
+        &-sep {
+            vertical-align: middle;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
     }
 
     .uppercase-first::first-letter {
