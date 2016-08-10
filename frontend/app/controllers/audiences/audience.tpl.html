@@ -441,5 +441,11 @@
             class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
             Save
         </button>
+        <button
+            type="button"
+            class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored"
+            ng-click="$event.stopPropagation(); verifyAudience(audience)">
+            Verify audience
+        </button>
     </div>
 </form>

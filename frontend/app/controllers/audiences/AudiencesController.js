@@ -975,6 +975,21 @@ momentum.controller('AudiencesController', [
             });
         };
 
+        $scope.verifyAudience = function (aud) {
+            return fb.get([
+                '/',
+                aud.ad_account,
+                '/reachestimate?optimize_for=LINK_CLICKS&targeting_spec=',
+                JSON.stringify(aud.data)
+            ].join(''),
+                $scope.user.fb_access_token
+            ).then(function (res) {
+                console.log('res', res);
+            }).catch(function (err) {
+                console.error('err', err);
+            });
+        };
+
         if ($scope.loaded) {
             init();
         } else {
