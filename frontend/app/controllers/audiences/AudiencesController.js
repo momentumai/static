@@ -3,9 +3,10 @@ momentum.controller('AudiencesController', [
     '$q',
     '$scope',
     'audience',
+    'dialog',
     'toast',
     'fb',
-    function ($q, $scope, audience, toast, fb) {
+    function ($q, $scope, audience, dialog, toast, fb) {
         $scope.viewLoaded = 0;
 
         $scope.assets = null;
@@ -577,7 +578,7 @@ momentum.controller('AudiencesController', [
             });
         };
 
-        $scope.addAudienceDetail = function (self, value) {
+        $scope.addAudienceDetail = function (self, value, internal) {
             var arr,
                 flexSpec,
                 flex;
@@ -606,10 +607,11 @@ momentum.controller('AudiencesController', [
                 };
             }
 
-            self.flex.$detValue = '';
-            self.audience.$flexibleSpec = getFlexibleSpec(self.audience);
-
-            $scope.$apply();
+            if (!internal) {
+                self.flex.$detValue = '';
+                self.audience.$flexibleSpec = getFlexibleSpec(self.audience);
+                $scope.$apply();
+            }
         };
 
         $scope.deleteDetail = function (audience, det, index) {
@@ -891,6 +893,65 @@ momentum.controller('AudiencesController', [
             }
 
             audience.$locations = getLocations(audience);
+        };
+
+        $scope.openDetailBrowse = function (aud, index) {
+            var model = {};
+
+            model.query = function (key) {
+                return model.data.filter(function (act) {
+                    return act.key !== '__ROOT__' &&
+                        act.parent === key;
+                });
+            };
+
+            model.getChecked = function () {
+                return model.data.filter(function (act) {
+                    return act.checked;
+                });
+            };
+
+            model.formatNumber = function (num) {
+                var n = Number(num);
+
+                if (!n) {
+                    return '?';
+                }
+
+                n = String(n);
+
+                return n.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            };
+
+            return fb.get(
+                [
+                    '/',
+                    aud.ad_account,
+                    '/targetingbrowse?include_nodes=true'
+                ].join(''),
+                $scope.user.fb_access_token
+            ).then(function (res) {
+                model.data = res.data;
+                return dialog.open({
+                    'template': 'detailBrowserDialog.tpl.html',
+                    'model': model,
+                    'dialogClass': 'detail-browser',
+                    'showCancel': true,
+                    'okText': 'Add targets'
+                }).then(function () {
+                    var checked = model.getChecked();
+
+                    checked.forEach(function (c) {
+                        c.path.push(null);
+                        $scope.addAudienceDetail({
+                            'audience': aud,
+                            'index': index
+                        }, c, 1);
+                    });
+
+                    aud.$flexibleSpec = getFlexibleSpec(aud);
+                });
+            });
         };
 
         if ($scope.loaded) {
