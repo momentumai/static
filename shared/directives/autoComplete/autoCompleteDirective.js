@@ -76,14 +76,21 @@ momentum.directive('autoComplete', [
 
                 outerDiv.appendChild(cont);
 
-                function valueChange (value) {
-                    if (!value) {
+                function valueChange (value, oldValue) {
+                    var getter = $scope.getter;
+
+                    if (!value &&
+                        oldValue &&
+                        typeof $scope.initGetter === 'function'
+                    ) {
+                        getter = $scope.initGetter;
+                    } else if (!value) {
                         cont.innerHTML = '';
                         $(cont).addClass('empty');
                         return;
                     }
 
-                    $scope.getter(
+                    getter(
                         value,
                         $scope.itemActionSelf
                     ).then(function (res) {
@@ -104,12 +111,11 @@ momentum.directive('autoComplete', [
                         }
                     });
                 }
-
                 $scope.$watch('value', valueChange);
 
                 element.addEventListener('focus', function () {
                     recalcPosition(cont, outerDiv);
-                    valueChange($scope.value);
+                    valueChange($scope.value, 'init');
                 });
 
                 element.addEventListener('blur', function () {
@@ -127,6 +133,7 @@ momentum.directive('autoComplete', [
             'restrict': 'A',
             'scope': {
                 'getter': '=autoComplete',
+                'initGetter': '=initQuery',
                 'itemTemplate': '@itemTemplate',
                 'containerClass': '@containerClass',
                 'value': '=ngModel',
