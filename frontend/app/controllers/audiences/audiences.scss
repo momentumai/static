@@ -154,6 +154,14 @@
                 width: calc(100% - 32px);
                 margin-left: 16px;
             }
+
+            .dropdown.loc-method {
+                margin-right: 8px;
+                select {
+                    height: 27px;
+                }
+            }
+
             &-input {
                 display: flex;
             }

@@ -52,55 +52,36 @@ momentum.controller('AudiencesController', [
             return aud.meta.connections_exclude;
         }
 
-        function getLocations (aud) {
-            var loc = aud.data.geo_locations || {},
-                cities = loc.cities || [],
-                regions = loc.regions || [],
-                zips = loc.zips || [],
-                countries = loc.countries || [];
+        function getLocations (aud, exclude) {
+            var loc = aud.data.geo_locations || {};
 
-            return [].concat(
-                cities.map(function (act) {
-                    return {
-                        'id': act.key,
-                        'type': 'city',
-                        'name': aud.meta[[
-                            'city',
-                            act.key
-                        ].join('_')]
-                    };
-                }),
-                regions.map(function (act) {
-                    return {
-                        'id': act.key,
-                        'type': 'region',
-                        'name': aud.meta[[
-                            'region',
-                            act.key
-                        ].join('_')]
-                    };
-                }),
-                zips.map(function (act) {
-                    return {
-                        'id': act.key,
-                        'type': 'zip',
-                        'name': aud.meta[[
-                            'zip',
-                            act.key
-                        ].join('_')]
-                    };
-                }),
-                countries.map(function (act) {
-                    return {
-                        'id': act,
-                        'type': 'country',
-                        'name': aud.meta[[
-                            'country',
-                            act
-                        ].join('_')]
-                    };
-                })
-            );
+            if (exclude) {
+                loc = aud.data.excluded_geo_locations || {};
+            }
+
+            return Object.keys(loc).reduce(function (prev, act) {
+                prev = prev.concat(
+                    loc[act].map(function (l) {
+                        if (act === 'countries') {
+                            return {
+                                'id': l,
+                                'type': 'countries',
+                                'name': aud.meta[['countries', l].join('_')]
+                            };
+                        }
+
+                        return {
+                            'id': l.key,
+                            'type': act,
+                            'name': aud.meta[[act, l.key].join('_')]
+                        };
+                    })
+                );
+
+                return prev;
+            }, []).filter(function (act) {
+                return act.type !== 'location_types';
+            });
         }
 
         function getGender (aud) {
@@ -190,6 +171,20 @@ momentum.controller('AudiencesController', [
             }
 
             return ret;
+        }
+
+        function getLocationFormat (value) {
+            var ret = [];
+
+            ret.push(value.country_name);
+
+            if (value.region) {
+                ret.unshift(value.region);
+            }
+
+            ret.unshift(value.name);
+
+            return ret.join(', ');
         }
 
         $scope.ageData = getAgeData();
@@ -346,6 +341,8 @@ momentum.controller('AudiencesController', [
                 willOpen.$ageMinValue = willOpen.data.age_min || 18;
                 willOpen.$ageMaxValue = willOpen.data.age_max || 65;
                 willOpen.$locations = getLocations(willOpen);
+                willOpen.$locationsEx = getLocations(willOpen, 1);
+                willOpen.$locMethod = 'geo_locations';
                 willOpen.$flexibleSpec = getFlexibleSpec(willOpen);
                 willOpen.$flexibleSpecEx = getFlexibleSpecEx(willOpen);
                 if (willOpen.$flexibleSpecEx.length) {
@@ -488,19 +485,27 @@ momentum.controller('AudiencesController', [
         };
 
         $scope.queryLocation = function (value) {
+            var typeMap = {
+                'country': 'countries',
+                'region': 'regions',
+                'city': 'cities',
+                'zip': 'zips',
+                'custom_location': 'custom_locations',
+                'geo_market': 'geo_markets',
+                'electoral_district': 'electoral_districts',
+                'country_group': 'country_groups'
+            };
+
             return fb.get([
                 '/search?type=adgeolocation&q=',
                 value
             ].join(''),
                 $scope.user.fb_access_token
             ).then(function (res) {
-                return res.data.filter(function (act) {
-                    return [
-                        'city',
-                        'country',
-                        'region',
-                        'zip'
-                    ].indexOf(act.type) !== -1;
+                return res.data.map(function (act) {
+                    act.type = typeMap[act.type];
+                    act.display = getLocationFormat(act);
+                    return act;
                 });
             });
         };
@@ -882,72 +887,55 @@ momentum.controller('AudiencesController', [
             $scope.verify(aud);
         };
 
+        function checkLocation (aud, id, country) {
+            function checkObject (obj) {
+                return Object.keys(obj || {}).reduce(function (prev, param) {
+                    prev += obj[param].filter(function (act) {
+                        if (country) {
+                            return act === id;
+                        }
+                        return act.key === id;
+                    }).length;
+
+                    return prev;
+                }, 0);
+            }
+
+            return checkObject(aud.data.geo_locations) ||
+                checkObject(aud.data.excluded_geo_locations);
+        }
+
         $scope.addAudienceLocation = function (aud, value) {
             var hash = [value.type, value.key].join('_'),
                 arr,
                 elem;
 
-            makeIfFalsy(aud.data, 'geo_locations', {});
+            makeIfFalsy(aud.data, aud.$locMethod, {});
             makeIfFalsy(aud, 'meta', {});
 
-            if (value.type === 'country') {
-                makeIfFalsy(aud.data.geo_locations, 'countries', []);
-                arr = aud.data.geo_locations.countries;
+            if (value.type === 'countries') {
+                makeIfFalsy(aud.data[aud.$locMethod], 'countries', []);
+                arr = aud.data[aud.$locMethod].countries;
+                elem = checkLocation(aud, value.key, 1);
                 if (arr.indexOf(value.key) === -1) {
-                    aud.data.geo_locations.countries.push(value.key);
+                    aud.data[aud.$locMethod].countries.push(value.key);
                     aud.meta[hash] = value.name;
                 }
-            } else if (value.type === 'region') {
-                makeIfFalsy(aud.data.geo_locations, 'regions', []);
-                arr = aud.data.geo_locations.regions;
-                elem = arr.filter(function (e) {
-                    return e.key === value.key;
-                })[0];
+            } else {
+                makeIfFalsy(aud.data[aud.$locMethod], value.type, []);
+                arr = aud.data[aud.$locMethod][value.type];
+                elem = checkLocation(aud, value.key);
                 if (!elem) {
                     arr.push({
                         'key': value.key
                     });
-                    aud.meta[hash] = [
-                        value.name,
-                        value.country_name
-                    ].join(', ');
-                }
-            } else if (value.type === 'city') {
-                makeIfFalsy(aud.data.geo_locations, 'cities', []);
-                arr = aud.data.geo_locations.cities;
-                elem = arr.filter(function (e) {
-                    return e.key === value.key;
-                })[0];
-                if (!elem) {
-                    arr.push({
-                        'key': value.key
-                    });
-                    aud.meta[hash] = [
-                        value.name,
-                        value.region,
-                        value.country_name
-                    ].join(', ');
-                }
-            } else if (value.type === 'zip') {
-                makeIfFalsy(aud.data.geo_locations, 'zips', []);
-                arr = aud.data.geo_locations.zips;
-                elem = arr.filter(function (e) {
-                    return e.key === value.key;
-                })[0];
-                if (!elem) {
-                    arr.push({
-                        'key': value.key
-                    });
-                    aud.meta[hash] = [
-                        value.name,
-                        value.region,
-                        value.country_name
-                    ].join(', ');
+                    aud.meta[hash] = getLocationFormat(value);
                 }
             }
 
             aud.$loValue = '';
             aud.$locations = getLocations(aud);
+            aud.$locationsEx = getLocations(aud, 1);
 
             $scope.$apply();
             $scope.verify(aud);
@@ -969,33 +957,31 @@ momentum.controller('AudiencesController', [
             audience.$langs = getLanguages(audience);
         };
 
-        $scope.deleteLocation = function (audience, location) {
+        $scope.deleteLocation = function (audience, location, exclude) {
             var hash = [
                     location.type,
                     location.id
                 ].join('_'),
-                locs = audience.data.geo_locations,
-                typeMap = {
-                    'region': 'regions',
-                    'zip': 'zips',
-                    'city': 'cities'
-                };
+                locs = audience.data.geo_locations;
+
+            if (exclude) {
+                locs = audience.data.excluded_geo_locations;
+            }
 
             delete audience.meta[hash];
 
-            if (location.type === 'country') {
+            if (location.type === 'countries') {
                 locs.countries = locs.countries.filter(function (c) {
                     return c !== location.id;
                 });
             } else {
-                locs[typeMap[location.type]] = locs[
-                    typeMap[location.type]
-                ].filter(function (a) {
+                locs[location.type] = locs[location.type].filter(function (a) {
                     return a.key !== location.id;
                 });
             }
 
             audience.$locations = getLocations(audience);
+            audience.$locationsEx = getLocations(audience, 1);
         };
 
         function getDetailBrowseModel (aud) {

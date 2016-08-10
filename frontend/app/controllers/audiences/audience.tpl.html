@@ -124,17 +124,44 @@
                     </span>
                 </li>
             </ul>
-            <div class="audience-name mdl-textfield mdl-js-textfield">
-                <input auto-complete="queryLocation"
-                    ng-model="audience.$loValue"
-                    item-template="locationItem.tpl.html"
-                    item-action="addAudienceLocation"
-                    item-action-self="audience"
-                    container-class="audience-ac"
-                    class="mdl-textfield__input"
-                    type="text"
-                    id="{{audience.id}}-location">
-                <label class="mdl-textfield__label" for="{{audience.id}}-location">Add location</label>
+            <ul class="mdl-list audience-list">
+                <li
+                    class="mdl-list__item"
+                    ng-repeat="loc in audience.$locationsEx track by loc.id">
+                    <span class="mdl-list__item-primary-content">
+                        Exclude: {{loc.name}}
+                    </span>
+                    <span class="mdl-list__item-secondary-content">
+                        <a
+                            class="rule-delete mdl-list__item-secondary-action"
+                            ng-click="deleteLocation(audience, loc, 1); verify(audience);"
+                            href="javascript:void(0)">
+                            <i class="material-icons">delete_forever</i>
+                        </a>
+                    </span>
+                </li>
+            </ul>
+            <div class="audience-name multi">
+                <div class="dropdown loc-method min">
+                    <select
+                        ng-model="audience.$locMethod">
+                        <option value="geo_locations">Include</option>
+                        <option value="excluded_geo_locations">Exclude</option>
+                    </select>
+                    <label></label>
+                </div>
+                <div class="mdl-textfield mdl-js-textfield">
+                    <input auto-complete="queryLocation"
+                        ng-model="audience.$loValue"
+                        item-template="locationItem.tpl.html"
+                        item-action="addAudienceLocation"
+                        item-action-self="audience"
+                        container-class="audience-ac"
+                        class="mdl-textfield__input"
+                        type="text"
+                        id="{{audience.id}}-location">
+                    <label class="mdl-textfield__label" for="{{audience.id}}-location">Add location</label>
+                </div>
             </div>
         </div>
     </div>
