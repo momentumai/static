@@ -1,12 +1,4 @@
 <div class="audience-location-item">
-    <div ng-if="type === 'city' || type === 'zip'" class="name">
-        {{name}}, {{region}}, {{country_name}}
-    </div>
-    <div ng-if="type === 'region'" class="name">
-        {{name}}, {{country_name}}
-    </div>
-    <div ng-if="type === 'country'" class="name">
-        {{name}}
-    </div>
+    <div class="name">{{display}}</div>
     <div class="type">{{type}}</div>
 </div>
