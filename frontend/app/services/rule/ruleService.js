@@ -6,7 +6,8 @@ momentum.factory('rule', ['category', '$q', '$http',
                 'slack|alert_make': 'top_not_alerted',
                 'promotion_stop|alert_remove': 'alerted',
                 'promotion_start': 'top_not_promoted',
-                'promotion_stop|promotion_finish': 'promoted'
+                'promotion_stop|promotion_finish': 'promoted',
+                'share': 'top_not_shared'
             };
 
         function getKey (item) {
