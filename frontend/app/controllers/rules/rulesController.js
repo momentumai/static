@@ -15,6 +15,7 @@ momentum.controller('RulesController', [
         function init () {
             $scope.groups = null;
             return rule.list($scope.sessionId).then(function (ret) {
+                ret = ret || {};
                 $scope.groups = ret.groups;
                 $scope.activeGroup = ret.active;
                 $scope.activeGroup.open = 1;
