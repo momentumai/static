@@ -18,9 +18,7 @@
         return "";
       }
       window.onload = function() {
-        var receiver = document.getElementById('receiver').contentWindow;
-		receiver.postMessage('Hello Mars!', '*');
-		receiver.postMessage('_momentum_team_id=' + getCookie('_momentum_team_id'), '*');
+		parent.postMessage('_momentum_team_id=' + getCookie('_momentum_team_id'), '*');
       }
     </script>
   </head>

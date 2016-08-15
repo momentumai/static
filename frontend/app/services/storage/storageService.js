@@ -122,5 +122,9 @@ function ($q, $cookies) {
         return put('is_demo', value);
     };
 
+    storage.setLoggedUser = function (teamId) {
+        $cookies.put('_momentum_team_id', teamId);
+    };
+
     return storage;
 }]);

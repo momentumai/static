@@ -174,10 +174,10 @@ gulp.task('copy:assets', function () {
 });
 
 gulp.task('copy:views', function () {
-    return gulp.src(
+    return gulp.src([
         path.join(docBase, 'app', 'index.html'),
         path.join(docBase, 'app', 'tracking.html')
-    ).pipe(gulp.dest(distDir));
+    ]).pipe(gulp.dest(distDir));
 });
 
 gulp.task('config', function () {
