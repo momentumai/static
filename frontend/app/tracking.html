@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <script>
+      function getCookie(cname) {
+        var name = cname + "=",
+          ca = document.cookie.split(';');
+        for(var i = 0; i <ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length,c.length);
+            }
+        }
+        return "";
+      }
+      window.onload = function() {
+		parent.postMessage('_momentum_team_id=' + getCookie('_momentum_team_id'), '*');
+      }
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

@@ -66,6 +66,7 @@ momentum.controller('RootController', [
         }).then(function (user) {
             $scope.user = user;
             $scope.loaded = 1;
+            storage.setLoggedUser(user.team_id);
             sendSessionId();
 
             $scope.$broadcast('loaded');
