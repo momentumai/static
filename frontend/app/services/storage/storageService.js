@@ -123,6 +123,7 @@ function ($q, $cookies) {
     };
 
     storage.setLoggedUser = function (teamId) {
+        $cookies.remove('_momentum_team_id');
         $cookies.put('_momentum_team_id', teamId);
     };
 
