@@ -1,4 +1,4 @@
-/*global momentum, window*/
+/* global momentum, window, navigator, guide */
 momentum.controller('RootController', [
     '$state',
     '$stateParams',
@@ -34,6 +34,22 @@ momentum.controller('RootController', [
         $scope.stateParams = $stateParams;
         $scope.loaded = 0;
 
+        function startServiceWorker () {
+            return navigator.serviceWorker.register('service-worker.js')
+            .then(function () {
+                return navigator.serviceWorker.ready;
+            }).then(function (reg) {
+                var messenger = navigator.serviceWorker.controller;
+
+                messenger.postMessage({'sessionId': $scope.sessionId});
+                return reg.pushManager.subscribe({'userVisibleOnly': true});
+            }).then(function (sub) {
+                return auth.setNotifEndpoint($scope.sessionId, sub.endpoint);
+            }).catch(function (error) {
+                console.log('Service Worker error :^(', error);
+            });
+        }
+
         $scope.openFilters = function () {
             category.getWithSelected(
                 $scope.sessionId
@@ -68,6 +84,14 @@ momentum.controller('RootController', [
             sendSessionId();
 
             $scope.$broadcast('loaded');
+
+            if (!Number(user.is_super)) {
+                return guide.show($scope.sessionId, user);
+            }
+        }).then(function () {
+            if ('serviceWorker' in navigator) {
+                return startServiceWorker();
+            }
         });
 
         $rootScope.$on(
