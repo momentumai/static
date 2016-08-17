@@ -27,6 +27,7 @@ gulp.cloudfront = require('gulp-cloudfront-invalidate');
 gulp.task('watch', function () {
     return gulp.watch([
         path.join(docBase, 'app', '**', '*'),
+        path.join(docBase, 'service-worker', '**', '*'),
         path.join(docBase, 'assets', '**', '*'),
         path.join(base, 'vendor', '**', '*'),
         path.join(base, 'shared', '**', '*')
@@ -155,6 +156,11 @@ gulp.task('copy:js', function () {
         .pipe(gulp.dest(distDir));
 });
 
+gulp.task('copy:service-worker', function () {
+    return gulp.src(path.join(docBase, 'service-worker/**'))
+        .pipe(gulp.dest(distDir));
+});
+
 gulp.task('copy:css', function () {
     return gulp.src([
         path.join(
@@ -262,6 +268,7 @@ gulp.task('copy', [
     'copy:js',
     'copy:css',
     'copy:assets',
+    'copy:service-worker',
     'copy:views'
 ]);
 
