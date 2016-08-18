@@ -14,11 +14,12 @@ function injectMomentum () {
 
     destroyMomentum();
 
-    iframe.id = '_momentum_embed';
+    iframe.id = 'momentum';
 
     iframe.src = [
         window.momentum_config.docBase,
-        '/embed/index.html'
+        '/embed/index.html?',
+        encodeURIComponent(window.location.href)
     ].join('');
 
     iframe.style.cssText = [
@@ -79,6 +80,26 @@ function injectMomentumButton () {
 
     document.body.appendChild(div);
 }
+
+window.addEventListener('message', function (event) {
+    var parts;
+
+    if (event.origin === window.momentum_config.docBase) {
+        if (event.data === 'destroyMomentum') {
+            destroyMomentum();
+        }
+
+        if (event.data.indexOf('redirect') === 0) {
+            parts = event.data.split('~');
+            if (window.location.href === parts[1]) {
+                destroyMomentum();
+                window.location.reload(true);
+            } else {
+                window.location.href = parts[1];
+            }
+        }
+    }
+}, false);
 
 window.onload = function () {
     injectMomentumButton();

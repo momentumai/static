@@ -1,52 +1,15 @@
-/*global momentum, URI, btoa */
+/*global momentum */
 momentum.config([
     '$provide',
     '$httpProvider',
     function ($provide, $httpProvider) {
-        function b64 (str) {
-            return btoa(
-                escape(encodeURIComponent(str))
-            );
-        }
-
-        function getCache (params) {
-            return b64(params.join('-'));
-        }
-
         $provide.factory('httpInterceptor', [
             'redirect',
             '$injector',
             'storage',
             '$q',
-            function (redirect, $injector, storage, $q) {
+            function (redirect, $injector, storage) {
                 return {
-                    'request': function (request) {
-                        var deferred = $q.defer();
-
-                        storage.getCache().then(function (cacheTimestamp) {
-                            var cache,
-                                uri = URI(request.url);
-
-                            uri.removeQuery('cache');
-
-                            if (request.method === 'POST') {
-                                cache = request.data.cache;
-                                if (cache) {
-                                    cache.push(cacheTimestamp);
-                                    uri.addQuery('cache', getCache(cache));
-                                    delete request.data.cache;
-                                } else {
-                                    uri.addQuery('cache', getCache([
-                                        String(Date.now())
-                                    ]));
-                                }
-                            }
-                            request.url = uri.toString();
-
-                            deferred.resolve(request);
-                        });
-                        return deferred.promise;
-                    },
                     'response': function (response) {
                         var status;
 
@@ -55,7 +18,8 @@ momentum.config([
                                 response.data.errorMessage.split(':')[1]
                             );
                             if (status === 401) {
-                                return storage.clear().then(function () {
+                                return storage.clearAuthData()
+                                .then(function () {
                                     return redirect.toAuth();
                                 });
                             }

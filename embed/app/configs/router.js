@@ -16,19 +16,6 @@ function ($stateProvider, $urlRouterProvider) {
         }
     });
 
-    $stateProvider.state('settings', {
-        'url': '/settings',
-        'params': {
-            'title': 'Settings'
-        },
-        'views': {
-            'container': {
-                'templateUrl': 'settings.tpl.html',
-                'controller': 'SettingsController'
-            }
-        }
-    });
-
     $stateProvider.state('urlBuilder', {
         'url': '/url-builder',
         'params': {

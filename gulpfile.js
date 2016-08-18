@@ -129,7 +129,7 @@ gulp.task('concat:sass:embed', function () {
 });
 
 gulp.task('concat:sass', function (done) {
-    gulp.runSequence(['concat:sass:embed', 'concat:sass:frontend'], done);
+    gulp.runSequence(['concat:sass:frontend', 'concat:sass:embed'], done);
 });
 
 gulp.task('concat:js:frontend', function () {
@@ -239,7 +239,7 @@ gulp.task('copy:css:embed', function () {
     return gulp.src([
         path.join(base, 'vendor/material-design-lite/dist/material.css'),
         path.join(base, 'vendor/nvd3/nvd3.css'),
-        path.join(tmpDirFrontend, 'app.css')
+        path.join(tmpDirEmbed, 'app.css')
     ]).pipe(gulp.concat('app.css'))
     .pipe(gulp.dest(path.join(distDir, 'embed')));
 });
@@ -315,14 +315,14 @@ gulp.task('uglify:embed:app', function () {
     return gulp.src([
         path.join(distDir, 'embed', 'app.js')
     ]).pipe(gulp.uglify())
-    .pipe(gulp.dest(distDir, 'embed'));
+    .pipe(gulp.dest(path.join(distDir, 'embed')));
 });
 
 gulp.task('uglify:embed:injector', function () {
     return gulp.src([
         path.join(distDir, 'embed', 'injector.js')
     ]).pipe(gulp.uglify())
-    .pipe(gulp.dest(distDir, 'embed'));
+    .pipe(gulp.dest(path.join(distDir, 'embed')));
 });
 
 gulp.task('uglify', function (done) {
