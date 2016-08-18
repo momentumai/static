@@ -43,7 +43,7 @@ function injectMomentumButton () {
     div.id = '_momentum_embed_button';
     div.style.cssText = [
         'position:fixed;',
-        'top: 15%;',
+        'top: 350px;',
         'right: 0;',
         'width: 40px;',
         'height: 40px;',
