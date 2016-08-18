@@ -12,8 +12,8 @@ deployment:
     staging:
         branch: dev
         commands:
-          - NODE_ENV=production AWS_BUCKET="momentum-stage" AWS_DISTRIBUTION="E2544IKNG88L2J" gulp deploy-frontend
+          - NODE_ENV=production AWS_BUCKET="momentum-stage" AWS_DISTRIBUTION="E2544IKNG88L2J" gulp deploy
     production:
         branch: master
         commands:
-          - NODE_ENV=production AWS_BUCKET="static-frontend" AWS_DISTRIBUTION="E3AZ1CD2OTJE1S" gulp deploy-frontend
+          - NODE_ENV=production AWS_BUCKET="static-frontend" AWS_DISTRIBUTION="E3AZ1CD2OTJE1S" gulp deploy
