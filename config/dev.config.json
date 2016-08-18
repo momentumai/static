@@ -6,5 +6,6 @@
     },
     "stripe": {
         "public": "pk_test_yWBSSDXz7dmdms3KKiWXLV2a"
-    }
+    },
+    "createEmbedTestPage": 1
 }

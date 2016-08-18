@@ -8,8 +8,7 @@ killall() {
 }
 
 # npm install -g static-server
-static-server -p 8080 frontend/dist &
+static-server -p 8080 dist &
 gulp &
-gulp extension &
 
 cat #run forever
