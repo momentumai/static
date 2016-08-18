@@ -1,9 +1,9 @@
 var gulp = require('gulp'),
     path = require('path'),
     base = __dirname,
-    docBase,
-    tmpDir,
-    distDir,
+    tmpDirFrontend = path.join(base, 'frontend', '.tmp'),
+    tmpDirEmbed = path.join(base, 'embed', '.tmp'),
+    distDir = path.join(base, 'dist'),
     config = require('./config'),
     failOnEslintError = 1;
 
@@ -26,26 +26,15 @@ gulp.cloudfront = require('gulp-cloudfront-invalidate');
 
 gulp.task('watch', function () {
     return gulp.watch([
-        path.join(docBase, 'app', '**', '*'),
-        path.join(docBase, 'assets', '**', '*'),
+        path.join(base, 'frontend', 'app', '**', '*'),
+        path.join(base, 'frontend', 'assets', '**', '*'),
+        path.join(base, 'embed', 'app', '**', '*'),
+        path.join(base, 'embed', 'assets', '**', '*'),
         path.join(base, 'vendor', '**', '*'),
         path.join(base, 'shared', '**', '*')
     ], function () {
         failOnEslintError = 0;
-        gulp.start('default:build');
-    });
-});
-
-gulp.task('watch:extension', function () {
-    return gulp.watch([
-        path.join(docBase, 'app', '**', '*'),
-        path.join(docBase, 'assets', '**', '*'),
-        path.join(docBase, 'chrome-background', '**', '*'),
-        path.join(base, 'vendor', '**', '*'),
-        path.join(base, 'shared', '**', '*')
-    ], function () {
-        failOnEslintError = 0;
-        gulp.start('extension:build');
+        gulp.runSequence('default:build');
     });
 });
 
@@ -53,8 +42,9 @@ gulp.task('eslint', function () {
     var task = gulp.src([
         './gulpfile.js',
         './frontend/**/*.js',
-        './extension/**/*.js',
+        './embed/**/*.js',
         './shared/**/*.js',
+        '!./embed/assets/injector.js',
         '!./**/vendor/**/*',
         '!./**/.tmp/**/*',
         '!./**/dist/**/*'
@@ -70,38 +60,80 @@ gulp.task('eslint', function () {
 });
 
 gulp.task('clean', function () {
-    return gulp.src([tmpDir, distDir], {'read': false})
-        .pipe(gulp.clean());
+    return gulp.src([
+        tmpDirFrontend,
+        tmpDirEmbed,
+        distDir
+    ], {'read': false}).pipe(gulp.clean());
 });
 
-gulp.task('svg', function () {
-    return gulp.src(path.join(docBase, 'app/svg/**/*.svg'))
+gulp.task('svg:frontend', function () {
+    return gulp.src(path.join(base, 'frontend/app/svg/**/*.svg'))
         .pipe(gulp.toSASSURI())
-        .pipe(gulp.dest(tmpDir));
+        .pipe(gulp.dest(tmpDirFrontend));
 });
 
-gulp.task('templates', function () {
+gulp.task('svg:embed', function () {
+    return gulp.src(path.join(base, 'embed/app/svg/**/*.svg'))
+        .pipe(gulp.toSASSURI())
+        .pipe(gulp.dest(tmpDirEmbed));
+});
+
+gulp.task('svg', function (done) {
+    gulp.runSequence(['svg:embed', 'svg:frontend'], done);
+});
+
+gulp.task('templates:frontend', function () {
     return gulp.src([
         path.join(base, 'shared/**/*.tpl.html'),
-        path.join(docBase, 'app/**/*.tpl.html')
+        path.join(base, 'frontend/app/**/*.tpl.html')
     ]).pipe(gulp.templateCache({
         'module': 'momentum',
         'transformUrl': function (url) {
             return path.basename(url);
         }
-    })).pipe(gulp.dest(tmpDir));
+    })).pipe(gulp.dest(tmpDirFrontend));
 });
 
-gulp.task('concat:sass', function () {
+gulp.task('templates:embed', function () {
     return gulp.src([
-        path.join(tmpDir, 'svg.scss'),
-        path.join(base, 'shared/**/*.scss'),
-        path.join(docBase, 'app/app.scss'),
-        path.join(docBase, 'app/**/*.scss')
-    ]).pipe(gulp.concat('app.scss')).pipe(gulp.dest(tmpDir));
+        path.join(base, 'shared/**/*.tpl.html'),
+        path.join(base, 'embed/app/**/*.tpl.html')
+    ]).pipe(gulp.templateCache({
+        'module': 'momentum',
+        'transformUrl': function (url) {
+            return path.basename(url);
+        }
+    })).pipe(gulp.dest(tmpDirEmbed));
 });
 
-gulp.task('concat:js', function () {
+gulp.task('templates', function (done) {
+    gulp.runSequence(['templates:embed', 'templates:frontend'], done);
+});
+
+gulp.task('concat:sass:frontend', function () {
+    return gulp.src([
+        path.join(tmpDirFrontend, 'svg.scss'),
+        path.join(base, 'shared/**/*.scss'),
+        path.join(base, 'frontend/app/app.scss'),
+        path.join(base, 'frontend/app/**/*.scss')
+    ]).pipe(gulp.concat('app.scss')).pipe(gulp.dest(tmpDirFrontend));
+});
+
+gulp.task('concat:sass:embed', function () {
+    return gulp.src([
+        path.join(tmpDirEmbed, 'svg.scss'),
+        path.join(base, 'shared/**/*.scss'),
+        path.join(base, 'embed/app/app.scss'),
+        path.join(base, 'embed/app/**/*.scss')
+    ]).pipe(gulp.concat('app.scss')).pipe(gulp.dest(tmpDirEmbed));
+});
+
+gulp.task('concat:sass', function (done) {
+    gulp.runSequence(['concat:sass:embed', 'concat:sass:frontend'], done);
+});
+
+gulp.task('concat:js:frontend', function () {
     return gulp.src([
         path.join(base, 'vendor/material-design-lite/dist/material.js'),
         path.join(base, 'vendor/d3/d3.js'),
@@ -118,72 +150,137 @@ gulp.task('concat:js', function () {
         path.join(base, 'vendor/angular-angulartics/angulartics-ga.min.js'),
         path.join(base, 'vendor/angular-angulartics/angulartics-debug.min.js'),
         path.join(base, 'vendor/URI/uri.js'),
-        path.join(docBase, 'app/app.js'),
-        path.join(docBase, 'app/**/*.js'),
-        path.join(tmpDir, 'templates.js'),
+        path.join(base, 'frontend/app/app.js'),
+        path.join(base, 'frontend/app/**/*.js'),
+        path.join(tmpDirFrontend, 'templates.js'),
         path.join(base, 'shared/**/*.js')
-    ]).pipe(gulp.concat('app.js')).pipe(gulp.dest(tmpDir));
+    ]).pipe(gulp.concat('app.js')).pipe(gulp.dest(tmpDirFrontend));
 });
 
-gulp.task('concat:background', function () {
+gulp.task('concat:js:embed', function () {
     return gulp.src([
-        path.join(docBase, 'chrome-background/vendor/bluebird/bluebird.js'),
-        path.join(docBase, 'chrome-background/vendor/jquery/jquery.js'),
-        path.join(docBase, 'chrome-background/vendor/URI/uri.js'),
-        path.join(docBase, 'chrome-background/background.js')
-    ]).pipe(gulp.concat('background.js')).pipe(gulp.dest(distDir));
+        path.join(base, 'vendor/material-design-lite/dist/material.js'),
+        path.join(base, 'vendor/d3/d3.js'),
+        path.join(base, 'vendor/nvd3/nvd3.js'),
+        path.join(base, 'vendor/angular-chart/angular-chart.js'),
+        path.join(base, 'vendor/fastclick/fastclick.js'),
+        path.join(base, 'vendor/angular/angular.js'),
+        path.join(base, 'vendor/angular-cookies/angular-cookies.js'),
+        path.join(base, 'vendor/angular-ui-router/ui-router.js'),
+        path.join(base, 'vendor/angular-mdl/angular-material-design-lite.js'),
+        path.join(base, 'vendor/angular-facebook/angular-facebook.js'),
+        path.join(base, 'vendor/angular-angulartics/angulartics.min.js'),
+        path.join(base, 'vendor/angular-angulartics/angulartics-ga.min.js'),
+        path.join(base, 'vendor/angular-angulartics/angulartics-debug.min.js'),
+        path.join(base, 'vendor/URI/uri.js'),
+        path.join(base, 'embed/app/app.js'),
+        path.join(base, 'embed/app/**/*.js'),
+        path.join(tmpDirEmbed, 'templates.js'),
+        path.join(base, 'shared/**/*.js')
+    ]).pipe(gulp.concat('app.js')).pipe(gulp.dest(tmpDirEmbed));
 });
 
-gulp.task('sass', function () {
-    return gulp.src(path.join(tmpDir, 'app.scss'))
+gulp.task('concat:js', function (done) {
+    gulp.runSequence(['concat:js:embed', 'concat:js:frontend'], done);
+});
+
+gulp.task('sass:frontend', function () {
+    return gulp.src(path.join(tmpDirFrontend, 'app.scss'))
         .pipe(gulp.sass({
             'includePaths': [
-                path.join(
-                    base,
-                    'vendor/material-design-lite/src/'
-                )
+                path.join(base, 'vendor/material-design-lite/src/')
             ],
             'file': 'app.css'
         }).on('error', gulp.sass.logError))
         .pipe(gulp.autoprefixer(config.autoprefixer))
-        .pipe(gulp.dest(tmpDir));
+        .pipe(gulp.dest(tmpDirFrontend));
 });
 
-gulp.task('copy:js', function () {
-    return gulp.src(path.join(tmpDir, 'app.js'))
+gulp.task('sass:embed', function () {
+    return gulp.src(path.join(tmpDirEmbed, 'app.scss'))
+        .pipe(gulp.sass({
+            'includePaths': [
+                path.join(base, 'vendor/material-design-lite/src/')
+            ],
+            'file': 'app.css'
+        }).on('error', gulp.sass.logError))
+        .pipe(gulp.autoprefixer(config.autoprefixer))
+        .pipe(gulp.dest(tmpDirEmbed));
+});
+
+gulp.task('sass', function (done) {
+    gulp.runSequence(['sass:embed', 'sass:frontend'], done);
+});
+
+gulp.task('copy:js:frontend', function () {
+    return gulp.src(path.join(tmpDirFrontend, 'app.js'))
         .pipe(gulp.concat('app.js'))
         .pipe(gulp.dest(distDir));
 });
 
-gulp.task('copy:css', function () {
+gulp.task('copy:js:embed', function () {
+    return gulp.src(path.join(tmpDirEmbed, 'app.js'))
+        .pipe(gulp.concat('app.js'))
+        .pipe(gulp.dest(path.join(distDir, 'embed')));
+});
+
+gulp.task('copy:js', function (done) {
+    gulp.runSequence(['copy:js:embed', 'copy:js:frontend'], done);
+});
+
+gulp.task('copy:css:frontend', function () {
     return gulp.src([
-        path.join(
-            base,
-            'vendor/material-design-lite/dist/material.css'
-        ),
-        path.join(
-            base,
-            'vendor/nvd3/nvd3.css'
-        ),
-        path.join(tmpDir, 'app.css')
+        path.join(base, 'vendor/material-design-lite/dist/material.css'),
+        path.join(base, 'vendor/nvd3/nvd3.css'),
+        path.join(tmpDirFrontend, 'app.css')
     ]).pipe(gulp.concat('app.css')).pipe(gulp.dest(distDir));
 });
 
-gulp.task('copy:assets', function () {
-    return gulp.src(path.join(docBase, 'assets/**')).pipe(gulp.dest(distDir));
+gulp.task('copy:css:embed', function () {
+    return gulp.src([
+        path.join(base, 'vendor/material-design-lite/dist/material.css'),
+        path.join(base, 'vendor/nvd3/nvd3.css'),
+        path.join(tmpDirFrontend, 'app.css')
+    ]).pipe(gulp.concat('app.css'))
+    .pipe(gulp.dest(path.join(distDir, 'embed')));
 });
 
-gulp.task('copy:views', function () {
-    return gulp.src([
-        path.join(docBase, 'app', 'index.html'),
-        path.join(docBase, 'app', 'tracking.html')
-    ]).pipe(gulp.dest(distDir));
+gulp.task('copy:css', function (done) {
+    gulp.runSequence(['copy:css:embed', 'copy:css:frontend'], done);
 });
 
-gulp.task('config', function () {
-    return gulp.src([
+gulp.task('copy:assets:frontend', function () {
+    return gulp.src(path.join(base, 'frontend/assets/**'))
+        .pipe(gulp.dest(distDir));
+});
+gulp.task('copy:assets:embed', function () {
+    return gulp.src(path.join(base, 'embed/assets/**'))
+        .pipe(gulp.dest(path.join(distDir, 'embed')));
+});
+
+gulp.task('copy:assets', function (done) {
+    gulp.runSequence(['copy:assets:embed', 'copy:assets:frontend'], done);
+});
+
+gulp.task('copy:views:frontend', function () {
+    return gulp.src(
+        path.join(base, 'frontend', 'app', 'index.html')
+    ).pipe(gulp.dest(distDir));
+});
+
+gulp.task('copy:views:embed', function () {
+    return gulp.src(
+        path.join(base, 'embed', 'app', 'index.html')
+    ).pipe(gulp.dest(path.join(distDir, 'embed')));
+});
+gulp.task('copy:views', function (done) {
+    gulp.runSequence(['copy:views:embed', 'copy:views:frontend'], done);
+});
+
+gulp.task('config:frontend', function () {
+    return gulp.src(
         path.join(distDir, 'app.js')
-    ]).pipe(gulp.replace({
+    ).pipe(gulp.replace({
         'patterns': [{
             'match': 'bvConfig',
             'replacement': JSON.stringify(config)
@@ -192,36 +289,64 @@ gulp.task('config', function () {
     })).pipe(gulp.dest(distDir));
 });
 
-gulp.task('config:background', function () {
-    return gulp.src([
-        path.join(distDir, 'background.js')
-    ]).pipe(gulp.replace({
+gulp.task('config:embed', function () {
+    return gulp.src(
+        path.join(distDir, 'embed', 'app.js')
+    ).pipe(gulp.replace({
         'patterns': [{
             'match': 'bvConfig',
             'replacement': JSON.stringify(config)
                 .replace(/\\/g, '\\\\')
         }]
-    })).pipe(gulp.dest(distDir));
+    })).pipe(gulp.dest(path.join(distDir, 'embed')));
 });
 
-gulp.task('uglify', function () {
+gulp.task('config', function (done) {
+    gulp.runSequence(['config:embed', 'config:frontend'], done);
+});
+
+gulp.task('uglify:frontend', function () {
     return gulp.src(path.join(distDir, 'app.js'))
         .pipe(gulp.uglify())
         .pipe(gulp.dest(distDir));
 });
 
-gulp.task('extension:uglify', function () {
+gulp.task('uglify:embed:app', function () {
     return gulp.src([
-        path.join(distDir, 'background.js'),
-        path.join(distDir, 'injector.js'),
-        path.join(distDir, 'scripts.js')
-    ]).pipe(gulp.uglify()).pipe(gulp.dest(distDir));
+        path.join(distDir, 'embed', 'app.js')
+    ]).pipe(gulp.uglify())
+    .pipe(gulp.dest(distDir, 'embed'));
 });
 
-gulp.task('cssmin', function () {
+gulp.task('uglify:embed:injector', function () {
+    return gulp.src([
+        path.join(distDir, 'embed', 'injector.js')
+    ]).pipe(gulp.uglify())
+    .pipe(gulp.dest(distDir, 'embed'));
+});
+
+gulp.task('uglify', function (done) {
+    gulp.runSequence([
+        'uglify:frontend',
+        'uglify:embed:app',
+        'uglify:embed:injector'
+    ], done);
+});
+
+gulp.task('cssmin:frontend', function () {
     return gulp.src(path.join(distDir, 'app.css'))
         .pipe(gulp.minifyCss())
         .pipe(gulp.dest(distDir));
+});
+
+gulp.task('cssmin:embed', function () {
+    return gulp.src(path.join(distDir, 'embed', 'app.css'))
+        .pipe(gulp.minifyCss())
+        .pipe(gulp.dest(path.join(distDir, 'embed')));
+});
+
+gulp.task('cssmin', function (done) {
+    gulp.runSequence(['cssmin:embed', 'cssmin:frontend'], done);
 });
 
 gulp.task('invalidate-cloudfront', function () {
@@ -252,7 +377,7 @@ gulp.task('sync-s3', function () {
 
     console.info('Deploy to ' + process.env['AWS_BUCKET']);
 
-    return gulp.src(path.join(distDir, '**/*'))
+    return gulp.src(distDir)
         .pipe(publisher.publish())
         .pipe(publisher.sync())
         .pipe(gulp.awspublish.reporter());
@@ -270,7 +395,7 @@ gulp.task('build', ['clean'], function (done) {
 });
 
 gulp.task('dist', ['clean'], function (done) {
-    return gulp.runSequence(
+    gulp.runSequence(
         'build',
         'concat:sass',
         'sass',
@@ -281,53 +406,17 @@ gulp.task('dist', ['clean'], function (done) {
 });
 
 gulp.task('package', ['eslint'], function (done) {
-    docBase = path.join(base, '/frontend/');
-    tmpDir = path.join(docBase, '.tmp');
-    distDir = path.join(docBase, 'dist');
     gulp.runSequence('dist', ['uglify', 'cssmin'], done);
 });
 
-gulp.task('deploy-frontend', function (done) {
-    docBase = path.join(base, '/frontend/');
-    tmpDir = path.join(docBase, '.tmp');
-    distDir = path.join(docBase, 'dist');
+gulp.task('deploy', function (done) {
     gulp.runSequence('package', 'sync-s3', 'invalidate-cloudfront', done);
 });
 
-gulp.task('extension:background', function (done) {
-    gulp.runSequence('concat:background', 'config:background', done);
-});
-
 gulp.task('default:build', ['eslint'], function () {
-    docBase = path.join(base, '/frontend/');
-    tmpDir = path.join(docBase, '.tmp');
-    distDir = path.join(docBase, 'dist');
-    gulp.runSequence('dist');
+    return gulp.runSequence('dist');
 });
 
 gulp.task('default', ['eslint'], function () {
-    gulp.runSequence('default:build', 'watch');
-});
-
-gulp.task('extension:build', function () {
-    docBase = path.join(base, '/extension/');
-    tmpDir = path.join(docBase, '.tmp');
-    distDir = path.join(docBase, 'dist');
-    gulp.runSequence('dist', 'extension:background');
-});
-
-gulp.task('extension', function () {
-    gulp.runSequence('extension:build', 'watch:extension');
-});
-
-gulp.task('extension:package', function () {
-    docBase = path.join(base, '/extension/');
-    tmpDir = path.join(docBase, '.tmp');
-    distDir = path.join(docBase, 'dist');
-    gulp.runSequence(
-        'dist',
-        ['uglify', 'cssmin'],
-        'extension:background',
-        'extension:uglify'
-    );
+    return gulp.runSequence('default:build', 'watch');
 });
