@@ -30,7 +30,7 @@ function injectMomentum () {
         'height: 100%;',
         'display: block;',
         'border: 0;',
-        'z-index: 99999999;'
+        'z-index: 999999999999999999;'
     ].join('');
 
     document.body.appendChild(iframe);
@@ -54,7 +54,10 @@ function injectMomentumButton () {
         'margin: 0;',
         'padding: 4px;',
         'border: 0;',
-        'z-index: 99999999;',
+        '-moz-box-sizing: content-box;',
+        '-webkit-box-sizing: content-box;',
+        'box-sizing: content-box;',
+        'z-index: 999999999999999999;',
         'cursor: pointer'
     ].join('');
 
@@ -101,6 +104,4 @@ window.addEventListener('message', function (event) {
     }
 }, false);
 
-window.onload = function () {
-    injectMomentumButton();
-};
+injectMomentumButton();
