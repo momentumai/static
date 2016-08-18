@@ -377,7 +377,7 @@ gulp.task('sync-s3', function () {
 
     console.info('Deploy to ' + process.env['AWS_BUCKET']);
 
-    return gulp.src(distDir)
+    return gulp.src(path.join(distDir, '**/*'))
         .pipe(publisher.publish())
         .pipe(publisher.sync())
         .pipe(gulp.awspublish.reporter());
