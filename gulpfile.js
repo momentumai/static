@@ -44,7 +44,6 @@ gulp.task('eslint', function () {
         './frontend/**/*.js',
         './embed/**/*.js',
         './shared/**/*.js',
-        '!./embed/assets/injector.js',
         '!./**/vendor/**/*',
         '!./**/.tmp/**/*',
         '!./**/dist/**/*'
@@ -290,9 +289,10 @@ gulp.task('config:frontend', function () {
 });
 
 gulp.task('config:embed', function () {
-    return gulp.src(
-        path.join(distDir, 'embed', 'app.js')
-    ).pipe(gulp.replace({
+    return gulp.src([
+        path.join(distDir, 'embed', 'app.js'),
+        path.join(distDir, 'embed', 'injector.js')
+    ]).pipe(gulp.replace({
         'patterns': [{
             'match': 'bvConfig',
             'replacement': JSON.stringify(config)
