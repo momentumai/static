@@ -1,29 +1,16 @@
-/*global momentum, URI, btoa, bvConfig, window */
+/*global momentum, URI, bvConfig, window */
 momentum.config([
     '$provide',
     '$httpProvider',
     function ($provide, $httpProvider) {
-        function b64 (str) {
-            return btoa(
-                escape(encodeURIComponent(str))
-            );
-        }
-
-        function getCache (params) {
-            return b64(params.join('-'));
-        }
-
         $provide.factory('httpInterceptor', ['$injector', '$q',
             function ($injector) {
                 return {
                     'request': function (request) {
-                        var cache,
-                            storage = $injector.get('storage'),
+                        var storage = $injector.get('storage'),
                             demo = $injector.get('demo'),
                             uri = URI(request.url),
                             demoObj = {};
-
-                        uri.removeQuery('cache');
 
                         if (request.method === 'POST') {
                             if (storage.getDemo() &&
@@ -43,17 +30,6 @@ momentum.config([
 
                                 demo.setState(demoObj.url);
                                 return request;
-                            }
-
-                            cache = request.data.cache;
-                            if (cache) {
-                                cache.push(storage.getCache());
-                                uri.addQuery('cache', getCache(cache));
-                                delete request.data.cache;
-                            } else {
-                                uri.addQuery('cache', getCache([
-                                    String(Date.now())
-                                ]));
                             }
                         }
 

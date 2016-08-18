@@ -126,6 +126,25 @@ function ($q, $cookies) {
         $cookies.remove('_momentum_team_id');
         $cookies.put('_momentum_team_id', teamId);
     };
+    storage.saveUtmParams = function (params) {
+        return $q(function (resolve) {
+            put('utmParams', JSON.stringify(params));
+            resolve();
+        });
+    };
+
+    storage.getUtmParams = function () {
+        return $q(function (resolve) {
+            var params = {};
+
+            try {
+                params = JSON.parse(get('utmParams') || '');
+            } catch (ignore) {
+                //ignore
+            }
+            resolve(params || {});
+        });
+    };
 
     return storage;
 }]);

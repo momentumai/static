@@ -4,6 +4,7 @@
 
     window.momentum = angular.module('momentum', [
         'ui.router',
-        'mdl'
+        'mdl',
+        'ngCookies'
     ]);
 }());
