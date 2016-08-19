@@ -64,22 +64,22 @@ momentum.controller('ContentHistoryController', [
                     Math.floor(model.until.getTime() / 1000)
                 ).then(function () {
                     dialog.destroy();
-                    $scope.history.campaigns.loading = 1;
+                    $scope.content.campaigns.loading = 1;
                     return fb.getCampaigns(
                         $scope.sessionId,
                         $scope.stateParams.contentId,
                         10,
-                        $scope.history.campaigns.offset
+                        $scope.content.campaigns.offset
                     ).then(function (campaigns) {
-                        $scope.history.campaigns = campaigns;
+                        $scope.content.campaigns = campaigns;
                         return toast.open({
                             'htmlText': 'Campaign saved successfully'
                         });
                     }).catch(function () {
-                        var h = $scope.history;
+                        var c = $scope.content;
 
-                        h.campaigns = defaultCampaigns;
-                        h.campaigns.errorMessage = 'Insufficient permission.';
+                        c.campaigns = defaultCampaigns;
+                        c.campaigns.errorMessage = 'Insufficient permission.';
                     });
                 }).catch(function (err) {
                     return dialog.open({
