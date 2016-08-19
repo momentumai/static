@@ -3,6 +3,7 @@ momentum.controller('ContentHistoryController', [
     'content',
     'fb',
     'dialog',
+    'toast',
     'storage',
     'utils',
     '$rootScope',
@@ -13,6 +14,7 @@ momentum.controller('ContentHistoryController', [
         content,
         fb,
         dialog,
+        toast,
         storage,
         utils,
         $rootScope,
@@ -34,6 +36,57 @@ momentum.controller('ContentHistoryController', [
         $scope.sourceStats = null;
         $scope.content = {
             'campaigns': null
+        };
+
+        $scope.edit = function (campaign) {
+            var model = {
+                'budget': campaign.adset.lifetime_budget / campaign.meta.offset,
+                'currency': campaign.meta.currency
+            };
+
+            model.from = new Date(campaign.adset.start_time);
+            model.to = new Date(model.from.getTime());
+            model.to.setUTCFullYear(model.to.getUTCFullYear() + 1);
+            model.until = new Date(campaign.adset.end_time);
+
+            dialog.open({
+                'template': 'campaignEditDialog.tpl.html',
+                'showCancel': true,
+                'okText': 'Save',
+                'model': model,
+                'dialogClass': 'promotion-form campaign-edit-dialog',
+                'destroy': false
+            }).then(function () {
+                return fb.saveCampaign(
+                    $scope.sessionId,
+                    campaign.id,
+                    model.budget * campaign.meta.offset,
+                    Math.floor(model.until.getTime() / 1000)
+                ).then(function () {
+                    dialog.destroy();
+                    $scope.history.campaigns.loading = 1;
+                    return fb.getCampaigns(
+                        $scope.sessionId,
+                        $scope.stateParams.contentId,
+                        10,
+                        $scope.history.campaigns.offset
+                    ).then(function (campaigns) {
+                        $scope.history.campaigns = campaigns;
+                        return toast.open({
+                            'htmlText': 'Campaign saved successfully'
+                        });
+                    }).catch(function () {
+                        var h = $scope.history;
+
+                        h.campaigns = defaultCampaigns;
+                        h.campaigns.errorMessage = 'Insufficient permission.';
+                    });
+                }).catch(function (err) {
+                    return dialog.open({
+                        'htmlText': err
+                    });
+                });
+            });
         };
 
         $scope.toggle = function (id, active, adset) {
