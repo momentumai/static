@@ -10,7 +10,8 @@ momentum.directive('campaigns', [
                 'next': '=ngNext',
                 'prev': '=ngPrev',
                 'toggle': '=ngToggle',
-                'export': '=ngExport'
+                'export': '=ngExport',
+                'edit': '=ngEdit'
             },
             'link': function ($scope, $element) {
                 $scope.model.animate = angular.bind(
