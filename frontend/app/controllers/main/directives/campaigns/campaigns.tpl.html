@@ -26,6 +26,7 @@
             <th title="Click">Click</th>
             <th title="Landing">Land.</th>
             <th title="Schedule">Schedule</th>
+            <th ng-if="false"></th>
           </tr>
         </thead>
         <tbody>
@@ -60,6 +61,11 @@
             <td ng-if="c.adset">{{c.click}}</td>
             <td ng-if="c.adset">{{c.landing}}</td>
             <td ng-if="c.adset">{{c.from}} - {{c.to}}</td>
+            <td ng-if="false && c.adset" mdl-upgrade>
+                <button ng-click="edit(c)" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+                    <i class="material-icons">edit</i>
+                </button>
+            </td>
           </tr>
         <tr class="spacer" ng-if="model.sum < 10">
             <td colspan="8" style="height: calc(49px * ({{10 - model.sum}}))">

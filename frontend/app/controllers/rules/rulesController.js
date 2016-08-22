@@ -418,8 +418,16 @@ momentum.controller('RulesController', [
                 return false;
             }
 
+            group.items.forEach(function (act) {
+                if (act.parent && act.parent.id === String(item.id)) {
+                    act.parent = {
+                        'id': 'all'
+                    };
+                }
+            });
+
             if (!String(item.id).indexOf('new_')) {
-                group.items.splice(group.items.indexOf(item, 1));
+                group.items.splice(group.items.indexOf(item), 1);
                 return true;
             }
 
@@ -428,11 +436,14 @@ momentum.controller('RulesController', [
 
         $scope.add = function (group) {
             group.items.push({
-                'id': 'new_' + group.items.length,
+                'id': 'new_' + Date.now(),
                 'condition': 'NONE',
                 'action': 'NONE',
                 'my': 1,
                 'value': 50,
+                'parent': {
+                    'id': 'all'
+                },
                 'options': {}
             });
         };
@@ -457,6 +468,12 @@ momentum.controller('RulesController', [
             });
         };
 
+        $scope.haveAction = function (action, group) {
+            return group.items.filter(function (act) {
+                return !act.deleted && act.action === action;
+            }).length;
+        };
+
         $scope.condNoneCheck = function (item) {
             return item.condition === 'NONE';
         };
@@ -470,6 +487,23 @@ momentum.controller('RulesController', [
                 return !Object.keys(item.options || {}).length;
             }
             return 0;
+        };
+
+        $scope.getStopPromotionOptions = function (group) {
+            var ret = [{'id': 'all', 'name': 'Any rule'}],
+                i = 0;
+
+            for (; i < group.items.length; i += 1) {
+                if (!group.items[i].deleted &&
+                        group.items[i].action === 'promotion_start') {
+                    ret.push({
+                        'id': String(group.items[i].id),
+                        'name': 'Rule #' + (i + 1)
+                    });
+                }
+            }
+
+            return ret;
         };
 
         if ($scope.loaded) {

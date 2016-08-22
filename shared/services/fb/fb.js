@@ -175,6 +175,22 @@ momentum.factory('fb', [
             return num.toPrecision(3);
         }
 
+        fb.saveCampaign = function (sessionId, campaignId, budget, endTime) {
+            return $http.post([
+                bvConfig.endpoint,
+                'promotion/campaign/save'
+            ].join(''), {
+                'session_id': sessionId,
+                'campaign_id': Number(campaignId),
+                'budget': Number(budget),
+                'end_time': Number(endTime)
+            }).then(function (res) {
+                if (res.data.errorMessage) {
+                    throw res.data.errorMessage.split(':')[2];
+                }
+            });
+        };
+
         fb.getCampaigns = function (sessionId, contentId, limit, offset) {
             var params = {
                 'session_id': sessionId
