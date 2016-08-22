@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+        <input
+            ng-model="model.budget"
+            class="mdl-textfield__input"
+            step="any"
+            min="0.000001"
+            type="number"
+            id="budget"
+            required>
+            <label for="budget">Lifetime budget ({{model.currency}})</label>
+        </input>
+    </div>
+</div>
+<div class="row">
+    <div
+        class="full date_picker">
+    <input
+      min="{{ model.from | date:'yyyy-MM-dd' }}"
+      max="{{ model.to | date:'yyyy-MM-dd' }}"
+      type="date"
+      id="date_picker"
+      ng-model="model.until"
+      required>
+    <label for="date_picker">Promote until</label>
+  </div>
+</div>

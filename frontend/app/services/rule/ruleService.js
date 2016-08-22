@@ -50,7 +50,12 @@ momentum.factory('rule', ['category', '$q', '$http',
                     'options': Object.keys(item.options).length &&
                         item.options || {},
                     'my': Number(item.my),
-                    'name': item.name
+                    'name': item.name,
+                    'parent': item.parent && {
+                        'id': String(item.parent)
+                    } || {
+                        'id': 'all'
+                    }
                 };
 
                 act.$original = angular.copy(act);
@@ -175,6 +180,12 @@ momentum.factory('rule', ['category', '$q', '$http',
             req.definition = JSON.stringify(req.definition, null, 4);
 
             req.module = moduleMap[item.action];
+
+            if (item.parent && item.parent.id && item.parent.id !== 'all') {
+                req.parent = item.parent.id;
+            } else {
+                req.parent = null;
+            }
 
             req.my = item.my;
 
