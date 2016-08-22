@@ -26,7 +26,7 @@
             <th title="Click">Click</th>
             <th title="Landing">Land.</th>
             <th title="Schedule">Schedule</th>
-            <th></th>
+            <th ng-if="false"></th>
           </tr>
         </thead>
         <tbody>
@@ -54,21 +54,21 @@
                     {{c.name}}
                 </a>
             </td>
-            <td ng-if="!c.adset" colspan="7">You don't have permission to access this campaign.</td>
+            <td ng-if="!c.adset" colspan="6">You don't have permission to access this campaign.</td>
             <td ng-if="c.adset">{{c.conversion}}</td>
             <td ng-if="c.adset">{{c.cpa}}</td>
             <td ng-if="c.adset">{{c.spend}}</td>
             <td ng-if="c.adset">{{c.click}}</td>
             <td ng-if="c.adset">{{c.landing}}</td>
             <td ng-if="c.adset">{{c.from}} - {{c.to}}</td>
-            <td ng-if="c.adset" mdl-upgrade>
+            <td ng-if="false && c.adset" mdl-upgrade>
                 <button ng-click="edit(c)" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
                     <i class="material-icons">edit</i>
                 </button>
             </td>
           </tr>
         <tr class="spacer" ng-if="model.sum < 10">
-            <td colspan="9" style="height: calc(49px * ({{10 - model.sum}}))">
+            <td colspan="8" style="height: calc(49px * ({{10 - model.sum}}))">
                 {{model.sum ? 
                     '&nbsp' :
                     model.errorMessage ?
