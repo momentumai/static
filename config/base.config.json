@@ -14,6 +14,7 @@
         "scope": [
             "manage_pages",
             "ads_management",
+            "business_management",
             "publish_pages",
             "user_managed_groups",
             "user_events"
