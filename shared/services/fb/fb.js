@@ -20,7 +20,7 @@ momentum.factory('fb', [
                 FB.init({
                     'appId': bvConfig.facebook.appId,
                     'xfbml': true,
-                    'version': 'v2.5'
+                    'version': 'v2.7'
                 });
             };
 
@@ -90,7 +90,7 @@ momentum.factory('fb', [
         };
 
         fb.share = function (url) {
-            var src = 'https://www.facebook.com/v2.5/dialog/share?' +
+            var src = 'https://www.facebook.com/v2.7/dialog/share?' +
                 'app_id=' +
                 bvConfig.facebook.appId +
                 '&display=popup' +
