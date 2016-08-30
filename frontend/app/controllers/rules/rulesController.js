@@ -39,7 +39,16 @@ momentum.controller('RulesController', [
                 return fb.audiences(
                     $scope.sessionId,
                     model.adaccount.selected
-                );
+                ).then(function (res) {
+                    res.validators = [{
+                        'message': 'Please fill out this field.',
+                        'cond': function (item) {
+                            return !item;
+                        }
+                    }];
+
+                    return res;
+                });
             }
         }
 
@@ -76,6 +85,7 @@ momentum.controller('RulesController', [
                 var offset = resp[1] && resp[1].offset || 100;
 
                 model.audiences = resp[0];
+
                 model.currency = resp[1];
                 model.budget = Math.floor(
                     2000 /
@@ -257,6 +267,7 @@ momentum.controller('RulesController', [
                 model.utm_source = 'facebook';
                 model.utm_medium = 'momentum';
                 model.utm_campaign = 'organic';
+                model.new = 1;
             }
 
             promise.then(function () {
@@ -344,6 +355,7 @@ momentum.controller('RulesController', [
                 model.utm_medium = '';
                 model.utm_campaign = '';
                 model.max_duration = 1;
+                model.new = 1;
             }
 
             promise.then(function () {
@@ -375,24 +387,24 @@ momentum.controller('RulesController', [
                             'utm_medium': model.utm_medium,
                             'utm_campaign': model.utm_campaign,
                             'meta': {
-                                'page': model.page.data.filter(
+                                'page': (model.page.data.filter(
                                     function (elem) {
                                         return elem.id ===
                                             model.page.selected;
                                     }
-                                )[0].label,
-                                'audience': model.audiences.data.filter(
+                                )[0] || {}).label,
+                                'audience': (model.audiences.data.filter(
                                     function (elem) {
                                         return elem.id ===
                                             model.audiences.selected;
                                     }
-                                )[0].label,
-                                'adaccount': model.adaccount.data.filter(
+                                )[0] || {}).label,
+                                'adaccount': (model.adaccount.data.filter(
                                     function (elem) {
                                         return elem.id ===
                                             model.adaccount.selected;
                                     }
-                                )[0].label,
+                                )[0] || {}).label,
                                 'currency': model.currency.name,
                                 'offset': model.currency.offset
                             }

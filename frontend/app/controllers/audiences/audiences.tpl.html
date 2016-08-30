@@ -6,7 +6,7 @@
 
 <div ng-if="viewLoaded" ng-repeat="asset in assets track by asset.id">
     <div class="asset-header">
-        {{asset.name}} {{$first ? '(default)': ''}}
+        {{asset.name}}
     </div>
     <div ng-if="asset.audiences.length" class="audiences" mdl-upgrade>
         <div class="group-cont"

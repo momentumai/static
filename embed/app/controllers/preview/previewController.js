@@ -1,11 +1,12 @@
 /*global momentum */
 momentum.controller('PreviewController', [
+    '$q',
     '$stateParams',
     '$state',
     'fb',
     'content',
     '$scope',
-    function ($stateParams, $state, fb, content, $scope) {
+    function ($q, $stateParams, $state, fb, content, $scope) {
         $scope.viewLoaded = 0;
         $scope.model = $stateParams.model;
         $scope.content = $stateParams.content;
@@ -20,7 +21,7 @@ momentum.controller('PreviewController', [
                         function (act) {
                             return act.id === id;
                         }
-                    )[0] || null;
+                    )[0] || {};
                 },
                 meta = {
                     'page': byId(
@@ -38,6 +39,10 @@ momentum.controller('PreviewController', [
                     'currency': model.currency.name,
                     'offset': model.currency.offset
                 };
+
+            if (!model.audiences.selected) {
+                return $q.reject('You must have at least one saved audience');
+            }
 
             model.preview = {
                 'ad_account': model.adaccount.selected,
