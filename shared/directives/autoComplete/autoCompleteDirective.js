@@ -7,7 +7,28 @@ momentum.directive('autoComplete', [
     function ($timeout, $templateCache, $rootScope, $compile) {
         var $ = angular.element;
 
+        function action (click, self, item, recalcPosition, cont, outerDiv) {
+            click(self, item);
+
+            $timeout(function () {
+                recalcPosition(cont, outerDiv);
+            });
+        }
+
         function link ($scope, $element) {
+            var elements = [],
+                resCache = [],
+                selectedIndex = 0;
+
+            function updateSelected () {
+                (elements || []).forEach(function (e) {
+                    $(e).removeClass('selected');
+                });
+                if (elements && elements[selectedIndex]) {
+                    $(elements[selectedIndex]).addClass('selected');
+                }
+            }
+
             function recalcPosition (cont, outerDiv) {
                 var element = $element[0],
                     pos = element.getBoundingClientRect();
@@ -50,27 +71,33 @@ momentum.directive('autoComplete', [
                 element.innerHTML = template;
 
                 element.addEventListener('mouseenter', function () {
-                    $(element).addClass('selected');
-                });
-
-                element.addEventListener('mouseleave', function () {
-                    $(element).removeClass('selected');
+                    selectedIndex = elements.indexOf(element);
+                    updateSelected();
                 });
 
                 element.addEventListener('mousedown', function (e) {
+                    if (e.which !== 1) {
+                        return;
+                    }
+
                     e.preventDefault();
 
-                    click(self, item);
-
-                    $timeout(function () {
-                        recalcPosition(cont, outerDiv);
-                    });
+                    action(
+                        click,
+                        self,
+                        item,
+                        recalcPosition,
+                        cont,
+                        outerDiv
+                    );
                 });
 
                 $(cont).removeClass('empty');
                 cont.appendChild(element);
 
                 $compile(element)(scope);
+
+                return element;
             }
 
             $timeout(function () {
@@ -111,10 +138,14 @@ momentum.directive('autoComplete', [
                     ).then(function (res) {
                         var i = 0;
 
+                        resCache = res;
+                        selectedIndex = 0;
+                        elements = [];
+
                         cont.innerHTML = '';
                         $(cont).addClass('empty');
                         for (; i < Math.min(10, res.length); i += 1) {
-                            addAndCompile(
+                            elements.push(addAndCompile(
                                 res[i],
                                 outerDiv,
                                 cont,
@@ -122,11 +153,53 @@ momentum.directive('autoComplete', [
                                 element,
                                 $scope.itemAction,
                                 $scope.itemActionSelf
-                            );
+                            ));
                         }
+
+                        updateSelected();
                     });
                 }
+
                 $scope.$watch('value', valueChange);
+
+                element.addEventListener('keydown', function (e) {
+                    var enter = 13,
+                        up = 38,
+                        down = 40,
+                        keys = [up, down, enter],
+                        key = e.keyCode || e.which;
+
+                    if (keys.indexOf(key) !== -1) {
+                        e.preventDefault();
+
+                        if (key === enter) {
+                            action(
+                                $scope.itemAction,
+                                $scope.itemActionSelf,
+                                resCache[selectedIndex],
+                                recalcPosition,
+                                cont,
+                                outerDiv
+                            );
+                        }
+
+                        if (key === up) {
+                            selectedIndex -= 1;
+                        }
+
+                        if (key === down) {
+                            selectedIndex += 1;
+                        }
+
+                        if (key !== enter) {
+                            selectedIndex = Math.max(0, Math.min(
+                                selectedIndex,
+                                elements.length - 1
+                            ));
+                            updateSelected();
+                        }
+                    }
+                });
 
                 element.addEventListener('focus', function () {
                     recalcPosition(cont, outerDiv);
