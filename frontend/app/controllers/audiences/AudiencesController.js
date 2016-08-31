@@ -1,12 +1,13 @@
-/*global momentum, angular */
+/*global momentum, angular, window */
 momentum.controller('AudiencesController', [
+    '$timeout',
     '$q',
     '$scope',
     'audience',
     'dialog',
     'toast',
     'fb',
-    function ($q, $scope, audience, dialog, toast, fb) {
+    function ($timeout, $q, $scope, audience, dialog, toast, fb) {
         $scope.viewLoaded = 0;
 
         $scope.assets = null;
@@ -274,6 +275,17 @@ momentum.controller('AudiencesController', [
             });
         };
 
+        function selectAllAndFocusName (audience) {
+            var id = [
+                    audience.id,
+                    'name'
+                ].join('-'),
+                input = window.document.getElementById(id);
+
+            input.select();
+            input.focus();
+        }
+
         $scope.create = function (asset) {
             var au = {
                 'id': String(Date.now()),
@@ -287,7 +299,11 @@ momentum.controller('AudiencesController', [
             asset.audiences.push(au);
 
             au.$original = angular.copy(au);
-            $scope.open(asset, au);
+            $scope.open(asset, au).then(function () {
+                return $timeout(function () {
+                    selectAllAndFocusName(au);
+                });
+            });
         };
 
         $scope.open = function (asset, audience) {
