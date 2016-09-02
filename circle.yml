@@ -1,7 +1,7 @@
 general:
   branches:
     only:
-      - dev
+      - staging
       - master
 
 machine:
@@ -10,7 +10,7 @@ machine:
 
 deployment:
     staging:
-        branch: dev
+        branch: staging
         commands:
           - NODE_ENV=production AWS_BUCKET="momentum-stage" AWS_DISTRIBUTION="E2544IKNG88L2J" gulp deploy
     production:
