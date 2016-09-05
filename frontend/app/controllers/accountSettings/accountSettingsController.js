@@ -52,15 +52,6 @@ momentum.controller('AccountSettingsController', [
                             $scope.fbInt.connected = 1;
                             $scope.user.fb_access_token = accessToken;
                             $scope.fbInt.dataLoading = 0;
-                            $rootScope.guideSteps['fb'] = 'added';
-                            return teamUserData.set(
-                                $scope.sessionId,
-                                'guide_fb',
-                                'added'
-                            ).then(function () {
-                                $rootScope.guideSteps['fb'] = 'added';
-                                return $rootScope.guide();
-                            });
                         });
                     });
                 }
