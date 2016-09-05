@@ -1,7 +1,7 @@
-/* global self, clients */
-console.log('Started', self);
-
+/* global self, clients, fetch */
 var bvConfig = JSON.parse('@@bvConfig');
+
+console.log('Started', self);
 
 self.addEventListener('install', function (event) {
     self.skipWaiting();
@@ -12,34 +12,34 @@ self.addEventListener('activate', function (event) {
     console.log('Activated', event);
 });
 
-self.addEventListener('message', function(event) {
+self.addEventListener('message', function (event) {
     self.token = event.data.token;
 });
 
 self.addEventListener('push', function (event) {
     event.waitUntil(
-        self.registration.pushManager.getSubscription().then(function(sub) {
+        self.registration.pushManager.getSubscription().then(function (sub) {
             var ep = [
                 bvConfig.endpoint,
                 'auth/user/notif/fetch'
             ].join();
 
             fetch(ep, {
-                method: 'post',
-                headers: {
+                'method': 'post',
+                'headers': {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: {
+                'body': {
                     'session_id': self.sessionId,
                     'endpoint': sub.endpoint
                 }
             })
-            .then(function(response) { return response.json(); })
-            .then(function(resp) {
+            .then(function (response) { return response.json(); })
+            .then(function (resp) {
                 self.registration.showNotification(resp.title, resp.data);
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 console.log('error', err);
             });
         })
