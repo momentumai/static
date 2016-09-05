@@ -53,15 +53,12 @@ function ($q, $cookies) {
     };
 
     storage.clearAuthData = function () {
-        return $q(function (resolve) {
-            $cookies.remove('BVSID');
-            remove('BVSID');
-            remove('BVUSER');
-            remove('BVTEAMS');
-            remove('BVSELECTEDTEAM');
-            remove('BVFILTERS');
-            resolve();
-        });
+        $cookies.remove('BVSID');
+        remove('BVSID');
+        remove('BVUSER');
+        remove('BVTEAMS');
+        remove('BVSELECTEDTEAM');
+        remove('BVFILTERS');
     };
 
     storage.getUser = function () {

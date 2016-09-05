@@ -3,6 +3,16 @@ momentum.config([
     '$provide',
     '$httpProvider',
     function ($provide, $httpProvider) {
+        function openErrorDialog (dialog) {
+            return dialog.open({
+                'template': 'errorDialog.tpl.html',
+                'okText': 'Reload',
+                'canHide': false
+            }).then(function () {
+                window.location.reload(true);
+            });
+        }
+
         $provide.factory('httpInterceptor', ['$injector', '$q',
             function ($injector) {
                 return {
@@ -40,35 +50,50 @@ momentum.config([
                     'response': function (response) {
                         var body,
                             status,
-                            storage,
-                            state = $injector.get('$state');
+                            storage;
 
                         if (response.data.errorMessage) {
                             storage = $injector.get('storage');
-                            storage.invalidateCache();
                             body = response.data.errorMessage.split(':');
                             status = Number(body[1]);
                             if (status === 401) {
-                                storage.clearAuthData().then(function () {
-                                    state.go('auth');
-                                    window.location.reload(true);
-                                });
+                                storage.clearAuthData();
+                                window.location.href = bvConfig.docBase +
+                                    '#/auth';
+                                throw 'Auth error';
                             }
                         }
 
                         if (response.data.Type === 'Service') {
-                            return $injector.get('$http')(response.config);
+                            return openErrorDialog($injector.get('dialog'));
                         }
 
                         return response;
                     },
                     'responseError': function (response) {
-                        var fb = 'https://graph.facebook.com/';
+                        var fb = 'https://graph.facebook.com/',
+                            exclude = [
+                                'dashboard/main',
+                                'dashboard/post/list'
+                            ],
+                            excluded = 0;
 
                         if (response.config.url.startsWith(fb)) {
                             return response;
                         }
-                        return $injector.get('$http')(response.config);
+
+                        excluded = exclude.reduce(function (prev, act) {
+                            prev += response.config.url.indexOf(act) === -1 ?
+                                0 :
+                                1;
+                            return prev;
+                        }, 0);
+
+                        if (excluded) {
+                            return response;
+                        }
+
+                        return openErrorDialog($injector.get('dialog'));
                     }
                 };
             }
