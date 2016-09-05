@@ -37,15 +37,13 @@ momentum.controller('RootController', [
         $scope.loaded = 0;
 
         function startServiceWorker () {
-            return navigator.serviceWorker.register('service-worker/index.js')
-            .then(function (reg) {
-                var messenger = reg.installing ||
-                        navigator.serviceWorker.controller;
-
-                messenger.postMessage({'token': $scope.sessionId});
-
+            return navigator.serviceWorker.register('service-worker.js')
+            .then(function () {
                 return navigator.serviceWorker.ready;
             }).then(function (reg) {
+                var messenger = navigator.serviceWorker.controller;
+
+                messenger.postMessage({'sessionId': $scope.sessionId});
                 return reg.pushManager.subscribe({'userVisibleOnly': true});
             }).then(function (sub) {
                 return auth.setNotifEndpoint($scope.sessionId, sub.endpoint);

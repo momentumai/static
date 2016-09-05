@@ -28,7 +28,6 @@ gulp.task('watch', function () {
     return gulp.watch([
         path.join(base, 'frontend', 'app', '**', '*'),
         path.join(base, 'frontend', 'assets', '**', '*'),
-        path.join(base, 'frontend', 'service-worker', '**', '*'),
         path.join(base, 'embed', 'app', '**', '*'),
         path.join(base, 'embed', 'assets', '**', '*'),
         path.join(base, 'vendor', '**', '*'),
@@ -228,11 +227,6 @@ gulp.task('copy:js', function (done) {
     gulp.runSequence(['copy:js:embed', 'copy:js:frontend'], done);
 });
 
-gulp.task('copy:service-worker', function () {
-    return gulp.src(path.join(base, 'frontend', 'service-worker', '**', '*'))
-        .pipe(gulp.dest(path.join(distDir, 'service-worker')));
-});
-
 gulp.task('copy:css:frontend', function () {
     return gulp.src([
         path.join(base, 'vendor/material-design-lite/dist/material.css'),
@@ -283,27 +277,16 @@ gulp.task('copy:views', function (done) {
 });
 
 gulp.task('config:frontend', function () {
-    return gulp.src(
-        path.join(distDir, 'app.js')
-    ).pipe(gulp.replace({
+    return gulp.src([
+        path.join(distDir, 'app.js'),
+        path.join(distDir, 'service-worker.js')
+    ]).pipe(gulp.replace({
         'patterns': [{
             'match': 'bvConfig',
             'replacement': JSON.stringify(config)
                 .replace(/\\/g, '\\\\')
         }]
     })).pipe(gulp.dest(distDir));
-});
-
-gulp.task('config:service-worker', function () {
-    return gulp.src(
-        path.join(distDir, 'service-worker', 'index.js')
-    ).pipe(gulp.replace({
-        'patterns': [{
-            'match': 'bvConfig',
-            'replacement': JSON.stringify(config)
-                .replace(/\\/g, '\\\\')
-        }]
-    })).pipe(gulp.dest(path.join(distDir, 'service-worker')));
 });
 
 gulp.task('config:embed', function () {
@@ -320,11 +303,7 @@ gulp.task('config:embed', function () {
 });
 
 gulp.task('config', function (done) {
-    gulp.runSequence([
-        'config:embed',
-        'config:frontend',
-        'config:service-worker'
-    ], done);
+    gulp.runSequence(['config:embed', 'config:frontend'], done);
 });
 
 gulp.task('uglify:frontend', function () {
@@ -409,7 +388,6 @@ gulp.task('copy', [
     'copy:js',
     'copy:css',
     'copy:assets',
-    'copy:service-worker',
     'copy:views'
 ]);
 
