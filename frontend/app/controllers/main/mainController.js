@@ -82,7 +82,7 @@ momentum.controller('MainController', [
                 );
             });
 
-            $q.all(promises).then(function () {
+            $q.all(promises).finally(function () {
                 $timeout(function () { $scope.viewLoaded = 1; });
                 poller = $timeout(oneMinutePoll, 60000);
             });
