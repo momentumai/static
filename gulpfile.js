@@ -224,17 +224,13 @@ gulp.task('copy:js:embed', function () {
         .pipe(gulp.dest(path.join(distDir, 'embed')));
 });
 
-gulp.task('copy:service-worker', function () {
-    return gulp.src(path.join(base, 'service-worker/**'))
-        .pipe(gulp.dest(path.join(distDir)));
+gulp.task('copy:js', function (done) {
+    gulp.runSequence(['copy:js:embed', 'copy:js:frontend'], done);
 });
 
-gulp.task('copy:js', function (done) {
-    gulp.runSequence([
-        'copy:js:embed',
-        'copy:js:frontend',
-        'copy:service-worker'
-    ], done);
+gulp.task('copy:service-worker', function () {
+    return gulp.src(path.join(base, 'frontend', 'service-worker', '**', '*'))
+        .pipe(gulp.dest(path.join(distDir, 'service-worker')));
 });
 
 gulp.task('copy:css:frontend', function () {

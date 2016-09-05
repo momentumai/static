@@ -37,7 +37,7 @@ momentum.controller('RootController', [
         $scope.loaded = 0;
 
         function startServiceWorker () {
-            return navigator.serviceWorker.register('sw.js')
+            return navigator.serviceWorker.register('service-worker/index.js')
             .then(function (reg) {
                 var messenger = reg.installing ||
                         navigator.serviceWorker.controller;
