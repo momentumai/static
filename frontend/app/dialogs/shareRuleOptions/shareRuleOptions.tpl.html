@@ -1,5 +1,13 @@
 <div class="promotion-form">
-    <div class="row">
+    <div ng-if="model.new" class="row">
+        <div
+            dropdown
+            ng-model="model.page"
+            storage-key="AD_PAGE"
+            class="dropdown full">
+        </div>
+    </div>
+    <div ng-if="!model.new" class="row">
         <div
             dropdown
             ng-model="model.page"
