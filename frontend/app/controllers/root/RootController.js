@@ -9,7 +9,6 @@ momentum.controller('RootController', [
     'auth',
     'dialog',
     'category',
-    'guide',
     function (
         $state,
         $stateParams,
@@ -19,8 +18,7 @@ momentum.controller('RootController', [
         storage,
         auth,
         dialog,
-        category,
-        guide
+        category
     ) {
         $scope.sessionId = '0';
 
@@ -86,10 +84,6 @@ momentum.controller('RootController', [
             sendSessionId();
 
             $scope.$broadcast('loaded');
-
-            if (!Number(user.is_super)) {
-                return guide.show($scope.sessionId, user);
-            }
         }).then(function () {
             if ('serviceWorker' in navigator) {
                 return startServiceWorker();

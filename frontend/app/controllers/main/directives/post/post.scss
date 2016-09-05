@@ -4,10 +4,6 @@
     background: white;
     top: 64px;
     width: 33.3333333333%;
-    .has-steps & {
-        top: 128px;
-        height: calc(100% - 128px);
-    }
     .post-list {
         position: absolute;
         top: 0;
