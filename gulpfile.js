@@ -294,6 +294,18 @@ gulp.task('config:frontend', function () {
     })).pipe(gulp.dest(distDir));
 });
 
+gulp.task('config:service-worker', function () {
+    return gulp.src(
+        path.join(distDir, 'service-worker', 'index.js')
+    ).pipe(gulp.replace({
+        'patterns': [{
+            'match': 'bvConfig',
+            'replacement': JSON.stringify(config)
+                .replace(/\\/g, '\\\\')
+        }]
+    })).pipe(gulp.dest(path.join(distDir, 'service-worker')));
+});
+
 gulp.task('config:embed', function () {
     return gulp.src([
         path.join(distDir, 'embed', 'app.js'),
@@ -308,7 +320,11 @@ gulp.task('config:embed', function () {
 });
 
 gulp.task('config', function (done) {
-    gulp.runSequence(['config:embed', 'config:frontend'], done);
+    gulp.runSequence([
+        'config:embed',
+        'config:frontend',
+        'config:service-worker'
+    ], done);
 });
 
 gulp.task('uglify:frontend', function () {
