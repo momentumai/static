@@ -17,9 +17,14 @@ momentum.config([
                             status = Number(
                                 response.data.errorMessage.split(':')[1]
                             );
+
                             if (status === 401) {
                                 storage.clearAuthData();
                                 return redirect.toAuth();
+                            }
+
+                            if (status === 405) {
+                                return redirect.toFacebook();
                             }
                         }
 
