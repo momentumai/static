@@ -10,6 +10,8 @@ momentum.config([
                 'canHide': false
             }).then(function () {
                 window.location.reload(true);
+                /** hide error dialog */
+                throw null;
             });
         }
 
