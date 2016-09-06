@@ -191,5 +191,15 @@ momentum.factory('auth', ['$http', function ($http) {
         });
     };
 
+    auth.setNotifEndpoint = function (sessionId, endpoint) {
+        return $http.post([
+            bvConfig.endpoint,
+            'auth/user/notif/set'
+        ].join(''), {
+            'session_id': sessionId,
+            'endpoint': endpoint
+        });
+    };
+
     return auth;
 }]);

@@ -35,14 +35,7 @@ momentum.controller('ContentController', [
                 return fb.audiences(
                     $scope.sessionId,
                     $scope.form.adaccount.selected
-                ).then(function (res) {
-                    if (!res.data.length) {
-                        dialog.destroy();
-                        $state.go('root.audiences');
-                        throw 'You must have at least one audience';
-                    }
-                    return res;
-                });
+                );
             }
         }
 
@@ -160,7 +153,6 @@ momentum.controller('ContentController', [
 
         function getSecondLevel (model, back) {
             $scope.form = model;
-
             return refreshModel(back);
         }
 
@@ -180,6 +172,12 @@ momentum.controller('ContentController', [
         };
 
         function loadPreview (model) {
+            if (!model.preview.meta.audience) {
+                dialog.destroy();
+                $state.go('root.audiences');
+                throw 'You must have at least one audience';
+            }
+
             return fb.preview(
                 $scope.sessionId,
                 $scope.content.id,
@@ -217,7 +215,7 @@ momentum.controller('ContentController', [
                                 function (act) {
                                     return act.id === id;
                                 }
-                            )[0] || null;
+                            )[0] || {};
                         },
                         meta = {
                             'page': byId(

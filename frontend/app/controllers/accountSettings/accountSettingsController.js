@@ -38,136 +38,29 @@ momentum.controller('AccountSettingsController', [
             });
         }
 
-        function reloadAssets () {
-            var promises = {},
-                fbAssets,
-                assets;
-
-            promises['fbAssets'] = fb.listFbAssets(
-                $scope.sessionId
-            ).then(function (a) {
-                $scope.fbInt.connected = 1;
-                fbAssets = a;
-            }).catch(function () {});
-
-            promises['assets'] = fb.listAssets(
-                $scope.sessionId
-            ).then(function (a) {
-                assets = a;
-            });
-
-            return $q.all(promises).then(function () {
-                if ($scope.fbInt.connected) {
-                    $scope.fbInt.assets = utils.mergeAssets(
-                        fbAssets,
-                        assets
-                    );
+        function getIntegration () {
+            return {
+                'dataLoading': 0,
+                'connected': $scope.user.fb_access_token ? 1 : 0,
+                'connect': function () {
+                    $scope.fbInt.dataLoading = 1;
+                    fb.login().then(function (accessToken) {
+                        return fb.token(
+                            $scope.sessionId,
+                            accessToken
+                        ).then(function () {
+                            $scope.fbInt.connected = 1;
+                            $scope.user.fb_access_token = accessToken;
+                            $scope.fbInt.dataLoading = 0;
+                        });
+                    });
                 }
-            });
+            };
         }
 
         $scope.viewLoaded = 0;
 
-        $scope.fbInt = {
-            'dataLoading': 0,
-            'connected': 0,
-            'assets': null,
-            'submit': function () {
-                var assets = $scope.fbInt.assets,
-                    checkFunc = function (e) {
-                        return e.checked;
-                    },
-                    pages = assets.page.filter(checkFunc),
-                    adaccounts = assets.adaccount.filter(checkFunc),
-                    req = pages.concat(adaccounts);
-
-                if (!pages.length || !adaccounts.length) {
-                    return dialog.open({
-                        'htmlText': 'Choose at least one ad account and page.'
-                    });
-                }
-
-                $scope.fbInt.dataLoading = 1;
-                return fb.saveAssets(
-                    $scope.sessionId,
-                    req
-                ).then(function (data) {
-                    if (data.length !== req.length) {
-                        return reloadAssets().then(function () {
-                            $scope.fbInt.dataLoading = 0;
-                            return dialog.open({
-                                'htmlText': 'Can\'t save one or more assets.'
-                            });
-                        });
-                    }
-                    $scope.fbInt.dataLoading = 0;
-                    toast.open({
-                        'htmlText': 'Assets saved'
-                    });
-                    return teamUserData.set(
-                        $scope.sessionId,
-                        'guide_fb',
-                        'added'
-                    ).then(function () {
-                        $rootScope.guideSteps['fb'] = 'added';
-                        return $rootScope.guide();
-                    });
-                });
-            },
-            'connect': function () {
-                $scope.fbInt.dataLoading = 1;
-                fb.login().then(function (accessToken) {
-                    return fb.token(
-                        $scope.sessionId,
-                        accessToken
-                    ).then(function () {
-                        return reloadAssets().then(function () {
-                            $scope.fbInt.dataLoading = 0;
-                        });
-                    });
-                });
-            },
-            'switchDefault': function (type, id) {
-                $scope.fbInt.assets[type].forEach(function (asset) {
-                    asset.default = false;
-                    if (asset.value === id) {
-                        asset.default = true;
-                        asset.checked = true;
-                    }
-                });
-            },
-            'checkChange': function (type, id) {
-                var val,
-                    hasDefault,
-                    checked = [];
-
-                $scope.fbInt.assets[type].forEach(function (asset) {
-                    val = asset.checked;
-                    if (asset.value === id) {
-                        if (val) {
-                            asset.checked = true;
-                            val = true;
-                        } else {
-                            asset.checked = false;
-                            asset.default = false;
-                        }
-                    }
-                    if (val) {
-                        checked.push(asset);
-                    }
-                });
-
-                checked.forEach(function (asset) {
-                    if (asset.default) {
-                        hasDefault = true;
-                    }
-                });
-
-                if (!hasDefault && checked.length) {
-                    checked[0].default = 1;
-                }
-            }
-        };
+        $scope.fbInt = null;
 
         $scope.teamSwitch = {
             'dataLoading': 0,
@@ -225,9 +118,8 @@ momentum.controller('AccountSettingsController', [
                 $scope.teamSwitch.teams = teams;
             });
 
-            promises['assets'] = reloadAssets();
-
             return $q.all(promises).then(function () {
+                $scope.fbInt = getIntegration();
                 animate();
                 $scope.viewLoaded = 1;
             });

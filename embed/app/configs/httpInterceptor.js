@@ -17,26 +17,34 @@ momentum.config([
                             status = Number(
                                 response.data.errorMessage.split(':')[1]
                             );
+
                             if (status === 401) {
-                                return storage.clearAuthData()
-                                .then(function () {
-                                    return redirect.toAuth();
-                                });
+                                storage.clearAuthData();
+                                return redirect.toAuth();
                             }
-                            //if (status === 405) {
-                            //    redirect.toFacebook();
-                            //    throw null;
-                            //}
+
+                            if (status === 405) {
+                                return redirect.toFacebook();
+                            }
                         }
 
                         if (response.data.Type === 'Service') {
-                            return $injector.get('$http')(response.config);
+                            $injector.get('$state').go('error', {
+                                'message': 'An unexpected error occurred. ' +
+                                'If the problem continues, contact support. ' +
+                                '(info@momentum.ai)'
+                            });
                         }
 
                         return response;
                     },
                     'responseError': function (response) {
-                        return $injector.get('$http')(response.config);
+                        $injector.get('$state').go('error', {
+                            'message': 'An unexpected error occurred. ' +
+                            'If the problem continues, contact support. ' +
+                            '(info@momentum.ai)'
+                        });
+                        return response;
                     }
                 };
             }

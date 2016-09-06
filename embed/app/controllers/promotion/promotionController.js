@@ -21,12 +21,7 @@ momentum.controller('PromotionController', [
             return fb.audiences(
                 $scope.sessionId,
                 $scope.form.adaccount.selected
-            ).then(function (res) {
-                if (!res.data.length) {
-                    throw 'You must have at least one saved audience';
-                }
-                return res;
-            });
+            );
         }
 
         function refreshModel () {

@@ -277,9 +277,10 @@ gulp.task('copy:views', function (done) {
 });
 
 gulp.task('config:frontend', function () {
-    return gulp.src(
-        path.join(distDir, 'app.js')
-    ).pipe(gulp.replace({
+    return gulp.src([
+        path.join(distDir, 'app.js'),
+        path.join(distDir, 'service-worker.js')
+    ]).pipe(gulp.replace({
         'patterns': [{
             'match': 'bvConfig',
             'replacement': JSON.stringify(config)

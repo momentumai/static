@@ -44,7 +44,7 @@ momentum.controller('InfoController', [
                 $scope.dashboard.stats = main.stats;
             });
 
-            $q.all(promises).then(function () {
+            $q.all(promises).finally(function () {
                 $scope.viewLoaded = 1;
                 if (first) {
                     animate();
