@@ -10,6 +10,8 @@ momentum.config([
                 'canHide': false
             }).then(function () {
                 window.location.reload(true);
+                /** hide error dialog */
+                throw null;
             });
         }
 
@@ -60,7 +62,13 @@ momentum.config([
                                 storage.clearAuthData();
                                 window.location.href = bvConfig.docBase +
                                     '#/auth';
-                                throw 'Auth error';
+                                /** hide error dialog */
+                                throw null;
+                            }
+                            if (status === 405) {
+                                window.location.href = bvConfig.docBase +
+                                    '#/dashboard/settings/account';
+                                throw null;
                             }
                         }
 

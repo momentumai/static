@@ -17,6 +17,7 @@ momentum.factory('demo', [function () {
             'dashboard/main': function () {},
             'dashboard/content/sources/history': function () {},
             'facebook/account/list': function () {},
+            'facebook/asset/get': function () {},
             'promotion/campaign/list': function () {},
             'promotion/autoschedule': function () {},
             'promotion/audience/list': function () {},
