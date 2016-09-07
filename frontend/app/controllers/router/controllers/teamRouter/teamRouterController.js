@@ -28,7 +28,6 @@ momentum.controller('TeamRouterController', [
                 'subSubCategory': 'all'
             });
         }).then(function () {
-            storage.invalidateCache();
             if ($stateParams.redirect) {
                 $scope.text = 'Redirecting...';
                 window.location.href = decodeURIComponent(
@@ -37,6 +36,7 @@ momentum.controller('TeamRouterController', [
             } else {
                 $state.go('root.main.dashboard.info');
             }
+            window.location.reload(true);
         }).catch(function () {
             $scope.text = 'The page cannot be displayed.';
         });
