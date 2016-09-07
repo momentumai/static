@@ -1,0 +1,7 @@
+.layout .navigation .mdl-navigation__link.disabled {
+    cursor: not-allowed;
+    color: rgba(255, 255, 255, 0.52);
+    .material-icons {
+        color: rgba(255, 255, 255, 0.52);
+    }
+}

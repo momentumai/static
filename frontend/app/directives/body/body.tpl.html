@@ -45,10 +45,12 @@
       <i class="material-icons" role="dashboard">dashboard</i>
       Dashboard
     </a>
-    <a hide-overlay
+    <a hide-overlay="!user.is_admin"
       class="mdl-navigation__link"
-      href="#/dashboard/audiences">
-      <i class="material-icons" role="audiences">people</i>
+      id="nav-aud"
+      ng-class="{'disabled': !user.is_admin}"
+      href="{{user.is_admin ? '#/dashboard/audiences' : 'javascript:void(0)'}}">
+      <i class="material-icons" role="audiences" mdl-upgrade>people</i>
       Audiences
     </a>
     <a hide-overlay
@@ -82,6 +84,9 @@
       Sign out
     </a>
   </nav>
+    <div class="mdl-tooltip" for="nav-aud" mdl-upgrade>
+        Admin only
+    </div>
 </div>
 <main
   ui-view="container"
