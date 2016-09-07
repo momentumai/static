@@ -62,7 +62,6 @@ momentum.controller('RootController', [
                     'destroy': false,
                     'model': data
                 }).then(function () {
-                    storage.invalidateCache();
                     return category.setSelected($scope.sessionId, {
                         'category': data.category.selected,
                         'subCategory': data.subCategory.selected,
