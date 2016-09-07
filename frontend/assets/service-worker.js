@@ -15,9 +15,7 @@ self.addEventListener('activate', function (event) {
 });
 
 self.addEventListener('message', function (event) {
-    if (event.origin === self.bvConfig.docBase) {
-        self.sessionId = event.data.sessionId;
-    }
+    self.sessionId = event.data.sessionId;
 });
 
 self.showNotif = function (notif) {

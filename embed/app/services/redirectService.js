@@ -22,7 +22,7 @@ momentum.factory('redirect', [
         redirect.toFacebook = function () {
             var url = [
                 bvConfig.docBase,
-                '/#/dashboard/facebook'
+                '/#/dashboard/settings/account'
             ].join('');
 
             redirectTo(url);
