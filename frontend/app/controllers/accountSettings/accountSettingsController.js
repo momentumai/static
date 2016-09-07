@@ -1,4 +1,4 @@
-/*global momentum */
+/*global momentum, window */
 momentum.controller('AccountSettingsController', [
     'auth',
     'account',
@@ -72,8 +72,8 @@ momentum.controller('AccountSettingsController', [
                     $scope.teamSwitch.teams.selected
                 ).then(function () {
                     $scope.teamSwitch.dataLoading = 0;
-                    storage.invalidateCache();
                     $state.go('root.main.dashboard.info');
+                    window.location.reload(true);
                 });
             }
         };
