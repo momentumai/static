@@ -3,7 +3,10 @@ momentum.directive('hideOverlay', [
     function () {
         return {
             'restrict': 'A',
-            'link': function (ignore, $element) {
+            'scope': {
+                'prevent': '=hideOverlay'
+            },
+            'link': function (scope, $element) {
                 function getElements () {
                     return {
                         'menu': angular.element(
@@ -17,12 +20,20 @@ momentum.directive('hideOverlay', [
                     };
                 }
 
-                $element[0].addEventListener('click', function () {
+                function click () {
                     var elements = getElements();
 
                     elements.menu.removeClass('is-visible');
                     elements.overlay.removeClass('is-visible');
-                }, false);
+                }
+
+                scope.$watch('prevent', function (p) {
+                    if (!p) {
+                        $element[0].addEventListener('click', click, false);
+                    } else {
+                        $element[0].removeEventListener('click', click);
+                    }
+                });
             }
         };
     }
