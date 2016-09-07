@@ -84,7 +84,7 @@
       Sign out
     </a>
   </nav>
-    <div class="mdl-tooltip" for="nav-aud" mdl-upgrade>
+    <div ng-if="!user.is_admin" class="mdl-tooltip" for="nav-aud" mdl-upgrade>
         Admin only
     </div>
 </div>
