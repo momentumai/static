@@ -20,14 +20,20 @@ momentum.directive('hideOverlay', [
                     };
                 }
 
-                if (!scope.prevent) {
-                    $element[0].addEventListener('click', function () {
-                        var elements = getElements();
+                function click () {
+                    var elements = getElements();
 
-                        elements.menu.removeClass('is-visible');
-                        elements.overlay.removeClass('is-visible');
-                    }, false);
+                    elements.menu.removeClass('is-visible');
+                    elements.overlay.removeClass('is-visible');
                 }
+
+                scope.$watch('prevent', function (p) {
+                    if (!p) {
+                        $element[0].addEventListener('click', click, false);
+                    } else {
+                        $element[0].removeEventListener('click', click);
+                    }
+                });
             }
         };
     }
