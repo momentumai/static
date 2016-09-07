@@ -33,6 +33,7 @@ momentum.controller('AccountSettingsController', [
         function animate () {
             $timeout(function () {
                 $scope.fbInt.animate();
+                $scope.notif.animate();
                 $scope.pwChange.animate();
                 $scope.teamSwitch.animate();
             });
@@ -58,9 +59,28 @@ momentum.controller('AccountSettingsController', [
             };
         }
 
+        function getNotif () {
+            var isChrome = (/chrom(e|ium)/).test(
+                    window.navigator.userAgent.toLowerCase()
+                ),
+                urls = {
+                    'chrome': 'https://support.google.com/' +
+                        'chrome/answer/6148059?hl=en-GB',
+                    'firefox': 'https://support.mozilla.org/' +
+                        'en-US/kb/push-notifications-firefox'
+                };
+
+            return {
+                'supported': ('serviceWorker' in window.navigator),
+                'helpURL': urls[isChrome ? 'chrome' : 'firefox']
+            };
+        }
+
         $scope.viewLoaded = 0;
 
         $scope.fbInt = null;
+
+        $scope.notif = getNotif();
 
         $scope.teamSwitch = {
             'dataLoading': 0,

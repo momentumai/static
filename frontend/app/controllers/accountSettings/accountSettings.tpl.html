@@ -6,17 +6,27 @@
       </div>
     </div>
 
-    <div
-        fb-int
-        ng-model="fbInt"
-        ng-if="viewLoaded"
-        class="animate
-            mdl-card
-            mdl-shadow--2dp
-            mdl-cell
-            mdl-cell--4-col-desktop
-            mdl-cell--8-col-tablet
-            mdl-cell--4-col-phone">
+    <div class="mdl-cell
+        mdl-cell--4-col-desktop
+        mdl-cell--8-col-tablet
+        mdl-cell--4-col-phone">
+        <div
+            fb-int
+            ng-model="fbInt"
+            ng-if="viewLoaded"
+            class="col-item animate
+                mdl-card
+                mdl-shadow--2dp">
+        </div>
+        <div
+            notif-cont
+            ng-model="notif"
+            ng-if="viewLoaded"
+            style="margin-top: 16px"
+            class="col-item animate
+                mdl-card
+                mdl-shadow--2dp">
+        </div>
     </div>
 
     <div
