@@ -532,7 +532,7 @@
             Reset
         </button>
         <button
-            ng-disabled="audience.error"
+            ng-disabled="audience.error || !user.is_admin"
             type="submit"
             class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
             Save
