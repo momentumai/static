@@ -1,0 +1,29 @@
+<form ng-submit="model.changePassword()" mdl-upgrade>
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">
+            Notifications
+        </h2>
+    </div>
+    <div class="mdl-card__supporting-text">
+        <span ng-if="model.supported">
+            You can change your notification settings in your browser's permission page.
+        </span>
+        <span ng-if="!model.supported">
+            Sorry, your browser does not support push notifications.
+        </span>
+    </div>
+    <div class="mdl-card__actions mdl-card--border">
+        <a
+            ng-if="model.supported"
+            href="{{model.helpURL}}"
+            target="_blank"
+            type="submit"
+            class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" mdl-upgrade>Get help</a>
+        <a
+            ng-if="!model.supported"
+            href="https://www.google.com/chrome/browser/desktop/"
+            target="_blank"
+            type="submit"
+            class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" mdl-upgrade>Get chrome</a>
+    </div>
+</form>
