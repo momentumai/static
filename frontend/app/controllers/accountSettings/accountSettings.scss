@@ -6,4 +6,10 @@
 	.mdl-textfield {
 		width: 100%;
 	}
+
+    .mdl-card.col-item {
+        height: auto;
+        width: 100%;
+        min-height: 0;
+    }
 }
