@@ -1,0 +1,51 @@
+<div class="promotion-form">
+    <div class="row">
+        <div class="full mdl-textfield mdl-textfield--floating-label">
+            <input
+                required
+                ng-model="model.name"
+                class="mdl-textfield__input"
+                type="text"
+                id="bl-name">
+                <label class="mdl-textfield__label" for="bl-name">Name</label>
+            </input>
+        </div>
+    </div>
+    <div class="row">
+        <div class="full mdl-textfield mdl-textfield--floating-label">
+            <input
+                required
+                validators="[{
+                    'message': 'Invalid regular expression',
+                    'cond': model.rxCheck
+                }]"
+                validators-item="model.regexp"
+                ng-change="model.rxChange(model)"
+                ng-model="model.regexp"
+                class="mdl-textfield__input"
+                type="text"
+                id="bl-reg">
+                <label class="mdl-textfield__label" for="bl-reg">RegExp</label>
+            </input>
+        </div>
+    </div>
+    <h4>Test</h4>
+    <div class="row">
+        <div class="full mdl-textfield mdl-textfield--floating-label">
+            <input
+                ng-change="model.rxChange(model)"
+                ng-model="model.test"
+                class="mdl-textfield__input"
+                type="text"
+                id="bl-test">
+                <label class="mdl-textfield__label" for="bl-test">URL</label>
+            </input>
+        </div>
+    </div>
+    <span ng-if="model.blacklisted">
+        Test URL will be blacklisted.
+    </span>
+    <span ng-if="!model.blacklisted">
+        Test URL will <b>NOT</b> be blacklisted.
+    </span>
+</div>

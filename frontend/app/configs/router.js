@@ -155,6 +155,19 @@ function ($stateProvider, $urlRouterProvider) {
         }
     });
 
+    root.state('root.content-settings', {
+        'url': '/settings/content',
+        'params': {
+            'title': 'Content settings'
+        },
+        'views': {
+            'container': {
+                'templateUrl': 'contentSettings.tpl.html',
+                'controller': 'ContentSettingsController'
+            }
+        }
+    });
+
     root.state('root.help', {
         'url': '/help',
         'params': {

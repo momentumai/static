@@ -67,6 +67,14 @@
       Admin
     </a>
     <div class="mdl-layout-spacer"></div>
+    <a hide-overlay="!user.is_admin"
+      class="mdl-navigation__link"
+      id="nav-scont"
+      ng-class="{'disabled': !user.is_admin}"
+      href="{{user.is_admin ? '#/dashboard/settings/content' : 'javascript:void(0)'}}">
+      <i class="material-icons" role="settings" mdl-upgrade>description</i>
+      Content settings
+    </a>
     <a hide-overlay
       class="mdl-navigation__link"
       href="#/dashboard/settings/account">
@@ -85,6 +93,9 @@
     </a>
   </nav>
     <div ng-if="!user.is_admin" class="mdl-tooltip" for="nav-aud" mdl-upgrade>
+        Admin only
+    </div>
+    <div ng-if="!user.is_admin" class="mdl-tooltip" for="nav-scont" mdl-upgrade>
         Admin only
     </div>
 </div>

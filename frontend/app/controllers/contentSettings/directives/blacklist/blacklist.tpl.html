@@ -1,0 +1,41 @@
+<form ng-submit="model.add()" mdl-upgrade>
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">
+            Blacklist
+        </h2>
+    </div>
+    <div class="mdl-card__supporting-text">
+        <ul ng-if="model.data.length" class="mdl-list">
+            <li class="mdl-list__item" ng-repeat="item in model.data track by item.id">
+                <span class="mdl-list__item-primary-content">
+                    {{item.name}}
+                </span>
+                <a class="mdl-list__item-secondary-action"
+                    href="javascript:void(0)"
+                    ng-click="model.edit(item)">
+                    <i class="material-icons">edit</i>
+                </a>
+                <a style="margin-left: 8px"
+                    class="mdl-list__item-secondary-action"
+                    href="javascript:void(0)"
+                    ng-click="model.delete(item.id)">
+                    <i style="color: rgba(0,0,0, 0.87)"
+                        class="material-icons">delete_forever</i>
+                </a>
+            </li>
+        </ul>
+        <ul ng-if="!model.data.length" class="mdl-list">
+            <li style="height: 59px;" class="mdl-list__item">
+                <span class="mdl-list__item-primary-content">
+                    The list is empty.
+                </span>
+            </li>
+        </ul>
+    </div>
+    <div class="mdl-card__actions mdl-card--border">
+        <button
+            ng-disabled="model.dataLoading"
+            type="submit"
+            class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Add</button>
+    </div>
+</form>
