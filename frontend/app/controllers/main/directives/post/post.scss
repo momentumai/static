@@ -4,12 +4,19 @@
     background: white;
     top: 64px;
     width: 33.3333333333%;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    &.open {
+        width: 96px;
+        .post-list {
+            overflow-y: scroll;
+        }
+    }
     .post-list {
-        position: absolute;
-        top: 0;
+        position: fixed;
+        top: 64px;
         left: 0;
         bottom: 0;
-        right: 0;
+        width: 33.3333333333%;
         box-sizing: border-box;
         padding: 8px 0;
         display: flex;
