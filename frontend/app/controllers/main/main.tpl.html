@@ -1,4 +1,5 @@
-<aside class="posts mdl-cell--4-col mdl-components__nav mdl-shadow--4dp">
+<aside ng-class="{'open': stateParams.contentId}"
+    class="posts mdl-cell--4-col mdl-components__nav">
   <div ng-if="viewLoaded"  class="post-list">
     <div
       post
@@ -10,11 +11,11 @@
     </div>
   </div>
 </aside>
-<div ng-if="!viewLoaded" class="fill-left">
+<div ng-if="!viewLoaded" class="fill-left" ng-class="{'open': stateParams.contentId}">
   <div
     class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active">
   </div>
 </div>
-<div class="details mdl-cell mdl-cell--8-col">
+<div class="details mdl-cell mdl-cell--8-col" ng-class="{'open': stateParams.contentId}">
     <div ui-view="container-details"></div>
 </div>
