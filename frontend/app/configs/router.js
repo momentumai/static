@@ -65,22 +65,22 @@ function ($stateProvider, $urlRouterProvider) {
         }
     });
 
-    dashboard.state('root.main.dashboard.info', {
-        'url': '',
-        'views': {
-            'tab-container': {
-                'templateUrl': 'info.tpl.html',
-                'controller': 'InfoController'
-            }
-        }
-    });
-
     dashboard.state('root.main.dashboard.history', {
-        'url': '/history',
+        'url': '',
         'views': {
             'tab-container': {
                 'templateUrl': 'history.tpl.html',
                 'controller': 'HistoryController'
+            }
+        }
+    });
+
+    dashboard.state('root.main.dashboard.info', {
+        'url': '/info',
+        'views': {
+            'tab-container': {
+                'templateUrl': 'info.tpl.html',
+                'controller': 'InfoController'
             }
         }
     });
@@ -96,22 +96,22 @@ function ($stateProvider, $urlRouterProvider) {
         }
     });
 
-    content.state('root.main.content.info', {
-        'url': '',
-        'views': {
-            'tab-container': {
-                'templateUrl': 'contentInfo.tpl.html',
-                'controller': 'ContentInfoController'
-            }
-        }
-    });
-
     content.state('root.main.content.history', {
-        'url': '/history',
+        'url': '',
         'views': {
             'tab-container': {
                 'templateUrl': 'contentHistory.tpl.html',
                 'controller': 'ContentHistoryController'
+            }
+        }
+    });
+
+    content.state('root.main.content.info', {
+        'url': '/info',
+        'views': {
+            'tab-container': {
+                'templateUrl': 'contentInfo.tpl.html',
+                'controller': 'ContentInfoController'
             }
         }
     });

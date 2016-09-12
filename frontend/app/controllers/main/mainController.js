@@ -22,11 +22,11 @@ momentum.controller('MainController', [
                 if (content.id === id) {
                     content.active = content.active ? 0 : 1;
                     if (content.active) {
-                        $state.go('root.main.content.info', {
+                        $state.go('root.main.content.history', {
                             'contentId': content.id
                         });
                     } else {
-                        $state.go('root.main.dashboard.info');
+                        $state.go('root.main.dashboard.history');
                         $scope.content = null;
                     }
                 } else {
@@ -48,7 +48,7 @@ momentum.controller('MainController', [
                     hasPost = 1;
                     $scope.content = post;
                     if (redirect) {
-                        $state.go('root.main.content.info', {
+                        $state.go('root.main.content.history', {
                             'contentId': contentId
                         });
                     }
@@ -58,7 +58,7 @@ momentum.controller('MainController', [
             });
 
             if (!hasPost && ($scope.content || first)) {
-                $state.go('root.main.dashboard.info');
+                $state.go('root.main.dashboard.history');
                 $scope.content = null;
             }
         }
