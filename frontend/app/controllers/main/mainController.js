@@ -58,7 +58,9 @@ momentum.controller('MainController', [
             });
 
             if (!hasPost && ($scope.content || first)) {
-                $state.go('root.main.dashboard.history');
+                if (!$state.includes('root.main.dashboard')) {
+                    $state.go('root.main.dashboard.history');
+                }
                 $scope.content = null;
             }
         }
