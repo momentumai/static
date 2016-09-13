@@ -142,6 +142,19 @@ function ($stateProvider, $urlRouterProvider) {
         }
     });
 
+    root.state('root.experiments', {
+        'url': '/experiments',
+        'params': {
+            'title': 'Experiments'
+        },
+        'views': {
+            'container': {
+                'templateUrl': 'experiments.tpl.html',
+                'controller': 'ExperimentsController'
+            }
+        }
+    });
+
     root.state('root.audiences', {
         'url': '/audiences',
         'params': {

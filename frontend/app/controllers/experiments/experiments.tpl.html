@@ -1,0 +1,25 @@
+<div class="experiments mdl-grid" mdl-upgrade>
+    <div ng-if="!viewLoaded" class="fill-full">
+      <div
+        class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active">
+      </div>
+    </div>
+    <div
+        mdl-upgrade
+        experiment-list
+        ng-next="experimentList.next"
+        ng-prev="experimentList.prev"
+        ng-toggle="experimentList.toggle"
+        ng-edit="experimentList.edit"
+        ng-model="experimentList"
+        ng-if="viewLoaded"
+        class="experiment-list
+            animate
+            mdl-card
+            mdl-shadow--2dp
+            mdl-cell
+            mdl-cell--10-col-desktop
+            mdl-cell--12-col-tablet
+            mdl-cell--4-col-phone">
+    </div>
+</div>
