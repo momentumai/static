@@ -80,13 +80,19 @@ a.primary {
 
 .fill {
   position: fixed;
-  left: 33%;
+  width: 66.6666666%;
+  left: 33.3333333%;
   top: 64px;
   bottom: 0;
-  right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  .open & {
+    left: 96px;
+    width: calc(100% - 96px)
+  }
 }
 
 .fill-left {
@@ -98,6 +104,10 @@ a.primary {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  &.open {
+    width: 96px;
+  }
 }
 
 .fill-full {
