@@ -15,17 +15,17 @@
                 class="mdl-data-table__cell--non-numeric"
             >Active</th>
             <th title="Name" class="mdl-data-table__cell--non-numeric">Name</th>
-            <th title="Conversion">Conv.</th>
+            <th title="Conversion">Conversion</th>
             <th title="CPA">CPA</th>
             <th title="Spent">Spent</th>
             <th title="Click">Click</th>
-            <th title="Landing">Land.</th>
+            <th title="Landing">Landing</th>
             <th title="Schedule">Schedule</th>
             <th ng-if="false"></th>
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="c in model.data">
+          <tr ng-repeat="c in model.data" mdl-upgrade>
             <td class="mdl-data-table__cell--non-numeric">
                 <label
                     ng-click="$event.preventDefault(); toggle(c.id, c.active, c.adset);"
@@ -49,7 +49,7 @@
                     {{c.name}}
                 </a>
             </td>
-            <td ng-if="!c.adset" colspan="6">You don't have permission to access this campaign.</td>
+            <td ng-if="!c.adset" colspan="6">You don't have permission to access this experiment.</td>
             <td ng-if="c.adset">{{c.conversion}}</td>
             <td ng-if="c.adset">{{c.cpa}}</td>
             <td ng-if="c.adset">{{c.spend}}</td>
@@ -68,7 +68,7 @@
                     '&nbsp' :
                     model.errorMessage ?
                         model.errorMessage :
-                        'No campaigns present.'}}
+                        'No experiments present.'}}
             </td>
         </tr>
         </tbody>
@@ -77,13 +77,13 @@
         <button
           ng-disabled="model.offset + model.sum >= model.cnt"
           class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect"
-          ng-click="next()">
+          ng-click="model.next()">
           <i class="material-icons">navigate_next</i>
         </button>
     <button
       ng-disabled="!model.offset"
       class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect"
-      ng-click="prev()">
+      ng-click="model.prev()">
       <i class="material-icons">navigate_before</i>
     </button>
     <span>{{model.sum ? model.offset + 1 : 0}}-{{model.offset + model.sum}} of {{model.cnt}}</span>

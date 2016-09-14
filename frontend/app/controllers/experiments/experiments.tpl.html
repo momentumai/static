@@ -7,10 +7,7 @@
     <div
         mdl-upgrade
         experiment-list
-        ng-next="experimentList.next"
-        ng-prev="experimentList.prev"
         ng-toggle="experimentList.toggle"
-        ng-edit="experimentList.edit"
         ng-model="experimentList"
         ng-if="viewLoaded"
         class="experiment-list
@@ -18,8 +15,22 @@
             mdl-card
             mdl-shadow--2dp
             mdl-cell
-            mdl-cell--10-col-desktop
-            mdl-cell--12-col-tablet
+            mdl-cell--9-col-desktop
+            mdl-cell--8-col-tablet
             mdl-cell--4-col-phone">
+    </div>
+    <div
+        mdl-upgrade
+        experiment-aside
+        ng-model="experimentAside"
+        ng-if="viewLoaded"
+        class="experiment-aside
+            animate
+            mdl-card
+            mdl-shadow--2dp
+            mdl-cell
+            mdl-cell--3-col-desktop
+            mdl-cell--hide-tablet
+            mdl-cell--hide-phone">
     </div>
 </div>
