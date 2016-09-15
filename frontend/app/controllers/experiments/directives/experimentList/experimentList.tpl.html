@@ -43,7 +43,8 @@
             <td class="mdl-data-table__cell--non-numeric">
                 <a
                     class="mdl-color-text--primary"
-                    ng-href="{{c.adset ? 'http://' + c.url : '#/dashboard/settings/account'}}"
+                    href="javascript:void(0)"
+                    ng-click="model.click(c)"
                     target="{{c.adset ? '_blank' : ''}}"
                     title="{{c.name}}">
                     {{c.name}}

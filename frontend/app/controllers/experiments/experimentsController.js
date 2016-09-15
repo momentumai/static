@@ -41,6 +41,9 @@ momentum.controller('ExperimentsController', [
                         exp
                     );
                 });
+            },
+            'click': function (experiment) {
+                console.log(experiment);
             }
         };
 
