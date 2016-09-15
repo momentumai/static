@@ -155,6 +155,19 @@ function ($stateProvider, $urlRouterProvider) {
         }
     });
 
+    root.state('root.tests', {
+        'url': '/experiments/:expId',
+        'params': {
+            'title': 'Tests'
+        },
+        'views': {
+            'container': {
+                'templateUrl': 'tests.tpl.html',
+                'controller': 'TestsController'
+            }
+        }
+    });
+
     root.state('root.audiences', {
         'url': '/audiences',
         'params': {

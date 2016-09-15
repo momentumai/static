@@ -1,5 +1,5 @@
 <div class="mdl-card__media mdl-color--white">
-    <div ng-if="model.loading" class="experiments-loader" mdl-upgrade>
+    <div ng-if="model.loading" class="tests-loader" mdl-upgrade>
         <div
             class="mdl-spinner
                 mdl-spinner--single-color
@@ -7,7 +7,7 @@
                 is-active">
         </div>
     </div>
-    <table ng-if="!model.loading" class="experiments-table mdl-data-table mdl-js-data-table" mdl-upgrade>
+    <table ng-if="!model.loading" class="tests-table mdl-data-table mdl-js-data-table" mdl-upgrade>
         <thead>
           <tr>
             <th
@@ -20,7 +20,6 @@
             <th title="Spent">Spent</th>
             <th title="Click">Click</th>
             <th title="Landing">Landing</th>
-            <th title="Schedule">Schedule</th>
           </tr>
         </thead>
         <tbody>
@@ -40,21 +39,17 @@
                 </label>
             </td>
             <td class="mdl-data-table__cell--non-numeric">
-                <a
-                    class="mdl-color-text--primary"
-                    href="javascript:void(0)"
-                    ng-click="model.click(c)"
+                <span class="mdl-color-text--primary"
                     title="{{c.name}}">
                     {{c.name}}
                 </a>
             </td>
-            <td ng-if="!c.adset" colspan="6">You don't have permission to access this experiment.</td>
+            <td ng-if="!c.adset" colspan="6">You don't have permission to access this test.</td>
             <td ng-if="c.adset">{{c.conversion}}</td>
             <td ng-if="c.adset">{{c.cpa}}</td>
             <td ng-if="c.adset">{{c.spend}}</td>
             <td ng-if="c.adset">{{c.click}}</td>
             <td ng-if="c.adset">{{c.landing}}</td>
-            <td ng-if="c.adset">{{c.from}} - {{c.to}}</td>
           </tr>
         <tr class="spacer" ng-if="model.sum < 8">
             <td colspan="8" style="height: calc(49px * ({{8 - model.sum}}))">
@@ -62,7 +57,7 @@
                     '&nbsp' :
                     model.errorMessage ?
                         model.errorMessage :
-                        'No experiments present.'}}
+                        'No tests present.'}}
             </td>
         </tr>
         </tbody>

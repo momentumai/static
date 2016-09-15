@@ -4,8 +4,9 @@ momentum.controller('ExperimentsController', [
     'experiments',
     '$timeout',
     '$q',
+    '$state',
     '$scope',
-    function (category, experiments, $timeout, $q, $scope) {
+    function (category, experiments, $timeout, $q, $state, $scope) {
         $scope.viewLoaded = 0;
         $scope.experimentListBase = {
             'sum': 0,
@@ -43,7 +44,9 @@ momentum.controller('ExperimentsController', [
                 });
             },
             'click': function (experiment) {
-                console.log(experiment);
+                $state.go('root.tests', {
+                    'expId': experiment.id
+                });
             }
         };
 

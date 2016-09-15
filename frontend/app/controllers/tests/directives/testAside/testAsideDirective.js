@@ -1,10 +1,10 @@
 /*global momentum, angular*/
-momentum.directive('experimentList', [
+momentum.directive('testAside', [
     'animate',
     function (animate) {
         return {
             'restrict': 'A',
-            'templateUrl': 'experimentList.tpl.html',
+            'templateUrl': 'testAside.tpl.html',
             'scope': {
                 'model': '=ngModel'
             },

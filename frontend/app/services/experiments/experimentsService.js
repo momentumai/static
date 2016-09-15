@@ -2,7 +2,9 @@
 momentum.factory('experiments', [
     '$q',
     function ($q) {
-        var experiments = {};
+        var experiments = {
+            'tests': {}
+        };
 
         function getK (number) {
             if (number > 1000) {
@@ -152,6 +154,32 @@ momentum.factory('experiments', [
                 });
 
                 return resp.data;
+            });
+        };
+
+        experiments.tests.list = function (sessionId, expId, limit, offset) {
+            return experiments.list(
+                sessionId,
+                limit,
+                offset
+            ).then(function (res) {
+                res.data = res.data.map(function (act) {
+                    act.name = 'Dummy test';
+                    return act;
+                });
+
+                return res;
+            });
+        };
+
+        experiments.get = function (sessionId, expId) {
+            console.log(expId);
+            return experiments.list(
+                sessionId,
+                1,
+                0
+            ).then(function (res) {
+                return res.data[0];
             });
         };
 

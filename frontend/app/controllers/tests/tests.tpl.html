@@ -6,30 +6,31 @@
     </div>
     <div
         mdl-upgrade
-        experiment-list
-        ng-model="experimentList"
+        test-list
+        ng-model="testList"
         ng-if="viewLoaded"
-        class="experiment-list
+        class="test-list
             animate
             mdl-card
             mdl-shadow--2dp
             mdl-cell
-            mdl-cell--9-col-desktop
+            mdl-cell--8-col-desktop
             mdl-cell--8-col-tablet
             mdl-cell--4-col-phone">
     </div>
-    <div
+    <form
         mdl-upgrade
-        experiment-aside
-        ng-model="experimentAside"
+        test-aside
+        ng-submit="testAside.save()"
+        ng-model="testAside"
         ng-if="viewLoaded"
-        class="experiment-aside
+        class="test-aside
             animate
             mdl-card
             mdl-shadow--2dp
             mdl-cell
-            mdl-cell--3-col-desktop
+            mdl-cell--4-col-desktop
             mdl-cell--hide-tablet
             mdl-cell--hide-phone">
-    </div>
+    </form>
 </div>

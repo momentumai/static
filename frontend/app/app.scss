@@ -4,6 +4,99 @@ html, body {
     background-color: rgb(250,250,250);
 }
 
+.momentum-form {
+
+    width: 100%;
+
+    .mdl-switch {
+        margin-bottom: 20px;
+    }
+
+    .mdl-switch__label {
+        line-height: 27px;
+    }
+
+    .row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-grow: 0;
+        flex-shrink: 0;
+
+        & > * {
+            width: calc(33.3333% - 12px);
+        } 
+    }
+
+    .full {
+        width: 100%;
+    }
+
+    .date_picker, .mdl-textfield {
+        position: relative;
+        padding: 20px 0;
+        input, textarea {
+            appearance: none;
+            display: block;
+            box-sizing: border-box;
+            background-color: transparent;
+            margin: 0;
+            padding: 4px 0;
+            font-size: 16px;
+            color: inherit;
+            width: 100%;
+            outline: 0;
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+            border-radius: 0;
+        }
+
+        input:disabled, textarea:disabled {
+            background-color: transparent;
+            border-bottom: 1px dotted $input-text-disabled-color;
+            color: $input-text-disabled-text-color;
+        }
+
+        input ~ label, textarea ~ label {
+            position: absolute;
+            display: block;
+            top: 4px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            color: inherit;
+            font-size: 12px;
+            overflow: hidden;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        input:focus ~ label, textarea:focus ~ label {
+            color: unquote("rgb(#{$color-primary})");
+        }
+
+        input:focus ~ label:after, textarea:focus ~ label:after {
+            left: 0;
+            width: 100%;
+            visibility: visible;
+        }
+
+        input ~ label:after, textarea ~ label:after {
+            position: absolute;
+            bottom: 20px;
+            height: 2px;
+            left: 45%;
+            width: 10%;
+            background-color: unquote("rgb(#{$color-primary})");
+            content: '';
+            transition-duration: .2s;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            visibility: hidden;
+        }
+    }
+}
+
 .mdl-layout-title {
   white-space: nowrap;
   flex-shrink: 1;
