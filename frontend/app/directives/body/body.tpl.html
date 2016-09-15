@@ -45,6 +45,14 @@
       <i class="material-icons" role="dashboard">dashboard</i>
       Dashboard
     </a>
+    <a hide-overlay
+      class="mdl-navigation__link"
+      id="nav-aud"
+      ng-class="{'disabled': !user.is_admin}"
+      href="#/dashboard/experiments">
+      <i class="material-icons" role="audiences" mdl-upgrade>monetization_on</i>
+      Experiments
+    </a>
     <a hide-overlay="!user.is_admin"
       class="mdl-navigation__link"
       id="nav-aud"
