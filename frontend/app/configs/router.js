@@ -168,6 +168,19 @@ function ($stateProvider, $urlRouterProvider) {
         }
     });
 
+    root.state('root.experimentWizard', {
+        'url': '/experiments/create/:contentId',
+        'params': {
+            'title': 'Create experiment'
+        },
+        'views': {
+            'container': {
+                'templateUrl': 'experimentWizard.tpl.html',
+                'controller': 'ExperimentWizardController'
+            }
+        }
+    });
+
     root.state('root.audiences', {
         'url': '/audiences',
         'params': {

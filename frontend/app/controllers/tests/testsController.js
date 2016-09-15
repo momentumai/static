@@ -112,6 +112,10 @@ momentum.controller('TestsController', [
             });
         }
 
+        $scope.$on('$destroy', function () {
+            $rootScope.title = '';
+        });
+
         if ($scope.loaded) {
             init();
         } else {

@@ -189,7 +189,13 @@ momentum.controller('ContentController', [
             });
         }
 
-        $scope.promotion = function (model) {
+        $scope.promotion = function () {
+            $state.go('root.experimentWizard', {
+                'contentId': $scope.stateParams.contentId
+            });
+        };
+
+        $scope.promotionBackup = function (model) {
             var back = model && true || false;
 
             getPromotionModel(model).then(function (model) {
