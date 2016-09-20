@@ -1,0 +1,29 @@
+<div class="mdl-card__title">
+    <h2 class="mdl-card__title-text">
+        2. Add images
+    </h2>
+</div>
+<div class="mdl-card__media mdl-color--white" style="padding: 16px">
+    <div class="momentum-form">
+        <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input
+                ng-model="model.link"
+                validators="[{
+                    'cond': model.max5,
+                    'message': 'You can add maximum 5 images'
+                }]"
+                validators-item="list"
+                class="mdl-textfield__input"
+                type="url"
+                id="exp-create-link">
+                <label for="exp-create-link">Image URL</label>
+            </input>
+        </div>
+    </div>
+</div>
+<div class="mdl-card__actions">
+    <button
+        ng-disabled="!model.link"
+        type="submit"
+        class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Add</button>
+</div>

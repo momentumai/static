@@ -1,0 +1,49 @@
+<div class="mdl-card__title">
+    <h2 class="mdl-card__title-text">
+        3. Add sets of texts
+    </h2>
+</div>
+<div class="mdl-card__media mdl-color--white" style="padding: 16px">
+    <div class="momentum-form">
+        <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <textarea
+                maxlength="90"
+                ng-model="model.message"
+                class="mdl-textfield__input"
+                type="text"
+                id="exp-create-message">
+            </textarea>
+            <label for="exp-create-message">Message</label>
+        </div>
+        <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input
+                required
+                maxlength="80"
+                ng-model="model.headline"
+                validators="[{
+                    'cond': model.max5,
+                    'message': 'You can add maximum 5 sets of texts'
+                }]"
+                validators-item="list"
+                class="mdl-textfield__input"
+                type="text"
+                id="exp-create-headline">
+                <label for="exp-create-headline">Headline</label>
+            </input>
+        </div>
+        <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <textarea
+                maxlength="200"
+                ng-model="model.desc"
+                class="mdl-textfield__input"
+                id="exp-create-desc">
+            </textarea>
+            <label for="exp-create-desc">Description</label>
+        </div>
+    </div>
+</div>
+<div class="mdl-card__actions">
+    <button
+        type="submit"
+        class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Add</button>
+</div>

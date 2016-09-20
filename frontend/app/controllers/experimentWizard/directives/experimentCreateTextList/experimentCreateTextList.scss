@@ -1,0 +1,82 @@
+.experiment-create-text-list {
+    .exp-create-empty {
+        height: 67px;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        span {
+            align-self: center;
+        }
+    }
+
+    .exp-create-text-list {
+        padding: 16px;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-between;
+        &.has-items {
+            padding-top: 0;
+        }
+    }
+
+    .exp-create-set {
+        width: calc((100% - 32px) / 3);
+        padding-bottom: calc(((100% - 32px) / 3);
+        margin-top: 16px;
+        position: relative;
+        box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.54);
+        .set-cont {
+            position: absolute;
+            top: 28px;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            overflow: auto;
+        }
+
+        .set-image {
+            position: relative;
+            padding-bottom: 33%;
+            background-color: rgba(0, 0, 0, 0.08);
+            justify-content: center;
+            & > div {
+                position: absolute;
+                top: 0;
+                width: 100%;
+                left: 0;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                span {
+                    align-self: center;
+                }
+            }
+        }
+
+        .set-message, .set-headline {
+            font-size: 11px;
+            line-height: 1.2;
+        }
+
+        .set-headline {
+            font-weight: bold;
+        }
+
+        .set-desc {
+            padding: 8px;
+            padding-top: 0;
+            font-size: 10px;
+            line-height: 1.2;
+        }
+
+        .set-headline, .set-message {
+            padding: 8px;
+        }
+
+        .controls {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    }
+}
