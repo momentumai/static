@@ -1,0 +1,21 @@
+<div class="mdl-card__title">
+    <h2 class="mdl-card__title-text">
+        3. Select your Facebook page
+    </h2>
+</div>
+<div class="mdl-card__media mdl-color--white" style="padding: 16px">
+    <div class="momentum-form">
+        <div
+            dropdown
+            ng-model="model.pages"
+            storage-key="AD_PAGE"
+            class="dropdown">
+        </div>
+    </div>
+</div>
+<div class="mdl-card__actions">
+    <button
+        ng-disabled="!model.pages.data.length"
+        type="submit"
+        class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Preview</button>
+</div>

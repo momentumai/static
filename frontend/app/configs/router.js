@@ -181,6 +181,21 @@ function ($stateProvider, $urlRouterProvider) {
         }
     });
 
+    root.state('root.experimentWizardPreview', {
+        'url': '/experiments/create/:contentId/preview',
+        'params': {
+            'title': 'Preview tests',
+            'config': null,
+            'contentId': null
+        },
+        'views': {
+            'container': {
+                'templateUrl': 'experimentWizardPreview.tpl.html',
+                'controller': 'ExperimentWizardPreviewController'
+            }
+        }
+    });
+
     root.state('root.audiences', {
         'url': '/audiences',
         'params': {
