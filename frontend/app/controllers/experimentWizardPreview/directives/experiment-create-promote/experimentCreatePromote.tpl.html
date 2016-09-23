@@ -1,0 +1,66 @@
+<div class="mdl-card__title">
+    <h2 class="mdl-card__title-text">
+        Settings
+    </h2>
+</div>
+<div class="mdl-card__media mdl-color--white" style="padding: 16px">
+    <div class="momentum-form">
+        <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input
+                ng-model="model.name"
+                validators-item="list"
+                class="mdl-textfield__input"
+                type="text"
+                id="exp-create-name">
+                <label for="exp-create-name">Experiment name</label>
+            </input>
+        </div>
+        <div
+            dropdown
+            ng-model="model.accounts"
+            storage-key="AD_ACCOUNT"
+            class="dropdown">
+        </div>
+        <div
+            dropdown
+            ng-model="model.audiences"
+            storage-key="AD_AUDIENCE"
+            class="dropdown">
+        </div>
+        <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input
+                ng-model="model.budget"
+                class="mdl-textfield__input"
+                step="any"
+                min="0.000001"
+                type="number"
+                id="budget">
+                <label for="budget">Lifetime budget
+                    <span ng-if="model.currency">({{model.currency.name}})</span>
+                </label>
+            </input>
+        </div>
+        <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input
+                ng-model="model.days"
+                class="mdl-textfield__input"
+                step="1"
+                min="1"
+                type="number"
+                id="budget">
+                <label for="budget">Test end time (days)</label>
+            </input>
+        </div>
+    </div>
+</div>
+<div class="mdl-card__actions">
+    <button
+        ng-disabled="!model.accounts.data.length ||
+            !model.audiences.data.length ||
+            !list.data.length ||
+            !model.budget ||
+            !model.days ||
+            !model.name"
+        type="submit"
+        class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Promote</button>
+</div>

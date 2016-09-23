@@ -260,5 +260,17 @@ momentum.factory('content', ['$http', function ($http) {
         });
     };
 
+    content.info = function (sessionId, contentId) {
+        return $http.post([
+            bvConfig.endpoint,
+            'content/info'
+        ].join(''), {
+            'session_id': sessionId,
+            'content_id': contentId
+        }).then(function (res) {
+            return res.data;
+        });
+    };
+
     return content;
 }]);

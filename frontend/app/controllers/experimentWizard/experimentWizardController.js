@@ -2,10 +2,12 @@
 momentum.controller('ExperimentWizardController', [
     'dialog',
     'fb',
+    'content',
+    '$q',
     '$state',
     '$timeout',
     '$scope',
-    function (dialog, fb, $state, $timeout, $scope) {
+    function (dialog, fb, content, $q, $state, $timeout, $scope) {
         $scope.selectPage = {
             'pages': {
                 'selected': null,
@@ -24,6 +26,7 @@ momentum.controller('ExperimentWizardController', [
                         'images': $scope.imageList.data,
                         'texts': $scope.textList.data
                     },
+                    'content': $scope.content,
                     'contentId': $scope.stateParams.contentId
                 }, {
                     'location': false
@@ -95,9 +98,22 @@ momentum.controller('ExperimentWizardController', [
         }
 
         function init () {
-            return fb.listAssets(
+            var promises = {};
+
+            promises['assets'] = fb.listAssets(
                 $scope.sessionId
-            ).then(function (a) {
+            );
+
+            promises['content'] = content.info(
+                $scope.sessionId,
+                $scope.stateParams.contentId
+            );
+
+            $q.all(promises).then(function (res) {
+                var a = res.assets,
+                    c = res.content,
+                    textSet = {};
+
                 a = a.filter(function (act) {
                     return act.type === 'page';
                 }).sort(function (a, b) {
@@ -111,6 +127,27 @@ momentum.controller('ExperimentWizardController', [
 
                 $scope.selectPage.pages.data = a;
                 $scope.selectPage.pages.selected = a[0].id;
+
+                $scope.content = c;
+
+                if (c.image) {
+                    $scope.imageList.data.push(c.image);
+                }
+
+                textSet.headline = (c.title || c.url).substr(
+                    0,
+                    80
+                );
+
+                if (c.description) {
+                    textSet.desc = c.description.substr(
+                        0,
+                        200
+                    );
+                }
+
+                $scope.textList.data.push(textSet);
+
                 animate();
                 $scope.viewLoaded = 1;
             });

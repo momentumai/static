@@ -186,6 +186,7 @@ function ($stateProvider, $urlRouterProvider) {
         'params': {
             'title': 'Preview tests',
             'config': null,
+            'content': null,
             'contentId': null
         },
         'views': {
