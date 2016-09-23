@@ -56,6 +56,7 @@
         .set-message, .set-headline {
             font-size: 11px;
             line-height: 1.2;
+            word-break: break-word;
         }
 
         .set-headline {
@@ -67,6 +68,7 @@
             padding-top: 0;
             font-size: 10px;
             line-height: 1.2;
+            word-break: break-word;
         }
 
         .set-headline, .set-message {
