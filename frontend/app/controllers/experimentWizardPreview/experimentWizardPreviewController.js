@@ -11,6 +11,9 @@ momentum.controller('ExperimentWizardPreviewController', [
             'name': '',
             'budget': 20,
             'days': 1,
+            'utm_source': 'facebook',
+            'utm_medium': '',
+            'utm_campaign': '',
             'accounts': {
                 'label': 'Ad account',
                 'data': [],
@@ -27,6 +30,9 @@ momentum.controller('ExperimentWizardPreviewController', [
             'data': [],
             'remove': function (index) {
                 $scope.previewList.data.splice(index, 1);
+            },
+            'range': function (n) {
+                return new Array(n);
             }
         };
 

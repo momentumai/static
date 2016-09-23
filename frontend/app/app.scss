@@ -16,17 +16,21 @@ html, body {
         line-height: 27px;
     }
 
-    .row {
+    .row, .row50 {
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
         flex-grow: 0;
         flex-shrink: 0;
+    }
 
-        & > * {
-            width: calc(33.3333% - 12px);
-        } 
+    .row50 > * {
+        width: calc(50% - 8px);
+    }
+
+    .row > * {
+        width: calc(33.3333% - 11px);
     }
 
     .full {

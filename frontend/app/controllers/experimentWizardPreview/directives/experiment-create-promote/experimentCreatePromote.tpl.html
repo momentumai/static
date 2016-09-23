@@ -27,29 +27,62 @@
             storage-key="AD_AUDIENCE"
             class="dropdown">
         </div>
-        <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-            <input
-                ng-model="model.budget"
-                class="mdl-textfield__input"
-                step="any"
-                min="0.000001"
-                type="number"
-                id="budget">
-                <label for="budget">Lifetime budget
-                    <span ng-if="model.currency">({{model.currency.name}})</span>
-                </label>
-            </input>
+        <div class="row50">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input
+                    ng-model="model.budget"
+                    class="mdl-textfield__input"
+                    step="any"
+                    min="0.000001"
+                    type="number"
+                    id="budget">
+                    <label for="budget">Lifetime budget
+                        <span ng-if="model.currency">({{model.currency.name}})</span>
+                    </label>
+                </input>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input
+                    ng-model="model.days"
+                    class="mdl-textfield__input"
+                    step="1"
+                    min="1"
+                    type="number"
+                    id="days">
+                    <label for="days">Test end time (days)</label>
+                </input>
+            </div>
         </div>
-        <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-            <input
-                ng-model="model.days"
-                class="mdl-textfield__input"
-                step="1"
-                min="1"
-                type="number"
-                id="budget">
-                <label for="budget">Test end time (days)</label>
-            </input>
+        <div class="row">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input
+                    ng-model="model.utm_source"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="exp-create-source">
+                    <label for="exp-create-source">UTM source</label>
+                </input>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input
+                    ng-model="model.utm_medium"
+                    validators-item="list"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="exp-create-medium">
+                    <label for="exp-create-medium">UTM medium</label>
+                </input>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input
+                    ng-model="model.utm_campaign"
+                    validators-item="list"
+                    class="mdl-textfield__input"
+                    type="text"
+                    id="exp-create-campaign">
+                    <label for="exp-create-campaign">UTM campaign</label>
+                </input>
+            </div>
         </div>
     </div>
 </div>
