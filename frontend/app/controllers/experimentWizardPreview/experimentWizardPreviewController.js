@@ -1,10 +1,13 @@
 /*global momentum, angular, window */
 momentum.controller('ExperimentWizardPreviewController', [
+    'toast',
+    'dialog',
     'fb',
+    '$state',
     '$timeout',
     '$q',
     '$scope',
-    function (fb, $timeout, $q, $scope) {
+    function (toast, dialog, fb, $state, $timeout, $q, $scope) {
         $scope.viewLoaded = 0;
 
         $scope.promote = {
@@ -28,6 +31,50 @@ momentum.controller('ExperimentWizardPreviewController', [
                 'label': 'Page',
                 'data': [],
                 'selected': null
+            },
+            'submit': function () {
+                var endTime = new Date();
+
+                endTime.setDate(endTime.getDate() + $scope.promote.days);
+                $scope.viewLoaded = 0;
+
+                return fb.createExperiment($scope.sessionId, {
+                    'name_text': $scope.promote.name,
+                    'audience_id': $scope.promote.audiences.selected,
+                    'adaccount': $scope.promote.accounts.selected,
+                    'page': $scope.promote.pages.selected,
+                    'budget': $scope.promote.budget * (
+                        $scope.promote.currency &&
+                            $scope.promote.currency.offset || 100
+                    ),
+                    'end_time': Math.floor(endTime.getTime() / 1000),
+                    'content_id': $scope.stateParams.contentId,
+                    'utm': {
+                        'utm_source': $scope.promote.utm_source,
+                        'utm_campaign': $scope.promote.utm_campaign,
+                        'utm_medium': $scope.promote.utm_medium
+                    },
+                    'tests': $scope.previewList.data.map(function (act) {
+                        return {
+                            'description': act.desc,
+                            'name': act.headline,
+                            'message': act.message,
+                            'image': act.image
+                        };
+                    })
+                }).then(function () {
+                    $state.go('root.experiments');
+                    return toast.open({
+                        'htmlText': 'Experiment created successfully'
+                    });
+                }).catch(function (err) {
+                    $scope.viewLoaded = 1;
+                    if (err) {
+                        return dialog.open({
+                            'htmlText': err
+                        });
+                    }
+                });
             }
         };
 

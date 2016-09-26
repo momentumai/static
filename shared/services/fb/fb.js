@@ -473,6 +473,21 @@ momentum.factory('fb', [
             });
         };
 
+        fb.createExperiment = function (sessionId, data) {
+            return $http.post([
+                bvConfig.endpoint,
+                'experiment/create'
+            ].join(''), {
+                'session_id': sessionId,
+                'data': data
+            }).then(function (res) {
+                if (res.data.errorMessage) {
+                    throw res.data.errorMessage.split(':')[2];
+                }
+                return res.data;
+            });
+        };
+
         return fb;
     }
 ]);
