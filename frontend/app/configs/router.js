@@ -171,7 +171,7 @@ function ($stateProvider, $urlRouterProvider) {
     root.state('root.experimentWizard', {
         'url': '/experiments/create/:contentId',
         'params': {
-            'title': 'Create experiment'
+            'title': 'Create an experiment'
         },
         'views': {
             'container': {
