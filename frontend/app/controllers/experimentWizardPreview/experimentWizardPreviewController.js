@@ -23,6 +23,11 @@ momentum.controller('ExperimentWizardPreviewController', [
                 'label': 'Audience',
                 'data': [],
                 'selected': null
+            },
+            'pages': {
+                'label': 'Page',
+                'data': [],
+                'selected': null
             }
         };
 
@@ -93,39 +98,20 @@ momentum.controller('ExperimentWizardPreviewController', [
             });
         }
 
-        function init () {
-            var promises = {};
+        function pageChange () {
+            if (!$scope.promote.pages.selected) {
+                $scope.pageData = {
+                    'name': 'Facebook page',
+                    'picture': ''
+                };
+                $scope.pageData.url = getHost($scope.stateParams.content.url);
+                return $q.resolve();
+            }
 
-            $scope.promote.name = $scope.stateParams.content.title;
-
-            promises['assets'] = fb.listAssets(
-                $scope.sessionId
-            );
-
-            promises['assets'] = promises['assets'].then(function (a) {
-                a = a.filter(function (act) {
-                    return act.type === 'adaccount';
-                }).sort(function (a, b) {
-                    return Number(b.default) - Number(a.default);
-                }).map(function (act) {
-                    return {
-                        'label': act.display,
-                        'id': act.value
-                    };
-                });
-
-                $scope.promote.accounts.data = a;
-                $scope.promote.accounts.selected = a[0].id;
-
-                $scope.promote.accounts.change = accountChange;
-
-                return accountChange();
-            });
-
-            promises['fb'] = fb.get(
+            return fb.get(
                 [
                     '/',
-                    $scope.stateParams.config.page,
+                    $scope.promote.pages.selected,
                     '?fields=name,picture'
                 ].join(''),
                 $scope.user.fb_access_token
@@ -137,6 +123,54 @@ momentum.controller('ExperimentWizardPreviewController', [
                         res.picture.data.url
                 };
                 $scope.pageData.url = getHost($scope.stateParams.content.url);
+            });
+        }
+
+        function init () {
+            var promises = {};
+
+            $scope.promote.name = $scope.stateParams.content.title;
+
+            promises['assets'] = fb.listAssets(
+                $scope.sessionId
+            );
+
+            promises['assets'] = promises['assets'].then(function (a) {
+                var accounts = a.filter(function (act) {
+                        return act.type === 'adaccount';
+                    }).sort(function (a, b) {
+                        return Number(b.default) - Number(a.default);
+                    }).map(function (act) {
+                        return {
+                            'label': act.display,
+                            'id': act.value
+                        };
+                    }),
+                    pages = a.filter(function (act) {
+                        return act.type === 'page';
+                    }).sort(function (a, b) {
+                        return Number(b.default) - Number(a.default);
+                    }).map(function (act) {
+                        return {
+                            'label': act.display,
+                            'id': act.value
+                        };
+                    });
+
+                $scope.promote.accounts.data = accounts;
+                $scope.promote.accounts.selected = accounts[0] &&
+                    accounts[0].id;
+
+                $scope.promote.pages.data = pages;
+                $scope.promote.pages.selected = pages[0] && pages[0].id;
+
+                $scope.promote.accounts.change = accountChange;
+                $scope.promote.pages.change = pageChange;
+
+                return $q.all([
+                    accountChange(),
+                    pageChange()
+                ]);
             });
 
             return $q.all(promises).then(function () {

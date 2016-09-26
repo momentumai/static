@@ -8,30 +8,23 @@ momentum.controller('ExperimentWizardController', [
     '$timeout',
     '$scope',
     function (dialog, fb, content, $q, $state, $timeout, $scope) {
-        $scope.selectPage = {
-            'pages': {
-                'selected': null,
-                'data': null
-            },
-            'submit': function () {
-                if (!$scope.imageList.data.length ||
-                    !$scope.textList.data.length) {
-                    return dialog.open({
-                        'htmlText': 'One image and set of texts required'
-                    });
-                }
-                $state.go('root.experimentWizardPreview', {
-                    'config': {
-                        'page': $scope.selectPage.pages.selected,
-                        'images': $scope.imageList.data,
-                        'texts': $scope.textList.data
-                    },
-                    'content': $scope.content,
-                    'contentId': $scope.stateParams.contentId
-                }, {
-                    'location': false
+        $scope.preview = function () {
+            if (!$scope.imageList.data.length ||
+                !$scope.textList.data.length) {
+                return dialog.open({
+                    'htmlText': 'One image and set of texts required'
                 });
             }
+            $state.go('root.experimentWizardPreview', {
+                'config': {
+                    'images': $scope.imageList.data,
+                    'texts': $scope.textList.data
+                },
+                'content': $scope.content,
+                'contentId': $scope.stateParams.contentId
+            }, {
+                'location': false
+            });
         };
 
         $scope.addImage = {
@@ -93,16 +86,11 @@ momentum.controller('ExperimentWizardController', [
                 $scope.imageList.animate();
                 $scope.addText.animate();
                 $scope.textList.animate();
-                $scope.selectPage.animate();
             });
         }
 
         function init () {
             var promises = {};
-
-            promises['assets'] = fb.listAssets(
-                $scope.sessionId
-            );
 
             promises['content'] = content.info(
                 $scope.sessionId,
@@ -110,23 +98,8 @@ momentum.controller('ExperimentWizardController', [
             );
 
             $q.all(promises).then(function (res) {
-                var a = res.assets,
-                    c = res.content,
+                var c = res.content,
                     textSet = {};
-
-                a = a.filter(function (act) {
-                    return act.type === 'page';
-                }).sort(function (a, b) {
-                    return Number(b.default) - Number(a.default);
-                }).map(function (act) {
-                    return {
-                        'label': act.display,
-                        'id': act.value
-                    };
-                });
-
-                $scope.selectPage.pages.data = a;
-                $scope.selectPage.pages.selected = a[0].id;
 
                 $scope.content = c;
 

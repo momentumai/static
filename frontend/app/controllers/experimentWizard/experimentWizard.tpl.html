@@ -1,3 +1,10 @@
+<button
+    ng-if="viewLoaded"
+    mdl-upgrade
+    ng-click="preview()"
+    class="experiment-wizard-preview-button top mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+    Preview
+</button>
 <div class="mdl-grid experiment-wizard" mdl-upgrade>
     <div ng-if="!viewLoaded" class="fill-full">
       <div
@@ -64,19 +71,11 @@
             mdl-cell--8-col-tablet
             mdl-cell--4-col-phone">
     </div>
-    <form
-        mdl-upgrade
-        ng-submit="selectPage.submit()"
-        experiment-create-select-page
-        ng-model="selectPage"
-        ng-if="viewLoaded"
-        class="experiment-create-select-page
-            animate
-            mdl-card
-            mdl-shadow--2dp
-            mdl-cell
-            mdl-cell--4-col-desktop
-            mdl-cell--8-col-tablet
-            mdl-cell--4-col-phone">
-    </form>
 </div>
+<button
+    ng-if="viewLoaded"
+    mdl-upgrade
+    ng-click="preview()"
+    class="experiment-wizard-preview-button bottom mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+    Preview
+</button>

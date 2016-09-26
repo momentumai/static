@@ -15,11 +15,19 @@
                 <label for="exp-create-name">Experiment name</label>
             </input>
         </div>
-        <div
-            dropdown
-            ng-model="model.accounts"
-            storage-key="AD_ACCOUNT"
-            class="dropdown">
+        <div class="row50">
+            <div
+                dropdown
+                ng-model="model.accounts"
+                storage-key="AD_ACCOUNT"
+                class="dropdown">
+            </div>
+            <div
+                dropdown
+                ng-model="model.pages"
+                storage-key="AD_PAGE"
+                class="dropdown">
+            </div>
         </div>
         <div
             dropdown
@@ -89,6 +97,7 @@
 <div class="mdl-card__actions">
     <button
         ng-disabled="!model.accounts.data.length ||
+            !model.pages.data.length ||
             !model.audiences.data.length ||
             !list.data.length ||
             !model.budget ||
