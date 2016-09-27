@@ -3,9 +3,7 @@ momentum.factory('experiments', [
     '$q',
     '$http',
     function ($q, $http) {
-        var experiments = {
-            'tests': {}
-        };
+        var experiments = {};
 
         function getK (number) {
             if (number > 1000) {
@@ -46,6 +44,21 @@ momentum.factory('experiments', [
             ].join(' ');
         }
 
+        function formatExperiment (e) {
+            e.click = getK(e.click);
+            e.fb_actions = getK(e.fb_actions);
+            e.landing = e.landing === -1 ? 'N/A' : round(e.landing);
+            e.latest_endtime = toShortDate(new Date(e.latest_endtime));
+
+            e.tests.forEach(function (t) {
+                t.click = getK(t.click);
+                t.fb_actions = getK(t.fb_actions);
+                t.landing = t.landing === -1 ? 'N/A' : round(t.landing);
+                t.start_time = toShortDate(new Date(t.start_time));
+                t.end_time = toShortDate(new Date(t.end_time));
+            });
+        }
+
         experiments.list = function (
                 sessionId,
                 limit,
@@ -80,40 +93,25 @@ momentum.factory('experiments', [
                     experiment.firstPage = true;
                 }
 
-                experiment.data.forEach(function (e) {
-                    e.click = getK(e.click);
-                    e.fb_actions = getK(e.fb_actions);
-                    e.landing = e.landing === -1 ? 'N/A' : round(e.landing);
-                    e.latest_endtime = toShortDate(new Date(e.latest_endtime));
-                });
+                experiment.data.forEach(formatExperiment);
 
                 return experiment;
             });
         };
 
-        experiments.tests.list = function (sessionId, expId, limit, offset) {
-            return experiments.list(
-                sessionId,
-                limit,
-                offset
-            ).then(function (res) {
-                res.data = res.data.map(function (act) {
-                    act.name = 'Dummy test';
-                    return act;
-                });
+        experiments.get = function (sessionId, contentId) {
+            return $http.post([
+                bvConfig.endpoint,
+                'experiment/get'
+            ].join(''), {
+                'session_id': sessionId,
+                'content_id': contentId
+            }).then(function (res) {
+                var e = res.data;
 
-                return res;
-            });
-        };
+                formatExperiment(e);
 
-        experiments.get = function (sessionId, expId) {
-            console.log(expId);
-            return experiments.list(
-                sessionId,
-                1,
-                0
-            ).then(function (res) {
-                return res.data[0];
+                return e;
             });
         };
 

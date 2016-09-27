@@ -15,11 +15,13 @@
                 class="mdl-data-table__cell--non-numeric"
             >Active</th>
             <th title="Name" class="mdl-data-table__cell--non-numeric">Name</th>
-            <th title="Conversion">Conversion</th>
+            <th title="Conversion">Conv.</th>
             <th title="CPA">CPA</th>
+            <th title="CPC">CPC</th>
             <th title="Spent">Spent</th>
             <th title="Click">Click</th>
-            <th title="Landing">Landing</th>
+            <th title="Landing">Land.</th>
+            <th title="Schedule">Schedule</th>
           </tr>
         </thead>
         <tbody>
@@ -31,7 +33,7 @@
                     for="switch-{{c.id}}">
                     <input
                         type="checkbox"
-                        ng-disabled="!c.adset"
+                        ng-disabled="c.permission_denied"
                         ng-model="c.active"
                         id="switch-{{c.id}}"
                         class="mdl-switch__input" />
@@ -44,15 +46,17 @@
                     {{c.name}}
                 </a>
             </td>
-            <td ng-if="!c.adset" colspan="6">You don't have permission to access this test.</td>
-            <td ng-if="c.adset">{{c.conversion}}</td>
-            <td ng-if="c.adset">{{c.cpa}}</td>
-            <td ng-if="c.adset">{{c.spend}}</td>
-            <td ng-if="c.adset">{{c.click}}</td>
-            <td ng-if="c.adset">{{c.landing}}</td>
+            <td ng-if="c.permission_denied" colspan="7">You don't have permission to access this test.</td>
+            <td ng-if="!c.permission_denied">{{c.click}}</td>
+            <td ng-if="!c.permission_denied">{{c.cpa}}</td>
+            <td ng-if="!c.permission_denied">{{c.cpc}}</td>
+            <td title="{{c.spend}}" ng-if="!c.permission_denied">{{c.spend}}</td>
+            <td ng-if="!c.permission_denied">{{c.fb_actions}}</td>
+            <td ng-if="!c.permission_denied">{{c.landing}}</td>
+            <td ng-if="!c.permission_denied">{{c.start_time}} - {{c.end_time}}</td>
           </tr>
         <tr class="spacer" ng-if="model.sum < 8">
-            <td colspan="8" style="height: calc(49px * ({{8 - model.sum}}))">
+            <td colspan="9" style="height: calc(49px * ({{8 - model.sum}}))">
                 {{model.sum ? 
                     '&nbsp' :
                     model.errorMessage ?

@@ -1,37 +1,26 @@
 <div class="mdl-card__title">
     <h2 class="mdl-card__title-text">
-        Edit experiment
+        Experiment summary
     </h2>
 </div>
-<div class="mdl-card__media mdl-color--white">
-    <div class="momentum-form">
-        <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-            <input
-                ng-model="model.budget"
-                class="mdl-textfield__input"
-                step="any"
-                min="0.000001"
-                type="number"
-                id="budget"
-                required>
-                <label for="budget">Lifetime budget ({{model.currency}})</label>
-            </input>
-        </div>
-        <div class="full date_picker">
-            <input
-              min="{{ model.from | date:'yyyy-MM-dd' }}"
-              max="{{ model.to | date:'yyyy-MM-dd' }}"
-              type="date"
-              id="date_picker"
-              ng-model="model.until"
-              required>
-            <label for="date_picker">Promote until</label>
-        </div>
+<div class="metric-map mdl-card__media mdl-color--white">
+    <div>
+        <div>Conversion</div>
+        <div>{{model.click}}</div>
+    </div>
+    <div>
+        <div>Click</div>
+        <div>{{model.fb_actions}}</div>
+    </div>
+    <div>
+        <div>Landing</div>
+        <div>{{model.landing}}</div>
     </div>
 </div>
 <div class="mdl-card__actions">
     <button
+        ui-sref="root.experimentWizard({'contentId': model.id})"
         ng-disabled="model.dataLoading"
-        type="submit"
-        class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Save</button>
+        type="button"
+        class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">New test</button>
 </div>

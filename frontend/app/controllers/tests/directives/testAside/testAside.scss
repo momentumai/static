@@ -10,4 +10,17 @@
             align-self: center;
         }
     }
+
+    .metric-map {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        & > div {
+            display: flex;
+            box-sizing: border-box;
+            padding: 0 8px;
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
 }
