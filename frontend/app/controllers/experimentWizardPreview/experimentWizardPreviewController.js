@@ -2,12 +2,13 @@
 momentum.controller('ExperimentWizardPreviewController', [
     'toast',
     'dialog',
+    'experiments',
     'fb',
     '$state',
     '$timeout',
     '$q',
     '$scope',
-    function (toast, dialog, fb, $state, $timeout, $q, $scope) {
+    function (toast, dialog, experiments, fb, $state, $timeout, $q, $scope) {
         $scope.viewLoaded = 0;
 
         $scope.promote = {
@@ -38,7 +39,7 @@ momentum.controller('ExperimentWizardPreviewController', [
                 endTime.setDate(endTime.getDate() + $scope.promote.days);
                 $scope.viewLoaded = 0;
 
-                return fb.createExperiment($scope.sessionId, {
+                return experiments.create($scope.sessionId, {
                     'name_text': $scope.promote.name,
                     'audience_id': $scope.promote.audiences.selected,
                     'adaccount': $scope.promote.accounts.selected,

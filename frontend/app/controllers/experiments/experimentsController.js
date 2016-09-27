@@ -8,9 +8,11 @@ momentum.controller('ExperimentsController', [
     '$scope',
     function (category, experiments, $timeout, $q, $state, $scope) {
         $scope.viewLoaded = 0;
+
+        $scope.experimentListStack = [];
+
         $scope.experimentListBase = {
             'sum': 0,
-            'cnt': 0,
             'next': function () {
                 var ex = $scope.experimentList;
 
@@ -18,30 +20,26 @@ momentum.controller('ExperimentsController', [
                 experiments.list(
                     $scope.sessionId,
                     8,
-                    Math.min(ex.offset + 8, ex.cnt)
+                    ex.offset
                 ).then(function (exp) {
                     $scope.experimentList = angular.extend(
                         {},
                         $scope.experimentListBase,
                         exp
                     );
+                    $scope.experimentListStack.push($scope.experimentList);
                 });
             },
             'prev': function () {
-                var ex = $scope.experimentList;
+                var ex;
 
-                ex.loading = 1;
-                experiments.list(
-                    $scope.sessionId,
-                    8,
-                    Math.max(ex.offset - 8, 0)
-                ).then(function (exp) {
-                    $scope.experimentList = angular.extend(
-                        {},
-                        $scope.experimentListBase,
-                        exp
-                    );
-                });
+                $scope.experimentListStack.pop();
+                ex = $scope.experimentListStack[
+                    $scope.experimentListStack.length - 1
+                ];
+
+                ex.loading = 0;
+                $scope.experimentList = ex;
             },
             'click': function (experiment) {
                 $state.go('root.tests', {
@@ -66,13 +64,16 @@ momentum.controller('ExperimentsController', [
             promises['exp'] = experiments.list(
                 $scope.sessionId,
                 8,
-                0
+                null,
+                1
             ).then(function (exp) {
                 $scope.experimentList = angular.extend(
                     {},
                     $scope.experimentListBase,
                     exp
                 );
+
+                $scope.experimentListStack.push($scope.experimentList);
             });
 
             promises['cat'] = category.getSelected(

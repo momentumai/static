@@ -1,7 +1,8 @@
-/*global momentum, angular */
+/*global momentum, bvConfig */
 momentum.factory('experiments', [
     '$q',
-    function ($q) {
+    '$http',
+    function ($q, $http) {
         var experiments = {
             'tests': {}
         };
@@ -23,22 +24,21 @@ momentum.factory('experiments', [
             return num.toPrecision(3);
         }
 
-        function toShortDate (timestamp) {
-            var date = new Date(timestamp * 1000),
-                months = [
-                    'Jan.',
-                    'Feb.',
-                    'Mar.',
-                    'Apr.',
-                    'May',
-                    'June',
-                    'July',
-                    'Aug.',
-                    'Sept.',
-                    'Oct.',
-                    'Nov.',
-                    'Dec.'
-                ];
+        function toShortDate (date) {
+            var months = [
+                'Jan.',
+                'Feb.',
+                'Mar.',
+                'Apr.',
+                'May',
+                'June',
+                'July',
+                'Aug.',
+                'Sept.',
+                'Oct.',
+                'Nov.',
+                'Dec.'
+            ];
 
             return [
                 date.getUTCDate(),
@@ -46,77 +46,12 @@ momentum.factory('experiments', [
             ].join(' ');
         }
 
-        function getDummyExperiments (params) {
-            var dummyExperiment = {
-                'id': 18837,
-                'cId': '959ace8a-1263-4ccc-8fd9-5fc4bdbfef0d',
-                'seed': 2,
-                'viral': 0,
-                'created_at': 1473813900,
-                'active': true,
-                'status': 'ACTIVE',
-                'name': 'Dummy experiment',
-                'url': 'google.com',
-                'from': 1473814693,
-                'to': 1473986700,
-                'conversion': 2,
-                'click': 0,
-                'landing': -1,
-                'lift': 1,
-                'cpa': 'N/A',
-                'spend': '£0.0',
-                'meta': {
-                    'page': 'FourFourTwo USA',
-                    'audience': '2% Lookalike_13-50_USA',
-                    'adaccount': 'FourFourTwo USA',
-                    'currency': 'GBP',
-                    'offset': 100
-                },
-                'adset': {
-                    'name': 'Dummy experiment',
-                    'start_time': '2016-09-14T01:58:13+0100',
-                    'end_time': '2016-09-16T01:45:00+0100',
-                    'effective_status': 'ACTIVE',
-                    'lifetime_budget': '2000',
-                    'ads': {
-                        'data': [
-                            {
-                                'effective_status': 'ACTIVE',
-                                'id': '6050205780203'
-                            }
-                        ],
-                        'paging': {
-                            'cursors': {
-                                'before': 'NjA1MDIwNTc4MDIwMwZDZD',
-                                'after': 'NjA1MDIwNTc4MDIwMwZDZD'
-                            }
-                        }
-                    },
-                    'id': '6050205778203'
-                }
-            };
-
-            return $q.resolve({
-                'data': {
-                    'data': new Array(8).fill(
-                        null
-                    ).map(function (ignore, index) {
-                        return angular.extend(
-                            {},
-                            dummyExperiment,
-                            {
-                                'id': String(index)
-                            }
-                        );
-                    }),
-                    'cnt': 80,
-                    'sum': 8,
-                    'offset': params.offset || 0
-                }
-            });
-        }
-
-        experiments.list = function (sessionId, limit, offset) {
+        experiments.list = function (
+                sessionId,
+                limit,
+                offset,
+                first
+        ) {
             var params = {
                 'session_id': sessionId
             };
@@ -125,35 +60,34 @@ momentum.factory('experiments', [
                 params.limit = Number(limit);
             }
 
-            if (Number(offset)) {
-                params.offset = Number(offset);
+            if (offset) {
+                params.offset = offset;
             }
 
-            return getDummyExperiments(params).then(function (resp) {
-                var campaigns = resp.data;
+            return $http.post([
+                bvConfig.endpoint,
+                'experiment/list'
+            ].join(''), params).then(function (res) {
+                var experiment = res.data;
 
-                if (resp.data.errorMessage) {
-                    throw resp.data.errorMessage.split(':')[2];
+                if (res.data.errorMessage) {
+                    throw res.data.errorMessage.split(':')[2];
                 }
 
-                campaigns.data.forEach(function (campaign) {
-                    campaign.from = toShortDate(campaign.from);
-                    campaign.to = toShortDate(campaign.to);
-                    campaign.conversion = getK(campaign.conversion);
-                    campaign.click = getK(campaign.click);
-                    if (campaign.landing < 0) {
-                        campaign.landing = 'N/A';
-                    } else {
-                        campaign.landing = round(campaign.landing);
-                    }
-                    if (campaign.lift > 10) {
-                        campaign.lift = getK(campaign.lift);
-                    } else {
-                        campaign.lift = round(campaign.lift);
-                    }
+                experiment.sum = experiment.data.length;
+
+                if (first) {
+                    experiment.firstPage = true;
+                }
+
+                experiment.data.forEach(function (e) {
+                    e.click = getK(e.click);
+                    e.fb_actions = getK(e.fb_actions);
+                    e.landing = e.landing === -1 ? 'N/A' : round(e.landing);
+                    e.latest_endtime = toShortDate(new Date(e.latest_endtime));
                 });
 
-                return resp.data;
+                return experiment;
             });
         };
 
@@ -180,6 +114,21 @@ momentum.factory('experiments', [
                 0
             ).then(function (res) {
                 return res.data[0];
+            });
+        };
+
+        experiments.create = function (sessionId, data) {
+            return $http.post([
+                bvConfig.endpoint,
+                'experiment/create'
+            ].join(''), {
+                'session_id': sessionId,
+                'data': data
+            }).then(function (res) {
+                if (res.data.errorMessage) {
+                    throw res.data.errorMessage.split(':')[2];
+                }
+                return res.data;
             });
         };
 
