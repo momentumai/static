@@ -22,6 +22,7 @@
             <th title="Name" class="mdl-data-table__cell--non-numeric">Name</th>
             <th title="Conversion">Conv.</th>
             <th title="CPA">CPA</th>
+            <th title="CPC">CPC</th>
             <th title="Spent">Spent</th>
             <th title="Click">Click</th>
             <th title="Landing">Land.</th>
@@ -57,6 +58,7 @@
             <td ng-if="!c.adset" colspan="6">You don't have permission to access this campaign.</td>
             <td ng-if="c.adset">{{c.conversion}}</td>
             <td ng-if="c.adset">{{c.cpa}}</td>
+            <td ng-if="c.adset">{{c.cpc}}</td>
             <td ng-if="c.adset">{{c.spend}}</td>
             <td ng-if="c.adset">{{c.click}}</td>
             <td ng-if="c.adset">{{c.landing}}</td>
@@ -69,7 +71,7 @@
           </tr>
         <tr class="spacer" ng-if="model.sum < 10">
             <td colspan="8" style="height: calc(49px * ({{10 - model.sum}}))">
-                {{model.sum ? 
+                {{model.sum ?
                     '&nbsp' :
                     model.errorMessage ?
                         model.errorMessage :
