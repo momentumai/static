@@ -30,7 +30,8 @@ momentum.factory('rule', ['category', '$q', '$http',
             var ret = [];
 
             items.forEach(function (item) {
-                var root = item.definition.OR[0].momentum,
+                var root = item.definition.OR[0],
+                    metric = Object.keys(root)[0],
                     actions = item.definition.action.slice(0),
                     act;
 
@@ -44,9 +45,10 @@ momentum.factory('rule', ['category', '$q', '$http',
 
                 act = {
                     'id': item.id,
-                    'value': root[Object.keys(root)[0]],
-                    'condition': Object.keys(root)[0],
+                    'value': root[metric][Object.keys(root[metric])[0]],
+                    'condition': Object.keys(root[metric])[0],
                     'action': actions.join('|'),
+                    'metric': metric,
                     'options': Object.keys(item.options).length &&
                         item.options || {},
                     'my': Number(item.my),
@@ -167,15 +169,12 @@ momentum.factory('rule', ['category', '$q', '$http',
             req.cat2 = group.cat2;
             req.cat3 = group.cat3;
             req.definition = {
-                'OR': [
-                    {
-                        'momentum': {}
-                    }
-                ],
+                'OR': [{}],
                 'action': item.action.split('|')
             };
 
-            req.definition.OR[0].momentum[item.condition] = item.value;
+            req.definition.OR[0][item.metric] = {};
+            req.definition.OR[0][item.metric][item.condition] = item.value;
 
             req.definition = JSON.stringify(req.definition, null, 4);
 

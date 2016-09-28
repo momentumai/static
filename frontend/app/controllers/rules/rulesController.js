@@ -451,6 +451,7 @@ momentum.controller('RulesController', [
                 'id': 'new_' + Date.now(),
                 'condition': 'NONE',
                 'action': 'NONE',
+                'metric': 'momentum',
                 'my': 1,
                 'value': 50,
                 'parent': {

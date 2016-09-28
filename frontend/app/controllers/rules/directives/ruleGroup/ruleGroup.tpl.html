@@ -25,7 +25,16 @@
             ng-repeat="item in group.items track by item.id" mdl-upgrade>
             <code class="mdl-list__item-primary-content">
                 <span>#{{$index + 1}}&nbsp;</span>
-                if Momentum score is
+                if
+
+                <select
+                    ng-disabled="item.deleted"
+                    ng-model="item.metric"
+                    class="rule-input">
+                    <option value="momentum">Momentum score</option>
+                    <option value="cpa">CPA</option>
+                </select>
+                is
                 <select
                     validators="[{
                         'message': 'Please fill out this field.',
