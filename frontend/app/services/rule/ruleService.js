@@ -3,11 +3,18 @@ momentum.factory('rule', ['category', '$q', '$http',
     function (category, $q, $http) {
         var rule = {},
             moduleMap = {
-                'slack|alert_make': 'top_not_alerted',
-                'promotion_stop|alert_remove': 'alerted',
-                'promotion_start': 'top_not_promoted',
-                'promotion_stop|promotion_finish': 'promoted',
-                'share': 'top_not_shared'
+                'momentum': {
+                    'slack|alert_make': 'top_not_alerted',
+                    'promotion_stop|alert_remove': 'alerted',
+                    'promotion_start': 'top_not_promoted',
+                    'promotion_stop|promotion_finish': 'promoted',
+                    'share': 'top_not_shared'
+                },
+                'cpa': {
+                    'promotion_start': 'cpa_not_promoted',
+                    'promotion_stop|promotion_finish': 'cpa_promoted',
+                    'share': 'cpa_not_shared'
+                }
             },
             actionMap = {
                 'momentum': [
@@ -193,7 +200,7 @@ momentum.factory('rule', ['category', '$q', '$http',
 
             req.definition = JSON.stringify(req.definition, null, 4);
 
-            req.module = moduleMap[item.action];
+            req.module = moduleMap[item.metric][item.action];
 
             if (item.parent && item.parent.id && item.parent.id !== 'all') {
                 req.parent = item.parent.id;
