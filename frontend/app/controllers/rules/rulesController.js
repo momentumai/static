@@ -451,6 +451,7 @@ momentum.controller('RulesController', [
                 'id': 'new_' + Date.now(),
                 'condition': 'NONE',
                 'action': 'NONE',
+                'metric': 'momentum',
                 'my': 1,
                 'value': 50,
                 'parent': {
@@ -516,6 +517,10 @@ momentum.controller('RulesController', [
             }
 
             return ret;
+        };
+
+        $scope.actionFilter = function (action, item) {
+            return rule.actionFilter(item.metric, action);
         };
 
         if ($scope.loaded) {
