@@ -519,6 +519,10 @@ momentum.controller('RulesController', [
             return ret;
         };
 
+        $scope.actionFilter = function (action, item) {
+            return rule.actionFilter(item.metric, action);
+        };
+
         if ($scope.loaded) {
             init();
         } else {

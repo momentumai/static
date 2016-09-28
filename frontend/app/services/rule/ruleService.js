@@ -8,6 +8,21 @@ momentum.factory('rule', ['category', '$q', '$http',
                 'promotion_start': 'top_not_promoted',
                 'promotion_stop|promotion_finish': 'promoted',
                 'share': 'top_not_shared'
+            },
+            actionMap = {
+                'momentum': [
+                    'promotion_start',
+                    'promotion_stop',
+                    'share',
+                    'alert_make',
+                    'alert_remove',
+                    'slack'
+                ],
+                'cpa': [
+                    'promotion_start',
+                    'promotion_stop',
+                    'share'
+                ]
             };
 
         function getKey (item) {
@@ -238,6 +253,10 @@ momentum.factory('rule', ['category', '$q', '$http',
             }).then(function (res) {
                 return res.data;
             });
+        };
+
+        rule.actionFilter = function (metric, action) {
+            return actionMap[metric].indexOf(action) !== -1;
         };
 
         return rule;

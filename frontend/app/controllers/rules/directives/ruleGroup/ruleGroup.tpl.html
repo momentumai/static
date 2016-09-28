@@ -78,23 +78,28 @@
                         ng-if="item.action === 'NONE'"
                         value="NONE">action</option>
                     <option
-                        ng-if="item.action === 'slack|alert_make' ||
-                            !haveAction('slack|alert_make', group)"
+                        ng-if="(item.action === 'slack|alert_make' ||
+                            !haveAction('slack|alert_make', group)) &&
+                            actionFilter('alert_make', item)"
                         value="slack|alert_make">
                         recommend
                     </option>
-                    <option ng-if="item.action === 'promotion_stop|alert_remove' ||
-                        !haveAction('promotion_stop|alert_remove', group)"
+                    <option ng-if="(item.action === 'promotion_stop|alert_remove' ||
+                        !haveAction('promotion_stop|alert_remove', group)) &&
+                        actionFilter('alert_remove', item)"
                         value="promotion_stop|alert_remove">
                         stop recommending
                     </option>
-                    <option value="promotion_start">
+                    <option ng-if="actionFilter('promotion_start', item)"
+                        value="promotion_start">
                         create a new promotion
                     </option>
-                    <option value="promotion_stop|promotion_finish">
+                    <option ng-if="actionFilter('promotion_stop', item)"
+                        value="promotion_stop|promotion_finish">
                         stop promotion
                     </option>
-                    <option value="share">
+                    <option ng-if="actionFilter('share', item)"
+                        value="share">
                         share on Facebook
                     </option>
                 </select>
