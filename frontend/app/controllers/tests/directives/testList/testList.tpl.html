@@ -26,7 +26,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="c in model.data" mdl-upgrade>
+          <tr 
+            ng-mouseover="model.over(c)"
+            ng-mouseleave="model.leave()"
+            ng-repeat="c in model.data" mdl-upgrade>
             <td ng-class="{'loading': c.loading}"
                 class="mdl-data-table__cell--non-numeric">
                 <label
@@ -42,7 +45,8 @@
                         class="mdl-switch__input" />
                     <span class="mdl-switch__label"></span>
                 </label>
-                <div style="width: 18px; height: 18px"    ng-if="c.loading"
+                <div style="width: 18px; height: 18px"
+                    ng-if="c.loading"
                     class="mdl-spinner
                     mdl-spinner--single-color
                     mdl-js-spinner

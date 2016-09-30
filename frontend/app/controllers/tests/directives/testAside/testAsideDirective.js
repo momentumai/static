@@ -6,7 +6,8 @@ momentum.directive('testAside', [
             'restrict': 'A',
             'templateUrl': 'testAside.tpl.html',
             'scope': {
-                'model': '=ngModel'
+                'model': '=ngModel',
+                'activeTest': '=ngActiveTest'
             },
             'link': function ($scope, $element) {
                 $scope.model.animate = angular.bind(

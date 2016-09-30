@@ -19,12 +19,21 @@ momentum.controller('TestsController', [
         $scope
     ) {
         $scope.viewLoaded = 0;
+
+        $scope.activeTest = null;
+
         $scope.testList = {
             'data': [],
             'dataRaw': [],
             'offset': 0,
             'sum': 0,
             'cnt': 0,
+            'over': function (t) {
+                $scope.activeTest = t;
+            },
+            'leave': function () {
+                $scope.activeTest = null;
+            },
             'next': function () {
                 $scope.testList.offset = Math.min(
                     $scope.testList.offset + 8,

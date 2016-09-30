@@ -1,4 +1,4 @@
-/*global momentum, bvConfig */
+/*global momentum, bvConfig, window */
 momentum.factory('experiments', [
     '$q',
     '$http',
@@ -44,6 +44,13 @@ momentum.factory('experiments', [
             ].join(' ');
         }
 
+        function getHost (url) {
+            var l = window.document.createElement('a');
+
+            l.href = 'http://' + url;
+            return l.hostname;
+        }
+
         function formatExperiment (e) {
             e.click = getK(e.click);
             e.fb_actions = getK(e.fb_actions);
@@ -58,6 +65,7 @@ momentum.factory('experiments', [
                 t.to = t.end_time;
                 t.start_time = toShortDate(new Date(t.start_time));
                 t.end_time = toShortDate(new Date(t.end_time));
+                t.host = getHost(e.url);
             });
         }
 
