@@ -61,6 +61,61 @@ momentum.controller('TestsController', [
                         'htmlText': err
                     });
                 });
+            },
+            'edit': function (test) {
+                var bData = test.budget_object,
+                    model = {
+                        'budget': bData.data / bData.currency.offset,
+                        'currency': bData.currency.name,
+                        'offset': bData.currency.offset
+                    };
+
+                model.name = test.name;
+                model.from = new Date(test.from);
+                model.to = new Date(model.from.getTime());
+                model.to.setUTCFullYear(model.to.getUTCFullYear() + 1);
+                model.until = new Date(test.to);
+
+                dialog.open({
+                    'template': 'testEditDialog.tpl.html',
+                    'showCancel': true,
+                    'okText': 'Save',
+                    'model': model,
+                    'dialogClass': 'promotion-form campaign-edit-dialog',
+                    'destroy': false
+                }).then(function () {
+                    return experiments.editTest(
+                        $scope.sessionId,
+                        test.id,
+                        {
+                            'end_time': Math.floor(
+                                model.until.getTime() / 1000
+                            ),
+                            'name_text': model.name,
+                            'budget': model.offset * model.budget
+                        }
+                    ).then(function () {
+                        dialog.destroy();
+                        test.name = model.name;
+                        test.budget = Number(
+                            model.budget
+                        ).toLocaleString('en-EN', {
+                            'style': 'currency',
+                            'currency': model.currency,
+                            'maximumSignificantDigits': 4
+                        });
+                        test.budget_object.data = model.budget * model.offset;
+                        test.to = model.until.toISOString();
+
+                        return toast.open({
+                            'htmlText': 'Test edited successfully'
+                        });
+                    }).catch(function (err) {
+                        return dialog.open({
+                            'htmlText': err
+                        });
+                    });
+                });
             }
         };
 

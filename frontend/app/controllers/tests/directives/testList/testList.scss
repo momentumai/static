@@ -38,7 +38,10 @@
             width: 40px;
         }
         &:nth-of-type(9) {
-            width: 150px;
+            width: 126px;
+        }
+        &:nth-of-type(10) {
+            width: calc(24px + 32px);
         }
     }
 }

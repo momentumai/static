@@ -54,6 +54,8 @@ momentum.factory('experiments', [
                 t.click = getK(t.click);
                 t.fb_actions = getK(t.fb_actions);
                 t.landing = t.landing === -1 ? 'N/A' : round(t.landing);
+                t.from = t.start_time;
+                t.to = t.end_time;
                 t.start_time = toShortDate(new Date(t.start_time));
                 t.end_time = toShortDate(new Date(t.end_time));
             });

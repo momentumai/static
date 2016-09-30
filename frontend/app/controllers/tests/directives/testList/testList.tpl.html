@@ -22,6 +22,7 @@
             <th title="Click">Click</th>
             <th title="Landing">Land.</th>
             <th title="Schedule">Schedule</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -53,7 +54,7 @@
                     {{c.name}}
                 </a>
             </td>
-            <td ng-if="c.permission_denied" colspan="7">You don't have permission to access this test.</td>
+            <td ng-if="c.permission_denied" colspan="8">You don't have permission to access this test.</td>
             <td ng-if="!c.permission_denied">{{c.click}}</td>
             <td ng-if="!c.permission_denied">{{c.cpa}}</td>
             <td ng-if="!c.permission_denied">{{c.cpc}}</td>
@@ -61,9 +62,14 @@
             <td ng-if="!c.permission_denied">{{c.fb_actions}}</td>
             <td ng-if="!c.permission_denied">{{c.landing}}</td>
             <td ng-if="!c.permission_denied">{{c.start_time}} - {{c.end_time}}</td>
+            <td ng-if="!c.permission_denied">
+                <button ng-click="model.edit(c)" class="mdl-button mdl-js-button mdl-button--icon">
+                    <i class="material-icons">settings</i>
+                </button>
+            </td>
           </tr>
         <tr class="spacer" ng-if="model.sum < 8">
-            <td colspan="9" style="height: calc(49px * ({{8 - model.sum}}))">
+            <td colspan="10" style="height: calc(49px * ({{8 - model.sum}}))">
                 {{model.sum ? 
                     '&nbsp' :
                     model.errorMessage ?
