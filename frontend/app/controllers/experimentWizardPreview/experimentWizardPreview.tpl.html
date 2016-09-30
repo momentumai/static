@@ -1,0 +1,38 @@
+<div class="mdl-grid experiment-wizard-preview" mdl-upgrade>
+    <div ng-if="!viewLoaded" class="fill-full" mdl-upgrade>
+      <div
+        class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active">
+      </div>
+    </div>
+    <form
+        mdl-upgrade
+        ng-submit="promote.submit()"
+        experiment-create-promote
+        ng-model="promote"
+        ng-list-model="previewList"
+        ng-if="viewLoaded"
+        class="experiment-create-promote
+            animate
+            mdl-card
+            mdl-shadow--2dp
+            mdl-cell
+            mdl-cell--4-col-desktop
+            mdl-cell--8-col-tablet
+            mdl-cell--4-col-phone">
+    </form>
+    <div
+        mdl-upgrade
+        experiment-create-preview-list
+        ng-model="previewList"
+        page-data="pageData"
+        ng-if="viewLoaded"
+        class="experiment-create-preview-list
+            animate
+            mdl-card
+            mdl-shadow--2dp
+            mdl-cell
+            mdl-cell--8-col-desktop
+            mdl-cell--8-col-tablet
+            mdl-cell--4-col-phone">
+    </div>
+</div>

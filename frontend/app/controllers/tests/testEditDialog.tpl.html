@@ -1,0 +1,39 @@
+<div class="row">
+    <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+        <input
+            ng-model="model.name"
+            class="mdl-textfield__input"
+            type="text"
+            id="test-edit-name"
+            required>
+            <label for="test-edit-name">Name</label>
+        </input>
+    </div>
+</div>
+<div class="row">
+    <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+        <input
+            ng-model="model.budget"
+            class="mdl-textfield__input"
+            step="any"
+            min="0.000001"
+            type="number"
+            id="test-edit-budget"
+            required>
+            <label for="test-edit-budget">Lifetime budget ({{model.currency}})</label>
+        </input>
+    </div>
+</div>
+<div class="row">
+    <div
+        class="full date_picker">
+    <input
+      min="{{ model.from | date:'yyyy-MM-dd' }}"
+      max="{{ model.to | date:'yyyy-MM-dd' }}"
+      type="date"
+      id="test-edit-date-picker"
+      ng-model="model.until"
+      required>
+    <label for="test-edit-date-picker">Promote until</label>
+  </div>
+</div>

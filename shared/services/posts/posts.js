@@ -34,8 +34,8 @@ function ($http) {
             'img': row.ogdata && row.ogdata.image,
             'momentum': Math.round(row.momentum * 100),
             'chartData': row.stats && getChartData(
-                row.stats.view &&
-                row.stats.view.values ||
+                row.stats.share &&
+                row.stats.share.values ||
                 null
             ) || null,
             'recommended': Number(row.recommended || 0),

@@ -92,7 +92,7 @@ momentum.controller('AccountSettingsController', [
                     $scope.teamSwitch.teams.selected
                 ).then(function () {
                     $scope.teamSwitch.dataLoading = 0;
-                    $state.go('root.main.dashboard.info');
+                    $state.go('root.main.dashboard.history');
                     window.location.reload(true);
                 });
             }

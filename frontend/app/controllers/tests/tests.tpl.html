@@ -1,0 +1,37 @@
+<div class="mdl-grid" mdl-upgrade>
+    <div ng-if="!viewLoaded" class="fill-full">
+      <div
+        class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active">
+      </div>
+    </div>
+    <div
+        mdl-upgrade
+        test-list
+        ng-model="testList"
+        ng-if="viewLoaded"
+        class="test-list
+            animate
+            mdl-card
+            mdl-shadow--2dp
+            mdl-cell
+            mdl-cell--8-col-desktop
+            mdl-cell--8-col-tablet
+            mdl-cell--4-col-phone">
+    </div>
+    <div
+        mdl-upgrade
+        test-aside
+        ng-submit="testAside.save()"
+        ng-model="testAside"
+        ng-active-test="activeTest"
+        ng-if="viewLoaded"
+        class="test-aside
+            animate
+            mdl-card
+            mdl-shadow--2dp
+            mdl-cell
+            mdl-cell--4-col-desktop
+            mdl-cell--hide-tablet
+            mdl-cell--hide-phone">
+    </div>
+</div>

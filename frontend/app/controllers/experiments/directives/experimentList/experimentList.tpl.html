@@ -1,0 +1,86 @@
+<div class="mdl-card__media mdl-color--white">
+    <div ng-if="model.loading" class="experiments-loader" mdl-upgrade>
+        <div
+            class="mdl-spinner
+                mdl-spinner--single-color
+                mdl-js-spinner
+                is-active">
+        </div>
+    </div>
+    <table ng-if="!model.loading" class="experiments-table mdl-data-table mdl-js-data-table" mdl-upgrade>
+        <thead>
+          <tr>
+            <th
+                title="Active"
+                class="mdl-data-table__cell--non-numeric"
+            >Active</th>
+            <th title="Name" class="mdl-data-table__cell--non-numeric">Name</th>
+            <th title="Conversion">Conversion</th>
+            <th title="Click">Click</th>
+            <th title="Landing">Landing</th>
+            <th title="Schedule">Ending</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="c in model.data" mdl-upgrade>
+            <td ng-class="{'loading': c.loading}" class="mdl-data-table__cell--non-numeric">
+                <label
+                    ng-if="!c.loading"
+                    ng-click="model.toggle(c);"
+                    class="mdl-switch mdl-js-switch mdl-js-ripple-effect"
+                    for="switch-{{c.id}}" mdl-upgrade>
+                    <input
+                        type="checkbox"
+                        ng-disabled="c.permission_denied"
+                        ng-model="c.active"
+                        id="switch-{{c.id}}"
+                        class="mdl-switch__input" />
+                    <span class="mdl-switch__label"></span>
+                </label>
+                <div style="width: 18px; height: 18px"    ng-if="c.loading"
+                    class="mdl-spinner
+                    mdl-spinner--single-color
+                    mdl-js-spinner
+                    is-active" mdl-upgrade></div>
+            </td>
+            <td class="mdl-data-table__cell--non-numeric">
+                <a
+                    class="mdl-color-text--primary"
+                    href="javascript:void(0)"
+                    ng-click="!c.permission_denied && model.click(c)"
+                    title="{{c.name}}">
+                    {{c.name}}
+                </a>
+            </td>
+            <td ng-if="c.permission_denied" colspan="4">You don't have permission to access this experiment.</td>
+            <td ng-if="!c.permission_denied">{{c.click}}</td>
+            <td ng-if="!c.permission_denied">{{c.fb_actions}}</td>
+            <td ng-if="!c.permission_denied">{{c.landing}}</td>
+            <td ng-if="!c.permission_denied">{{c.latest_endtime}}</td>
+          </tr>
+        <tr class="spacer" ng-if="model.sum < 8">
+            <td colspan="6" style="height: calc(49px * ({{8 - model.sum}}))">
+                {{model.sum ? 
+                    '&nbsp' :
+                    model.errorMessage ?
+                        model.errorMessage :
+                        'No experiments present.'}}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="mdl-data-table__footer">
+        <button
+          ng-disabled="model.loading || !model.offset"
+          class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect"
+          ng-click="model.next()">
+          <i class="material-icons">navigate_next</i>
+        </button>
+    <button
+      ng-disabled="model.loading || model.firstPage"
+      class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect"
+      ng-click="model.prev()">
+      <i class="material-icons">navigate_before</i>
+    </button>
+  </div>
+</div>

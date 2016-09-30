@@ -1,0 +1,71 @@
+<div ng-if="!activeTest" class="mdl-card__title">
+    <h2 class="mdl-card__title-text">
+        Experiment summary
+    </h2>
+</div>
+<div ng-if="activeTest" class="mdl-card__title">
+    <h2 class="mdl-card__title-text">
+        Preview
+    </h2>
+</div>
+<div ng-if="!activeTest" class="metric-map mdl-card__media mdl-color--white">
+    <div>
+        <div>Conversion</div>
+        <div>{{model.click}}</div>
+    </div>
+    <div>
+        <div>Click</div>
+        <div>{{model.fb_actions}}</div>
+    </div>
+    <div>
+        <div>Landing</div>
+        <div>{{model.landing}}</div>
+    </div>
+</div>
+<div ng-if="activeTest" class="test-list-preview experiment-create-preview-list mdl-card__media mdl-color--white">
+    <div class="exp-create-set">
+        <div class="set-cont">
+            <div class="set-bg">
+                <div class="set-header">
+                    <div class="set-header-img"
+                        ng-class="{'no-margin': !activeTest.creative.message}"
+                        ng-style="{'background-image': 'url(' + activeTest.page.picture + ')'}"></div>
+                    <div class="set-header-name">
+                        <div class="set-header-name-text">
+                            {{activeTest.page.name}}
+                        </div>
+                        <div class="set-header-name-sponsored">
+                            <span>Sponsored &#8226; </span>
+                            <div class="sprite sprite-preview_action_5"></div>
+                        </div>
+                    </div>
+                    <div class="set-header-like">
+                        <div class="sprite sprite-preview_action_4"></div>
+                    </div>
+                    <div class="set-header-more">
+                        <div class="sprite sprite-preview_action_6"></div>
+                    </div>
+                </div>
+                <div ng-if="activeTest.creative.message" class="set-message">{{activeTest.creative.message}}</div>
+                <div class="set-image"><img ng-src="{{activeTest.creative.image}}"/></div>
+                <div class="set-image-text">
+                    <div class="set-image-text-headline">{{activeTest.creative.name}}</div>
+                    <div class="set-image-text-desc">{{activeTest.creative.description}}</div>
+                    <div class="set-image-text-page">{{activeTest.host}}</div>
+                </div>
+            </div>
+            <div class="set-actions">
+                <div class="sprite sprite-preview_action_1"></div>
+                <div class="sprite sprite-preview_action_2"></div>
+                <div class="sprite sprite-preview_action_3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div ng-if="!activeTest" class="mdl-card__actions" mdl-upgrade>
+    <button
+        ui-sref="root.experimentWizard({'contentId': model.id})"
+        ng-disabled="model.dataLoading"
+        type="button"
+        class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">New test</button>
+</div>

@@ -1,3 +1,5 @@
+@import 'variables.scss';
+
 .content-fab {
   position: fixed;
   bottom: 24px;
@@ -64,6 +66,21 @@
       }
     }
 
+    &-fab.primary-colored {
+        background-color: unquote("rgb(#{$color-primary})") !important;
+        color: rgb(250, 250, 250);
+        &:hover, &:focus {
+            background-color: unquote("rgb(#{$color-primary-dark})") !important;
+        }
+    }
+
+    &-fab.flask {
+        background-image: url(/images/flask-outline.png);
+        background-size: calc(100% * 2 / 3);
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
     &-fab.fab1 {
       transform: scale(0);
       transition-delay: 0;
@@ -75,6 +92,10 @@
     &-fab.fab3 {
       transform: scale(0);
       transition-delay: 0.1s;
+    }
+    &-fab.fab4 {
+      transform: scale(0);
+      transition-delay: 0.15s;
     }
   }
 }

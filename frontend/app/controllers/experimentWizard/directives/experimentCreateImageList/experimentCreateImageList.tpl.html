@@ -1,0 +1,33 @@
+<div class="mdl-card__title">
+    <h2 class="mdl-card__title-text">
+        Images added so far
+    </h2>
+</div>
+<div class="mdl-card__media mdl-color--white exp-create-img-list"
+    ng-class="{'has-items': model.data.length}">
+    <div ng-if="model.data.length"
+        class="exp-create-img"
+        ng-repeat="img in model.data track by $index">
+        <img ng-src="{{img}}"/>
+        <div class="controls">
+            <button
+                ng-click="model.remove($index)"
+                class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored mdl-button--accent">
+              <i class="material-icons">close</i>
+            </button>
+        </div>
+    </div>
+    <div ng-if="model.data.length"
+        ng-repeat="i in model.range(3 - (model.data.length % 3 ? model.data.length % 3 : 3)) track by $index"
+        class="exp-create-img" style="visibility: hidden"></div>
+    <div ng-if="!model.data.length" class="exp-create-empty">
+        <span>The list is empty.</span>
+    </div>
+</div>
+<div class="mdl-card__actions">
+    <button
+        ng-disabled="!model.data.length"
+        ng-click="model.removeAll()"
+        type="button"
+        class="mdl-button mdl-js-button mdl-js-ripple-effect">Remove all</button>
+</div>
