@@ -1,0 +1,101 @@
+<div class="mdl-card__media mdl-color--white">
+    <div ng-if="model.loading" class="tests-loader" mdl-upgrade>
+        <div
+            class="mdl-spinner
+                mdl-spinner--single-color
+                mdl-js-spinner
+                is-active">
+        </div>
+    </div>
+    <table ng-if="!model.loading" class="tests-table mdl-data-table mdl-js-data-table" mdl-upgrade>
+        <thead>
+          <tr>
+            <th
+                title="Active"
+                class="mdl-data-table__cell--non-numeric"
+            >Active</th>
+            <th title="Name" class="mdl-data-table__cell--non-numeric">Name</th>
+            <th title="Conversion">Conv.</th>
+            <th title="CPA">CPA</th>
+            <th title="CPC">CPC</th>
+            <th title="Spent">Spent</th>
+            <th title="Click">Click</th>
+            <th title="Landing">Land.</th>
+            <th title="Schedule">Schedule</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr 
+            ng-mouseover="model.over(c)"
+            ng-mouseleave="model.leave()"
+            ng-repeat="c in model.data" mdl-upgrade>
+            <td ng-class="{'loading': c.loading}"
+                class="mdl-data-table__cell--non-numeric">
+                <label
+                    ng-if="!c.loading"
+                    ng-click="model.toggle(c);"
+                    class="mdl-switch mdl-js-switch mdl-js-ripple-effect"
+                    for="switch-{{c.id}}" mdl-upgrade>
+                    <input
+                        type="checkbox"
+                        ng-disabled="c.permission_denied"
+                        ng-model="c.active"
+                        id="switch-{{c.id}}"
+                        class="mdl-switch__input" />
+                    <span class="mdl-switch__label"></span>
+                </label>
+                <div style="width: 18px; height: 18px"
+                    ng-if="c.loading"
+                    class="mdl-spinner
+                    mdl-spinner--single-color
+                    mdl-js-spinner
+                    is-active" mdl-upgrade></div>
+            </td>
+            <td class="mdl-data-table__cell--non-numeric">
+                <span class="mdl-color-text--primary"
+                    title="{{c.name}}">
+                    {{c.name}}
+                </a>
+            </td>
+            <td ng-if="c.permission_denied" colspan="8">You don't have permission to access this test.</td>
+            <td ng-if="!c.permission_denied">{{c.click}}</td>
+            <td ng-if="!c.permission_denied">{{c.cpa}}</td>
+            <td ng-if="!c.permission_denied">{{c.cpc}}</td>
+            <td title="{{c.spend}}" ng-if="!c.permission_denied">{{c.spend}}</td>
+            <td ng-if="!c.permission_denied">{{c.fb_actions}}</td>
+            <td ng-if="!c.permission_denied">{{c.landing}}</td>
+            <td ng-if="!c.permission_denied">{{c.start_time}} - {{c.end_time}}</td>
+            <td ng-if="!c.permission_denied">
+                <button ng-click="model.edit(c)" class="mdl-button mdl-js-button mdl-button--icon">
+                    <i class="material-icons">settings</i>
+                </button>
+            </td>
+          </tr>
+        <tr class="spacer" ng-if="model.sum < 8">
+            <td colspan="10" style="height: calc(49px * ({{8 - model.sum}}))">
+                {{model.sum ? 
+                    '&nbsp' :
+                    model.errorMessage ?
+                        model.errorMessage :
+                        'No tests present.'}}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="mdl-data-table__footer">
+        <button
+          ng-disabled="model.offset + model.sum >= model.cnt"
+          class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect"
+          ng-click="model.next()">
+          <i class="material-icons">navigate_next</i>
+        </button>
+    <button
+      ng-disabled="!model.offset"
+      class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect"
+      ng-click="model.prev()">
+      <i class="material-icons">navigate_before</i>
+    </button>
+    <span>{{model.sum ? model.offset + 1 : 0}}-{{model.offset + model.sum}} of {{model.cnt}}</span>
+  </div>
+</div>

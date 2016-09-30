@@ -65,22 +65,22 @@ function ($stateProvider, $urlRouterProvider) {
         }
     });
 
-    dashboard.state('root.main.dashboard.info', {
-        'url': '',
-        'views': {
-            'tab-container': {
-                'templateUrl': 'info.tpl.html',
-                'controller': 'InfoController'
-            }
-        }
-    });
-
     dashboard.state('root.main.dashboard.history', {
-        'url': '/history',
+        'url': '',
         'views': {
             'tab-container': {
                 'templateUrl': 'history.tpl.html',
                 'controller': 'HistoryController'
+            }
+        }
+    });
+
+    dashboard.state('root.main.dashboard.info', {
+        'url': '/info',
+        'views': {
+            'tab-container': {
+                'templateUrl': 'info.tpl.html',
+                'controller': 'InfoController'
             }
         }
     });
@@ -96,22 +96,22 @@ function ($stateProvider, $urlRouterProvider) {
         }
     });
 
-    content.state('root.main.content.info', {
-        'url': '',
-        'views': {
-            'tab-container': {
-                'templateUrl': 'contentInfo.tpl.html',
-                'controller': 'ContentInfoController'
-            }
-        }
-    });
-
     content.state('root.main.content.history', {
-        'url': '/history',
+        'url': '',
         'views': {
             'tab-container': {
                 'templateUrl': 'contentHistory.tpl.html',
                 'controller': 'ContentHistoryController'
+            }
+        }
+    });
+
+    content.state('root.main.content.info', {
+        'url': '/info',
+        'views': {
+            'tab-container': {
+                'templateUrl': 'contentInfo.tpl.html',
+                'controller': 'ContentInfoController'
             }
         }
     });
@@ -138,6 +138,61 @@ function ($stateProvider, $urlRouterProvider) {
             'container': {
                 'templateUrl': 'rules.tpl.html',
                 'controller': 'RulesController'
+            }
+        }
+    });
+
+    root.state('root.experiments', {
+        'url': '/experiments',
+        'params': {
+            'title': 'Experiments'
+        },
+        'views': {
+            'container': {
+                'templateUrl': 'experiments.tpl.html',
+                'controller': 'ExperimentsController'
+            }
+        }
+    });
+
+    root.state('root.tests', {
+        'url': '/experiments/:expId',
+        'params': {
+            'title': 'Tests'
+        },
+        'views': {
+            'container': {
+                'templateUrl': 'tests.tpl.html',
+                'controller': 'TestsController'
+            }
+        }
+    });
+
+    root.state('root.experimentWizard', {
+        'url': '/experiments/create/:contentId',
+        'params': {
+            'title': 'Create an experiment'
+        },
+        'views': {
+            'container': {
+                'templateUrl': 'experimentWizard.tpl.html',
+                'controller': 'ExperimentWizardController'
+            }
+        }
+    });
+
+    root.state('root.experimentWizardPreview', {
+        'url': '/experiments/create/:contentId/preview',
+        'params': {
+            'title': 'Preview tests',
+            'config': null,
+            'content': null,
+            'contentId': null
+        },
+        'views': {
+            'container': {
+                'templateUrl': 'experimentWizardPreview.tpl.html',
+                'controller': 'ExperimentWizardPreviewController'
             }
         }
     });

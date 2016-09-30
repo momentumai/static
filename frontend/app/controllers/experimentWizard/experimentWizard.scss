@@ -1,0 +1,14 @@
+.experiment-wizard {
+    .mdl-card {
+        height: 100%;
+    }
+    &-preview-button {
+        margin-left: 16px;
+        &.top {
+            margin-top: 16px;
+        }
+        &.bottom {
+            margin-bottom: 16px;
+        }
+    }
+}

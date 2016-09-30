@@ -1,0 +1,43 @@
+.experiment-create-image-list {
+    .exp-create-empty {
+        height: 67px;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        span {
+            align-self: center;
+        }
+    }
+
+    .exp-create-img-list {
+        padding: 16px;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-between;
+        &.has-items {
+            padding-top: 0;
+        }
+    }
+
+    .exp-create-img {
+        width: calc((100% - 32px) / 3);
+        padding-bottom: calc((100% - 32px) / 3 * 0.52333333333);
+        margin-top: 16px;
+        position: relative;
+        box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.54);
+        &:hover img {
+            opacity: 0.9;
+        }
+        img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .controls {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    }
+}

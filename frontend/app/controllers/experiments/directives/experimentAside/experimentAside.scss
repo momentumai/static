@@ -1,0 +1,13 @@
+.experiment-aside {
+    height: 100%;
+    .mdl-card__media {
+        min-height: 150px;
+        display: flex;
+        justify-content: center;
+        padding: 16px;
+        word-break: break-all;
+        & > span {
+            align-self: center;
+        }
+    }
+}

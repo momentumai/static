@@ -1,17 +1,17 @@
 <div mdl-upgrade class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
   <div class="mdl-tabs__tab-bar">
     <a
-        href="#tab1"
-        ng-click="state.go('root.main.content.info')"
-        ng-class="{'is-active': state.is('root.main.content.info')}"
-        class="mdl-tabs__tab"
-    >Today</a>
-    <a
         href="#tab2"
         ng-click="state.go('root.main.content.history')"
         ng-class="{'is-active': state.is('root.main.content.history')}"
         class="mdl-tabs__tab"
     >History</a>
+    <a
+        href="#tab1"
+        ng-click="state.go('root.main.content.info')"
+        ng-class="{'is-active': state.is('root.main.content.info')}"
+        class="mdl-tabs__tab"
+    >Today</a>
   </div>
 </div>
 
@@ -19,7 +19,8 @@
 
 <div style="height: 86px"></div>
 
-<a analytics-on="click"
+<a title="Promote"
+    analytics-on="click"
     analytics-event="fab"
     analytics-properties="{
         category: 'promote',
@@ -54,7 +55,8 @@
     ng-if="viewLoaded"
     class="content-fab-menu"
     mdl-upgrade>
-    <a analytics-on="click"
+    <a title="{{content.blacklist ? 'Remove from blacklist' : 'Blacklist content'}}"
+        analytics-on="click"
         analytics-event="fab"
         analytics-properties="{
             category: 'blacklist',
@@ -62,7 +64,7 @@
         }"
         ng-click="blacklist()"
         ng-class="{'inverse': !content.blacklist}"
-        class="fab3
+        class="fab4
             content-fab-menu-fab
             mdl-shadow--8dp
             mdl-button
@@ -72,7 +74,8 @@
             mdl-js-ripple-effect">
         <i class="material-icons">{{content.blacklist ? 'restore page' : 'block'}}</i>
     </a>
-    <a analytics-on="click"
+    <a title="Open"
+        analytics-on="click"
         analytics-event="fab"
         analytics-properties="{
             category: 'open_link',
@@ -80,7 +83,7 @@
         }"
         ng-href="http://{{content.url}}"
         target="_blank"
-        class="fab2
+        class="fab3
             content-fab-menu-fab
             mdl-shadow--8dp
             mdl-button
@@ -90,14 +93,15 @@
             mdl-js-ripple-effect">
         <i class="material-icons">open_in_new</i>
     </a>
-    <a analytics-on="click"
+    <a  title="Share"
+        analytics-on="click"
         analytics-event="fab"
         analytics-properties="{
             category: 'share',
             label: user.real_team_id
         }"
         ng-click="share()"
-        class="fab1
+        class="fab2
         content-fab-menu-fab
         mdl-shadow--8dp
         mdl-button
@@ -106,5 +110,24 @@
         mdl-button--mini-fab
         mdl-js-ripple-effect">
         <i class="material-icons">share</i>
+    </a>
+    <a title="Do an experiment"
+        analytics-on="click"
+        analytics-event="fab"
+        analytics-properties="{
+            category: 'experiment',
+            label: user.real_team_id
+        }"
+        ng-click="experiment()"
+        class="fab1
+        primary-colored
+        flask
+        content-fab-menu-fab
+        mdl-shadow--8dp
+        mdl-button
+        mdl-js-button
+        mdl-button--fab
+        mdl-button--mini-fab
+        mdl-js-ripple-effect">
     </a>
 </div>

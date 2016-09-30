@@ -32,7 +32,7 @@ momentum.controller('BillingSettingsController', [
                 $scope.payment.amount = resp.amount;
                 $scope.payment.name = resp.name;
                 if (!resp.status) {
-                    $state.go('root.main.dashboard.info');
+                    $state.go('root.main.dashboard.history');
                 }
             });
         }

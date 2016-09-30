@@ -34,7 +34,7 @@ momentum.controller('TeamRouterController', [
                     $stateParams.redirect
                 );
             } else {
-                $state.go('root.main.dashboard.info');
+                $state.go('root.main.dashboard.history');
             }
             window.location.reload(true);
         }).catch(function () {
