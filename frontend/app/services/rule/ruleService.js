@@ -3,11 +3,33 @@ momentum.factory('rule', ['category', '$q', '$http',
     function (category, $q, $http) {
         var rule = {},
             moduleMap = {
-                'slack|alert_make': 'top_not_alerted',
-                'promotion_stop|alert_remove': 'alerted',
-                'promotion_start': 'top_not_promoted',
-                'promotion_stop|promotion_finish': 'promoted',
-                'share': 'top_not_shared'
+                'momentum': {
+                    'slack|alert_make': 'top_not_alerted',
+                    'promotion_stop|alert_remove': 'alerted',
+                    'promotion_start': 'top_not_promoted',
+                    'promotion_stop|promotion_finish': 'promoted',
+                    'share': 'top_not_shared'
+                },
+                'cpa': {
+                    'promotion_start': 'cpa_not_promoted',
+                    'promotion_stop|promotion_finish': 'cpa_promoted',
+                    'share': 'cpa_not_shared'
+                }
+            },
+            actionMap = {
+                'momentum': [
+                    'promotion_start',
+                    'promotion_stop',
+                    'share',
+                    'alert_make',
+                    'alert_remove',
+                    'slack'
+                ],
+                'cpa': [
+                    'promotion_start',
+                    'promotion_stop',
+                    'share'
+                ]
             };
 
         function getKey (item) {
@@ -30,7 +52,8 @@ momentum.factory('rule', ['category', '$q', '$http',
             var ret = [];
 
             items.forEach(function (item) {
-                var root = item.definition.OR[0].momentum,
+                var root = item.definition.OR[0],
+                    metric = Object.keys(root)[0],
                     actions = item.definition.action.slice(0),
                     act;
 
@@ -44,9 +67,10 @@ momentum.factory('rule', ['category', '$q', '$http',
 
                 act = {
                     'id': item.id,
-                    'value': root[Object.keys(root)[0]],
-                    'condition': Object.keys(root)[0],
+                    'value': root[metric][Object.keys(root[metric])[0]],
+                    'condition': Object.keys(root[metric])[0],
                     'action': actions.join('|'),
+                    'metric': metric,
                     'options': Object.keys(item.options).length &&
                         item.options || {},
                     'my': Number(item.my),
@@ -167,19 +191,16 @@ momentum.factory('rule', ['category', '$q', '$http',
             req.cat2 = group.cat2;
             req.cat3 = group.cat3;
             req.definition = {
-                'OR': [
-                    {
-                        'momentum': {}
-                    }
-                ],
+                'OR': [{}],
                 'action': item.action.split('|')
             };
 
-            req.definition.OR[0].momentum[item.condition] = item.value;
+            req.definition.OR[0][item.metric] = {};
+            req.definition.OR[0][item.metric][item.condition] = item.value;
 
             req.definition = JSON.stringify(req.definition, null, 4);
 
-            req.module = moduleMap[item.action];
+            req.module = moduleMap[item.metric][item.action];
 
             if (item.parent && item.parent.id && item.parent.id !== 'all') {
                 req.parent = item.parent.id;
@@ -239,6 +260,10 @@ momentum.factory('rule', ['category', '$q', '$http',
             }).then(function (res) {
                 return res.data;
             });
+        };
+
+        rule.actionFilter = function (metric, action) {
+            return actionMap[metric].indexOf(action) !== -1;
         };
 
         return rule;
