@@ -130,6 +130,38 @@ momentum.factory('experiments', [
             });
         };
 
+        experiments.edit = function (sessionId, contentId, data) {
+            return $http.post([
+                bvConfig.endpoint,
+                'experiment/edit'
+            ].join(''), {
+                'session_id': sessionId,
+                'content_id': contentId,
+                'data': data
+            }).then(function (res) {
+                if (res.data.errorMessage) {
+                    throw res.data.errorMessage.split(':')[2];
+                }
+                return res.data;
+            });
+        };
+
+        experiments.editTest = function (sessionId, testId, data) {
+            return $http.post([
+                bvConfig.endpoint,
+                'experiment/test/edit'
+            ].join(''), {
+                'session_id': sessionId,
+                'id': testId,
+                'data': data
+            }).then(function (res) {
+                if (res.data.errorMessage) {
+                    throw res.data.errorMessage.split(':')[2];
+                }
+                return res.data;
+            });
+        };
+
         return experiments;
     }
 ]);

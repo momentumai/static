@@ -1,13 +1,23 @@
-/*global momentum, angular */
+/*global momentum */
 momentum.controller('TestsController', [
     'category',
     'experiments',
     'toast',
+    'dialog',
     '$rootScope',
     '$timeout',
     '$q',
     '$scope',
-    function (category, experiments, toast, $rootScope, $timeout, $q, $scope) {
+    function (
+        category,
+        experiments,
+        toast,
+        dialog,
+        $rootScope,
+        $timeout,
+        $q,
+        $scope
+    ) {
         $scope.viewLoaded = 0;
         $scope.testList = {
             'data': [],
@@ -36,6 +46,21 @@ momentum.controller('TestsController', [
                     $scope.testList.offset + 8
                 );
                 $scope.testList.sum = $scope.testList.data.length;
+            },
+            'toggle': function (test) {
+                test.loading = true;
+                experiments.editTest(
+                    $scope.sessionId,
+                    test.id,
+                    {'active': !test.active}
+                ).then(function () {
+                    test.loading = false;
+                    test.active = !test.active;
+                }).catch(function (err) {
+                    return dialog.open({
+                        'htmlText': err
+                    });
+                });
             }
         };
 

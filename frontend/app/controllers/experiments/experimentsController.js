@@ -2,11 +2,12 @@
 momentum.controller('ExperimentsController', [
     'category',
     'experiments',
+    'dialog',
     '$timeout',
     '$q',
     '$state',
     '$scope',
-    function (category, experiments, $timeout, $q, $state, $scope) {
+    function (category, experiments, dialog, $timeout, $q, $state, $scope) {
         $scope.viewLoaded = 0;
 
         $scope.experimentListStack = [];
@@ -40,6 +41,21 @@ momentum.controller('ExperimentsController', [
 
                 ex.loading = 0;
                 $scope.experimentList = ex;
+            },
+            'toggle': function (experiment) {
+                experiment.loading = true;
+                experiments.edit(
+                    $scope.sessionId,
+                    experiment.id,
+                    {'active': !experiment.active}
+                ).then(function () {
+                    experiment.loading = false;
+                    experiment.active = !experiment.active;
+                }).catch(function (err) {
+                    return dialog.open({
+                        'htmlText': err
+                    });
+                });
             },
             'click': function (experiment) {
                 $state.go('root.tests', {

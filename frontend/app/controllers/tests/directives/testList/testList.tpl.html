@@ -26,11 +26,13 @@
         </thead>
         <tbody>
           <tr ng-repeat="c in model.data" mdl-upgrade>
-            <td class="mdl-data-table__cell--non-numeric">
+            <td ng-class="{'loading': c.loading}"
+                class="mdl-data-table__cell--non-numeric">
                 <label
-                    ng-click="$event.preventDefault(); toggle(c.id, c.active, c.adset);"
+                    ng-if="!c.loading"
+                    ng-click="model.toggle(c);"
                     class="mdl-switch mdl-js-switch mdl-js-ripple-effect"
-                    for="switch-{{c.id}}">
+                    for="switch-{{c.id}}" mdl-upgrade>
                     <input
                         type="checkbox"
                         ng-disabled="c.permission_denied"
@@ -39,6 +41,11 @@
                         class="mdl-switch__input" />
                     <span class="mdl-switch__label"></span>
                 </label>
+                <div style="width: 18px; height: 18px"    ng-if="c.loading"
+                    class="mdl-spinner
+                    mdl-spinner--single-color
+                    mdl-js-spinner
+                    is-active" mdl-upgrade></div>
             </td>
             <td class="mdl-data-table__cell--non-numeric">
                 <span class="mdl-color-text--primary"
