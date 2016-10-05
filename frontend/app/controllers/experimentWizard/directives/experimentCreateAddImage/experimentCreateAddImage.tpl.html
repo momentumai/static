@@ -5,6 +5,21 @@
 </div>
 <div class="mdl-card__media mdl-color--white" style="padding: 16px">
     <div class="momentum-form">
+        <div class="full">
+            <input
+                ng-model="model.image"
+                onchange="angular.element(this).scope().model.upload(this.files)"
+                validators="[{
+                    'cond': model.max5,
+                    'message': 'You can add maximum 5 images'
+                }]"
+                validators-item="list"
+                class="mdl-textfield__input"
+                type="file"
+                id="exp-upload-image">
+                <label for="exp-upload-image">Upload image</label>
+            </input>
+        </div>
         <div class="full mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
             <input
                 ng-model="model.link"
@@ -16,7 +31,7 @@
                 class="mdl-textfield__input"
                 type="url"
                 id="exp-create-link">
-                <label for="exp-create-link">Image URL</label>
+                <label for="exp-create-link">Add by URL</label>
             </input>
         </div>
     </div>

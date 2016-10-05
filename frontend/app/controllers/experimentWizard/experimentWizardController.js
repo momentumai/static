@@ -1,4 +1,4 @@
-/*global momentum */
+/*global momentum, FileReader, Uint8Array, btoa */
 momentum.controller('ExperimentWizardController', [
     'dialog',
     'fb',
@@ -8,6 +8,24 @@ momentum.controller('ExperimentWizardController', [
     '$timeout',
     '$scope',
     function (dialog, fb, content, $q, $state, $timeout, $scope) {
+        function uploadFile (file) {
+            return $q(function (resolve, reject) {
+                var reader = new FileReader();
+
+                if (!file.type.match('image.*')) {
+                    return reject('You have to upload an image.');
+                }
+                reader.onload = function () {
+                    var arrayBuffer = this.result,
+                        array = new Uint8Array(arrayBuffer),
+                        binaryString = String.fromCharCode.apply(null, array);
+
+                    resolve(btoa(binaryString));
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
         $scope.preview = function () {
             if (!$scope.imageList.data.length ||
                 !$scope.textList.data.length) {
@@ -29,8 +47,33 @@ momentum.controller('ExperimentWizardController', [
 
         $scope.addImage = {
             'link': '',
+            'image': '',
+            'upload': function (files) {
+                if (!files.length) {
+                    return 0;
+                }
+                return uploadFile(files[0]).then(function (image) {
+                    var params = {
+                        'bytes': image
+                    };
+
+                    return fb.post(
+                        '/act_1136171943066150/adimages',
+                        params,
+                        $scope.user.fb_access_token
+                    ).then(function (res) {
+                        if (res && res.images && res.images.bytes) {
+                            $scope.imageList.data.push(res.images.bytes);
+                        }
+                    });
+                }).catch(function (err) {
+                    return dialog.open({
+                        'htmlText': err
+                    });
+                });
+            },
             'submit': function () {
-                $scope.imageList.data.push($scope.addImage.link);
+                $scope.imageList.data.push({'url': $scope.addImage.link});
                 $scope.addImage.link = '';
             },
             'max5': function () {
@@ -104,7 +147,7 @@ momentum.controller('ExperimentWizardController', [
                 $scope.content = c;
 
                 if (c.image) {
-                    $scope.imageList.data.push(c.image);
+                    $scope.imageList.data.push({'url': c.image});
                 }
 
                 textSet.headline = (c.title || c.url).substr(

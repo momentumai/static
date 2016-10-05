@@ -8,7 +8,7 @@
     <div ng-if="model.data.length"
         class="exp-create-img"
         ng-repeat="img in model.data track by $index">
-        <img ng-src="{{img}}"/>
+        <img ng-src="{{img.url}}"/>
         <div class="controls">
             <button
                 ng-click="model.remove($index)"
