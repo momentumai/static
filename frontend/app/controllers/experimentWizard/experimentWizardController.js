@@ -54,8 +54,9 @@ momentum.controller('ExperimentWizardController', [
                 }
                 return uploadFile(files[0]).then(function (image) {
                     var params = {
-                        'bytes': image
-                    };
+                            'bytes': image
+                        },
+                        hash = '';
 
                     return fb.post(
                         '/act_1136171943066150/adimages',
@@ -63,8 +64,20 @@ momentum.controller('ExperimentWizardController', [
                         $scope.user.fb_access_token
                     ).then(function (res) {
                         if (res && res.images && res.images.bytes) {
-                            $scope.imageList.data.push(res.images.bytes);
+                            hash = res.images.bytes.hash;
                         }
+                        return fb.get([
+                            '/act_1136171943066150/adimages',
+                            '?fields=permalink_url,hash'
+                        ].join(''),
+                            $scope.user.fb_access_token
+                        );
+                    }).then(function (res) {
+                        return res.data.map(function (act) {
+                            if (hash && act.hash === hash) {
+                                $scope.imageList.data.push(act.permalink_url);
+                            }
+                        });
                     });
                 }).catch(function (err) {
                     return dialog.open({
@@ -73,7 +86,7 @@ momentum.controller('ExperimentWizardController', [
                 });
             },
             'submit': function () {
-                $scope.imageList.data.push({'url': $scope.addImage.link});
+                $scope.imageList.data.push($scope.addImage.link);
                 $scope.addImage.link = '';
             },
             'max5': function () {
@@ -147,7 +160,7 @@ momentum.controller('ExperimentWizardController', [
                 $scope.content = c;
 
                 if (c.image) {
-                    $scope.imageList.data.push({'url': c.image});
+                    $scope.imageList.data.push(c.image);
                 }
 
                 textSet.headline = (c.title || c.url).substr(
